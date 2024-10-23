@@ -1,0 +1,59 @@
+/* UserProfile.css */
+
+/* Style for the container box */
+.profile-container {
+  background-color: #f9f9f9; /* Light grey background for the profile box */
+  border-radius: 12px; /* Slightly more rounded corners for a modern look */
+  padding: 24px; /* Increase padding for better spacing */
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1); /* Slightly deeper shadow for depth */
+  max-width: 600px; /* Limit the width of the profile box */
+  margin: 30px auto; /* Center the box horizontally with more vertical space */
+  border: 1px solid #ddd; /* Add a subtle border */
+}
+
+/* Style for the header */
+.profile-header {
+  color: #333; /* Dark grey color for the text */
+  font-family: 'Arial', sans-serif; /* Font for the header */
+  text-align: center; /* Center the header text */
+  margin-bottom: 25px; /* Space below the header */
+  font-weight: 600; /* Increase the weight of the header text */
+  font-size: 28px; /* Increase font size for the header */
+}
+
+/* Style for each piece of user detail */
+.profile-detail {
+  color: #555; /* Slightly lighter grey for the details */
+  font-family: 'Arial', sans-serif; /* Font for the details */
+  margin-bottom: 15px; /* Space below each detail */
+  display: flex; /* Use flexbox to align items */
+  align-items: center; /* Align icon and text vertically */
+}
+
+/* Style for the icons */
+.profile-icon {
+  color: #1976d2; /* Blue color for the icons */
+  margin-right: 12px; /* Increase space between the icon and text */
+  font-size: 28px; /* Slightly larger icon size */
+}
+
+/* Style for the labels in user details */
+.profile-label {
+  font-weight: bold; /* Make labels bold */
+  margin-right: 10px; /* Space between label and value */
+  font-size: 18px; /* Increase font size for labels */
+}
+
+/* Style for the values in user details */
+.profile-value {
+  color: #000; /* Black color for the detail values */
+  font-size: 17px; /* Consistent font size for values */
+}
+
+/* Style for hover effects (optional for interactive feel) */
+.profile-detail:hover {
+  background-color: #f0f4f7; /* Light background on hover */
+  border-radius: 8px; /* Soft rounding on hover */
+  padding: 10px; /* Add padding on hover for a button-like effect */
+  transition: background-color 0.2s ease-in-out; /* Smooth transition */
+}
