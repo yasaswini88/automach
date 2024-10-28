@@ -1,48 +1,40 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Card, CardContent, Typography, Alert } from '@mui/material';
+import { useSearchParams } from 'react-router-dom';
 
 const RequiredProductsStockAlerts = () => {
+    const [searchParams, setSearchParams] = useSearchParams();
     const [alerts, setAlerts] = useState([]);
 
     useEffect(() => {
         const fetchData = async () => {
             try {
-                // Fetch all products and inventory data
-                const productsResponse = await axios.get('http://localhost:8080/api/products');
-                const inventoryResponse = await axios.get('http://localhost:8080/api/inventory');
+                // Fetch product and raw material stock data
+                const productName = searchParams.get('productName'); // Replace this with dynamic product selection if necessary
+                const productResponse = await axios.get(`http://localhost:8080/api/products/name/${encodeURIComponent(productName)}`);
                 const rawMaterialStockResponse = await axios.get('http://localhost:8080/api/rawMaterialStock');
 
-                const products = productsResponse.data;
-                const inventory = inventoryResponse.data;
+                const product = productResponse.data;
                 const rawMaterialStock = rawMaterialStockResponse.data;
 
-                // Dictionary to hold total required quantities of raw materials across all products
+                // Dictionary to hold total required quantities of raw materials for this specific product
                 const requiredRawMaterials = {};
 
-                // Map inventory data to calculate total required raw materials
-                inventory.forEach(item => {
-                    const { productId, requiredQuantity } = item;
-                    
-                    // Only process products with required quantity greater than 0
-                    if (requiredQuantity > 0) {
-                        // Find the corresponding product by productId
-                        const product = products.find(p => p.prodId === productId);
-                        
-                        if (product) {
-                            product.rawMaterials.forEach(material => {
-                                const rawMaterialName = material.rawMaterial.materialName;
-                                const quantityNeededPerUnit = material.rawMaterialQuantity;
-                                const totalQuantityNeeded = requiredQuantity * quantityNeededPerUnit;
-                                
-                                // Accumulate the total required quantity for each raw material
-                                if (!requiredRawMaterials[rawMaterialName]) {
-                                    requiredRawMaterials[rawMaterialName] = 0;
-                                }
-                                requiredRawMaterials[rawMaterialName] += totalQuantityNeeded;
-                            });
-                        }
+                // Assuming the requiredQuantity is dynamic, you can hard-code it for now for testing
+                const requiredQuantity = searchParams.get('requiredQuantity'); // Example: 15 units of Wooden Dining Table
+
+                // Loop through the raw materials needed for the specific product
+                product.rawMaterials.forEach(material => {
+                    const rawMaterialName = material.rawMaterial.materialName;
+                    const quantityNeededPerUnit = material.rawMaterialQuantity; // How much of the material is needed per unit of product
+                    const totalQuantityNeeded = requiredQuantity * quantityNeededPerUnit; // Total material required for the total units
+
+                    // If material is not already in the dictionary, initialize it
+                    if (!requiredRawMaterials[rawMaterialName]) {
+                        requiredRawMaterials[rawMaterialName] = 0;
                     }
+                    requiredRawMaterials[rawMaterialName] += totalQuantityNeeded;
                 });
 
                 // Array to hold any stock alerts that need to be shown
@@ -70,13 +62,13 @@ const RequiredProductsStockAlerts = () => {
         };
 
         fetchData();
-    }, []);
+    }, [searchParams]);
 
     return (
         <Card sx={{ m: 3, p: 2 }}>
             <CardContent>
                 <Typography variant="h5" gutterBottom>
-                    Required Products Stock Alerts
+                    Required Products Stock Alerts for <strong>{searchParams.get('productName')}</strong>
                 </Typography>
                 {alerts.length > 0 ? (
                     alerts.map((alert, index) => (

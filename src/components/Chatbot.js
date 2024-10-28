@@ -106,53 +106,53 @@ const Chatbot = ({ userDetails }) => {
 
           const handleApiCall = async (url, queryContext = {}) => {
             try {
-                let response;
-        
-                switch (true) {
-                    // Case for most commonly used raw materials
-                    case url === 'http://localhost:8080/api/sales/top-raw-materials':
-                        response = await axios.get(url);
-                        console.log(response)
-                        // Extract raw material names from the response data
-                        const topMaterials = response.data.rawMaterials.map((material) => material.rawMaterial.materialName || 'Unknown').join(', ');
-                        return `Most commonly used raw materials: ${topMaterials}.`;
-        
-                    // Case for low stock alerts among commonly used raw materials
-                    case url === 'http://localhost:8080/api/sales/top-raw-materials/low-stock':
-                        // Step 1: Fetch the most commonly used raw materials
-                        const topRawMaterialsResponse = await axios.get('http://localhost:8080/api/sales/top-raw-materials');
-                        const topRawMaterials = topRawMaterialsResponse.data;
-        
-                        // Step 2: Fetch all raw material stocks
-                        const stockResponse = await axios.get('http://localhost:8080/api/rawMaterialStock');
-                        const allStocks = stockResponse.data;
-        
-                        // Step 3: Filter to get stocks of the top raw materials with low quantities
-                        const lowStockAlerts = topRawMaterials.reduce((acc, material) => {
-                            const stock = allStocks.find(stock => 
-                                stock.rawMaterial.materialName.toLowerCase() === material.rawMaterialName.toLowerCase()
-                            );
-        
-                            if (stock && stock.quantity < stock.minQuantity) {
-                                acc.push(`${material.rawMaterialName} has ${stock.quantity} units, below minimum of ${stock.minQuantity} units.`);
-                            }
-                            return acc;
-                        }, []);
-        
-                        // Format the response
-                        return lowStockAlerts.length 
-                            ? `Low stock alerts for commonly used raw materials: ${lowStockAlerts.join('; ')}.` 
-                            : 'No low stock alerts for the commonly used raw materials.';
-        
-                    default:
-                        return 'No valid API URL provided.';
-                }
+              let response;
+
+              switch (true) {
+                // Case for most commonly used raw materials
+                case url === 'http://localhost:8080/api/sales/top-raw-materials':
+                  response = await axios.get(url);
+                  console.log(response)
+                  // Extract raw material names from the response data
+                  const topMaterials = response.data.rawMaterials.map((material) => material.rawMaterial.materialName || 'Unknown').join(', ');
+                  return `Most commonly used raw materials: ${topMaterials}.`;
+
+                // Case for low stock alerts among commonly used raw materials
+                case url === 'http://localhost:8080/api/sales/top-raw-materials/low-stock':
+                  // Step 1: Fetch the most commonly used raw materials
+                  const topRawMaterialsResponse = await axios.get('http://localhost:8080/api/sales/top-raw-materials');
+                  const topRawMaterials = topRawMaterialsResponse.data;
+
+                  // Step 2: Fetch all raw material stocks
+                  const stockResponse = await axios.get('http://localhost:8080/api/rawMaterialStock');
+                  const allStocks = stockResponse.data;
+
+                  // Step 3: Filter to get stocks of the top raw materials with low quantities
+                  const lowStockAlerts = topRawMaterials.reduce((acc, material) => {
+                    const stock = allStocks.find(stock =>
+                      stock.rawMaterial.materialName.toLowerCase() === material.rawMaterialName.toLowerCase()
+                    );
+
+                    if (stock && stock.quantity < stock.minQuantity) {
+                      acc.push(`${material.rawMaterialName} has ${stock.quantity} units, below minimum of ${stock.minQuantity} units.`);
+                    }
+                    return acc;
+                  }, []);
+
+                  // Format the response
+                  return lowStockAlerts.length
+                    ? `Low stock alerts for commonly used raw materials: ${lowStockAlerts.join('; ')}.`
+                    : 'No low stock alerts for the commonly used raw materials.';
+
+                default:
+                  return 'No valid API URL provided.';
+              }
             } catch (error) {
-                console.error(`Error fetching data from ${url}:`, error);
-                return 'Sorry, there was an issue fetching the data. Please try again later.';
+              console.error(`Error fetching data from ${url}:`, error);
+              return 'Sorry, there was an issue fetching the data. Please try again later.';
             }
-        };
-        
+          };
+
 
         default:
           // If the URL doesn't match any of the cases, return an error message
@@ -247,14 +247,14 @@ const Chatbot = ({ userDetails }) => {
                 }}
               >
                 {/* User Icon */}
-                <Person4Icon sx={{ color: '#1976d2' }} /> {/* Adjust color for visibility */}
+                <Person4Icon sx={{ color: '#1976d2' }} /> 
 
                 <Box
                   sx={{
                     maxWidth: '75%',
                     padding: 1.5,
                     borderRadius: 3,
-                    backgroundColor: '#1565c0', // Blue background for user messages
+                    backgroundColor: '#4aedc4', // background for user messages
                     color: '#fff',
                     textAlign: 'right',
                   }}
@@ -263,6 +263,7 @@ const Chatbot = ({ userDetails }) => {
                     {chat.user}
                   </Typography>
                 </Box>
+
               </Box>
             )}
             {/* Bot Message */}

@@ -148,21 +148,8 @@ const Layout = ({ userDetails }) => {
           
 
           {/* Chatbot */}
-          <ListItem
-            button
-            component={Link}
-            to="/chatbot"
-            sx={{
-              '&:hover': {
-                backgroundColor: '#0f172a', // Darker blue on hover
-              },
-            }}
-          >
-            <ListItemIcon sx={{ color: '#a78bfa' /* Purple color for icon */ }}>
-              <SmartToyIcon />
-            </ListItemIcon>
-            <ListItemText primary="Chatbot" />
-          </ListItem>
+         
+            
         </List>
       </Drawer>
       <Box component="main" sx={{ flexGrow: 1, bgcolor: 'background.default', p: 3 }}>

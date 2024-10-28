@@ -22,8 +22,8 @@ const NewSignUp = () => {
 
     const positions = [
         { label: "Supervisor", value: "supervisor" },
-        { label: "Manager", value: "manager" },
-        { label: "Worker", value: "worker" },
+        { label: "Inventory manager", value: "Inventory manager" },
+        { label: "Quality Assurance Manager", value: "Quality Assurance Manager" },
     ];
 
     const [formData, setFormData] = useState({

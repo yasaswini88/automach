@@ -34,13 +34,31 @@ import ForgotPassword from './components/ForgotPassword';
 import VerifyCode from './components/VerifyCode';
 import ResetPassword from './components/ResetPassword';
 import { Navigate } from 'react-router-dom';
-
-
+import {   Fab } from '@mui/material';
+import ChatIcon from '@mui/icons-material/Chat';  // Import chat icon
+import FloatingChatButton from './components/FloatingChatButton';
+import DeliveredOrders from './components/DeliveredOrders';
+import RequiredProductsStockAlerts from './components/RequiredProductsStockAlerts';
 
 const App = () => {
   
   const authState = useSelector((state) => state.auth);
   const dispatch = useDispatch();
+
+  const [authChecked, setAuthChecked] = useState(false);
+  
+  // Loading the auth state
+  useEffect(() => {
+    const loadAuthState = async () => {
+      await dispatch(loadAuth());
+      setAuthChecked(true);
+    };
+  
+    loadAuthState();
+  }, [dispatch]);
+  
+
+
   const navigate = useNavigate();
   const location = useLocation();
   // Dialog state for notifications
@@ -84,6 +102,8 @@ const App = () => {
 
     fetchTopRawMaterials();
   }, []);
+
+  
 
   useEffect(() => {
     console.log("url changed");
@@ -144,6 +164,39 @@ const App = () => {
     setDrawerOpen(open);
   };
 
+    // State to control chatbot dialog open/close
+    const [chatOpen, setChatOpen] = useState(false);
+
+    const handleChatOpen = () => {
+      setChatOpen(true);
+    };
+  
+    const handleChatClose = () => {
+      setChatOpen(false);
+    };
+  
+    // Floating Action Button (Chatbot)
+    <Fab
+      color="primary"
+      aria-label="chat"
+      onClick={handleChatOpen}
+      sx={{ position: 'fixed', bottom: 16, right: 16 }}  // Position FAB at bottom-right
+    >
+      <ChatIcon />
+    </Fab>
+  
+    {/* Chatbot dialog */}
+    <Dialog open={chatOpen} onClose={handleChatClose}>
+      <DialogContent>
+        <Chatbot userDetails={authState.userDetails} />
+      </DialogContent>
+    </Dialog>
+  
+
+  // Loading indicator while waiting for auth check
+  if (!authChecked) {
+    return <div>Loading...</div>;
+  }
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
@@ -352,6 +405,7 @@ const App = () => {
             )}
           </Box>
         </Toolbar>
+
       </AppBar>
       <Routes>
         {/* Routes */}
@@ -363,8 +417,10 @@ const App = () => {
         <Route path="sales" element={authState.isLoggedIn ? <Sales userDetails={authState.userDetails} /> : <Navigate to="/login" />} />
         <Route path="inventory" element={authState.isLoggedIn ? <Inventory userDetails={authState.userDetails} /> : <Navigate to="/login" />} />
         <Route path="supplier" element={authState.isLoggedIn ? <Supplier /> : <Navigate to="/login" />} />
-        <Route path="chatbot" element={authState.isLoggedIn ? <Chatbot userDetails={authState.userDetails} /> : <Navigate to="/login" />} />
+        
+        <Route path="delivered-orders" element={authState.isLoggedIn ? <DeliveredOrders userDetails={authState.userDetails} /> : <Navigate to="/login" />} />
         <Route path="products" element={authState.isLoggedIn ? <Products /> : <Navigate to="/login" />} />
+        <Route path="/required-products-stock-alerts" element={<RequiredProductsStockAlerts />} />
 
         {/* Public routes */}
         <Route path="/login" element={<NewLogin />} />
@@ -383,9 +439,13 @@ const App = () => {
         <NotificationAlerts alerts={stockAlerts} />
       </CustomDialog>
 
+      {authState.isLoggedIn && (
+      <FloatingChatButton userDetails={authState.userDetails} />
+    )}
 
 
     </ThemeProvider>
+    
   );
 };
 

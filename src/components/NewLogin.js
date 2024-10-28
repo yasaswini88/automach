@@ -3,6 +3,11 @@ import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import Snackbar from '@mui/material/Snackbar';
 import Button from '@mui/material/Button';
+import IconButton from '@mui/material/IconButton';
+import InputAdornment from '@mui/material/InputAdornment';
+import TextField from '@mui/material/TextField';
+import Visibility from '@mui/icons-material/Visibility';
+import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import axios from 'axios';
 import { loginSuccess, loadAuth } from "../redux/reducers/authSlice";
 import "./Login.css";
@@ -11,6 +16,7 @@ const NewLogin = () => {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [keepMeSignedIn, setKeepMeSignedIn] = useState(false); // Added state for "Keep Me Signed In"
+    const [showPassword, setShowPassword] = useState(false); // State to toggle password visibility
     const [open, setOpen] = useState(false);
     const [message, setMessage] = useState("");
 
@@ -36,6 +42,10 @@ const NewLogin = () => {
 
     const handleCheckboxChange = (e) => {
         setKeepMeSignedIn(e.target.checked);
+    };
+
+    const handleClickShowPassword = () => {
+        setShowPassword((prev) => !prev);
     };
 
     const handleSubmit = async (event) => {
@@ -88,20 +98,37 @@ const NewLogin = () => {
             <form onSubmit={handleSubmit}>
                 <div className="form-group">
                     <label>Username:</label>
-                    <input
+                    <TextField
+                        fullWidth
                         type="text"
                         name="username"
                         value={username}
                         onChange={handleChange}
+                        variant="outlined"
                     />
                 </div>
                 <div className="form-group">
                     <label>Password:</label>
-                    <input
-                        type="password"
+                    <TextField
+                        fullWidth
+                        type={showPassword ? "text" : "password"}
                         name="password"
                         value={password}
                         onChange={handleChange}
+                        variant="outlined"
+                        InputProps={{
+                            endAdornment: (
+                                <InputAdornment position="end">
+                                    <IconButton
+                                        aria-label="toggle password visibility"
+                                        onClick={handleClickShowPassword}
+                                        edge="end"
+                                    >
+                                        {showPassword ? <VisibilityOff /> : <Visibility />}
+                                    </IconButton>
+                                </InputAdornment>
+                            ),
+                        }}
                     />
                 </div>
                 <div className="form-group">

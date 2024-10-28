@@ -15,6 +15,8 @@ import Container from '@mui/material/Container';
 import ListItem from '@mui/material/ListItem';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
+import { Snackbar, Alert } from '@mui/material';
+
 
 const getTagColor = (tag) => {
   const key = tag.name?.toLowerCase();
@@ -75,6 +77,12 @@ const Products = () => {
 
     setSortedProducts(sorted);
   };
+
+  const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
+
+  const handleSnackbarClose = () => {
+    setSnackbar({ ...snackbar, open: false });
+};
 
 
   useEffect(() => {
@@ -218,19 +226,25 @@ const Products = () => {
       }
     });
 
+    const validTags = newProduct.tags.filter(tag => tag && tag.id != null);
+
     const payload = {
       product: {
         prodName: newProduct.prodName,
         category: newProduct.category,
         price: newProduct.price, // Include price in payload
-        tags: newProduct.tags.map(tag => ({ id: tag.id }))
+        // tags: newProduct.tags.map(tag => ({ id: tag.id }))
+        tags: validTags.map(tag => ({ id: tag.id }))
       },
       rawMaterialQuantities: rawMaterialQuantities
     };
 
+    console.log('Payload being sent:', payload);
+
     axios.post('http://localhost:8080/api/products', payload)
       .then(response => {
         setProducts([...products, response.data]);
+        setSnackbar({ open: true, message: 'Product created successfully!', severity: 'success' });
         handleClose();
       })
       .catch(error => {
@@ -491,7 +505,7 @@ const Products = () => {
           {selectedProduct && (
             <>
               <Typography variant="h6" component="h4" mt={4} gutterBottom>
-                Raw Materials for Selected Product
+              Raw Materials for {products.find(product => product.prodId === selectedProduct)?.prodName || 'Selected Product'}
               </Typography>
               <TableContainer component={Paper} sx={{ mt: 3, border: '1px solid #ccc' }}>
                 <Table>
@@ -518,6 +532,17 @@ const Products = () => {
 
 
         </Container>
+        <Snackbar
+    open={snackbar.open}
+    autoHideDuration={6000}
+    onClose={handleSnackbarClose}
+    anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+>
+    <Alert onClose={handleSnackbarClose} severity={snackbar.severity} sx={{ width: '100%' }}>
+        {snackbar.message}
+    </Alert>
+</Snackbar>
+
       </Box>
     </Box>
   );

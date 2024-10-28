@@ -12,6 +12,8 @@ import AddIcon from '@mui/icons-material/Add';
 import { formatDate } from '../utils/utilities';
 import ExpandMore from '@mui/icons-material/ExpandMore';
 import { TableSortLabel } from '@mui/material';
+import { Snackbar, Alert } from '@mui/material';
+
 
 
 
@@ -22,6 +24,10 @@ const Sales = ({ userDetails }) => {
   const [orderStatus, setOrderStatus] = useState('');
 
   const [expandedRow, setExpandedRow] = useState(null);
+
+  //snackbar
+  const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
+
 
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
@@ -61,6 +67,14 @@ const Sales = ({ userDetails }) => {
     createdUserId: userDetails.userId,
     orderDeliveryDate: "",
   });
+
+  //snack bar 
+
+  const handleSnackbarClose = () => {
+    setSnackbar({ ...snackbar, open: false });
+};
+
+
 
   // Fetch sales data
   useEffect(() => {
@@ -169,10 +183,13 @@ const Sales = ({ userDetails }) => {
     axios.delete(`http://localhost:8080/api/sales/${saleToDelete}`)
       .then(() => {
         setSales(sales.filter(sale => sale.saleId !== saleToDelete)); // Update sales list
+        setSnackbar({ open: true, message: 'Order deleted successfully!', severity: 'success' });
         setOpenDeleteDialog(false);  // Close the dialog
         setSaleToDelete(null);  // Reset saleToDelete
       })
-      .catch(error => console.error('Error deleting sale:', error));
+      .catch(error => {
+            setSnackbar({ open: true, message: 'Error deleting order.', severity: 'error' });
+        });
   };
 
   // Handle dialog open for editing
@@ -191,22 +208,69 @@ const Sales = ({ userDetails }) => {
     setOpenEdit(true);
   };
 
-  // Handle save (PUT request)
-  const handleSave = () => {
-    const updatedSale = {
-      ...formData,
-      updatedUserId: userDetails.userId,
-      updatedDate: new Date().toISOString(),
-      quantities: Array.isArray(formData.quantities) ? formData.quantities : formData.quantities.split(',').map(Number), // Ensure quantities is an array before saving
-    };
+  
 
-    axios.put(`http://localhost:8080/api/sales/${editSale.saleId}`, updatedSale)
-      .then(response => {
-        setSales(sales.map(sale => (sale.saleId === editSale.saleId ? response.data : sale)));
-        setOpenEdit(false);
-      })
-      .catch(error => console.error('Error updating sale:', error));
+  // Handle save (PUT request)
+// const handleSave = () => {
+//   const updatedSale = {
+//     ...formData,
+//     updatedUserId: userDetails.userId,
+//     updatedDate: new Date().toISOString(),
+//     quantities: Array.isArray(formData.quantities) ? formData.quantities : formData.quantities.split(',').map(Number), // Ensure quantities is an array before saving
+//   };
+
+//   axios.put(`http://localhost:8080/api/sales/${editSale.saleId}`, updatedSale)
+//     .then(response => {
+//       setSales(sales.map(sale => (sale.saleId === editSale.saleId ? response.data : sale)));
+//       setOpenEdit(false);
+//     })
+//     .catch(error => console.error("Error updating sale:", error));
+// };
+
+// Handle save (PUT request)
+// Handle save (PUT request)
+const handleSave = () => {
+
+  // Extract the old quantities and product IDs from the sale being edited
+  const oldQuantities = editSale.quantities || [];
+  const productIds = editSale.products.map(product => product.prodId);
+  console.log(oldQuantities)
+  console.log(productIds )
+
+  // Check if `orderDecision` is changing from "Quoted" to "Confirmed"
+  const orderDecisionChangedToConfirmed = editSale.orderDecision.toLowerCase() === 'quoted' && formData.orderDecision.toLowerCase() === 'confirmed';
+console.log(orderDecisionChangedToConfirmed)
+  const updatedSale = {
+    ...formData,
+    updatedUserId: userDetails.userId,
+    updatedDate: new Date().toISOString(),
+    
+    quantities: Array.isArray(formData.quantities) ? formData.quantities : formData.quantities.split(',').map(Number), // Ensure quantities is an array before saving
+    oldQuantities: oldQuantities, // Add old quantities here
+    // productIds: productIds // Add product IDs here if needed
+    orderDecisionChangedToConfirmed: orderDecisionChangedToConfirmed // Flag to indicate change
+  
+
   };
+
+  axios.put(`http://localhost:8080/api/sales/${editSale.saleId}`, updatedSale)
+    .then(response => {
+      setSales(sales.map(sale => (sale.saleId === editSale.saleId ? response.data : sale)));
+      // Refresh inventory to reflect updated blocked/required quantities
+      axios.get('http://localhost:8080/api/inventory/')
+        .then(inventoryResponse => {
+          setInventory(inventoryResponse.data);
+          setSnackbar({ open: true, message: 'Order updated successfully!', severity: 'success' });
+        });
+      setOpenEdit(false);
+    })
+    .catch(error => {
+      setSnackbar({ open: true, message: 'Error updating order.', severity: 'error' });
+  });
+};
+
+
+
 
   // Handle form input changes for editing
   const handleChange = (e) => {
@@ -303,14 +367,21 @@ const Sales = ({ userDetails }) => {
     };
 
     axios.post("http://localhost:8080/api/sales", saleData)
-      .then(() => {
-        setSales([...sales, saleData]);
-        handleCloseAdd(); // Close the add dialog
-      })
-      .catch((error) => {
-        console.error("Error adding new order:", error);
-      });
-  };
+    .then(() => {
+        axios.get('http://localhost:8080/api/sales')
+            .then(response => {
+                setSales(response.data);  
+                setSnackbar({ open: true, message: 'Order added successfully!', severity: 'success' });
+                handleCloseAdd();
+            })
+            .catch(error => {
+                setSnackbar({ open: true, message: 'Error fetching updated sales.', severity: 'error' });
+            });
+    })
+    .catch((error) => {
+        setSnackbar({ open: true, message: 'Error adding new order.', severity: 'error' });
+    });
+};
 
   // Handle status updates for delivered orders
   const handleStatusUpdate = (saleId, newStatus) => {
@@ -324,6 +395,11 @@ const Sales = ({ userDetails }) => {
   };
 
 
+// Styling adjustments for light and dark modes
+const tableRowStyles = {
+  backgroundColor: theme.palette.mode === 'dark' ? '#424242' : '#f0f0f0',
+  borderBottom: `1px solid ${theme.palette.divider}`,
+};
 
   const handleExpandClick = (saleId) => {
     setExpandedRow(expandedRow === saleId ? null : saleId);
@@ -480,8 +556,8 @@ const Sales = ({ userDetails }) => {
               onChange={(e) => setNewSale({ ...newSale, orderStatus: e.target.value })}
             >
               <MenuItem value="Pending">Pending</MenuItem>
-              <MenuItem value="Shipped">Shipped</MenuItem>
-              <MenuItem value="Delivered">Delivered</MenuItem>
+              {/* {/* <MenuItem value="Shipped">Shipped</MenuItem> */}
+              <MenuItem value="Delivered">Delivered</MenuItem> 
             </Select>
           </FormControl>
 
@@ -511,10 +587,10 @@ const Sales = ({ userDetails }) => {
 
 
 
-      <TableContainer>
+      <TableContainer >
         <Table sx={{ border: '1px solid grey', mt: 3, ml: 3 }}>
-          <TableHead>
-            <TableRow>
+          <TableHead sx={{ border: '1px solid grey', mt: 3, ml: 3 }}>
+            <TableRow style={tableRowStyles}>
               <TableCell>
                 <TableSortLabel
                   active={sortColumn === 'customerName'}
@@ -592,7 +668,7 @@ const Sales = ({ userDetails }) => {
                   <TableCell>{formatDate(sale.orderDeliveryDate)}</TableCell>
                   <TableCell>{sale.createdBy.firstName}</TableCell>
                   <TableCell>{sale.updatedBy?.firstName || '-'}</TableCell>
-                  <TableCell>{formatDate(sale.updatedDate)}</TableCell>
+                  <TableCell>{sale.updatedDate ? formatDate(sale.updatedDate) : formatDate(sale.orderCreatedDate)}</TableCell>
                   <TableCell>
                     {/* Button Alignment */}
                     <Box display="flex" flexDirection="row" gap={1}>
@@ -794,8 +870,23 @@ const Sales = ({ userDetails }) => {
           </Button>
         </DialogActions>
       </Dialog>
+      <Snackbar
+    open={snackbar.open}
+    autoHideDuration={6000}
+    onClose={handleSnackbarClose}
+>
+    <Alert onClose={handleSnackbarClose} severity={snackbar.severity} sx={{ width: '100%' }}>
+        {snackbar.message}
+    </Alert>
+</Snackbar>
     </Paper>
+    
   );
+  
+
+
+  
+
 };
 
 export default Sales;

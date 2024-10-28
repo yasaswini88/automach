@@ -169,7 +169,7 @@ const [deliveryStatusData, setDeliveryStatusData] = useState({
             {
                 name: 'Current Quantity',
                 data: [],
-                color: '#00BFFF'  // Light blue for Current Quantity
+                color: '#90caf9'  // Light blue for Current Quantity
             },
             {
                 name: 'Min Quantity',
@@ -179,7 +179,7 @@ const [deliveryStatusData, setDeliveryStatusData] = useState({
         ],
         options: {
             chart: {
-                type: 'bar',  // Change to Bar chart
+                type: 'bar',  // Ensuring the chart is a bar chart
                 zoom: {
                     enabled: true,
                     type: 'x',  // Horizontal zoom
@@ -194,16 +194,21 @@ const [deliveryStatusData, setDeliveryStatusData] = useState({
                     }
                 }
             },
-            
-            
+            plotOptions: {
+                bar: {
+                    horizontal: false,
+                    columnWidth: '50%',  // Set width for better visibility
+                    endingShape: 'rounded'  // Rounded bars for smooth styling
+                }
+            },
             xaxis: {
-                categories: [],
+                categories: [],  // Will be populated dynamically
                 tickPlacement: 'on',
                 title: {
                     text: 'Raw Materials'
                 },
                 labels: {
-                    rotate: -45, // Rotate labels for readability
+                    rotate: -45,  // For better readability
                     style: {
                         fontSize: '12px',
                     }
@@ -212,29 +217,35 @@ const [deliveryStatusData, setDeliveryStatusData] = useState({
                     enabled: true,  // Enable scrollbar for horizontal scrolling
                     height: 8,
                     borderRadius: 10,
-                    offsetX: 0,
-                    offsetY: 0,
                     barBackgroundColor: '#e7e7e7',
-                    barHeight: '80%',
                     barBorderRadius: 10,
                     barBorderColor: '#CCCCCC',
-                    position: 'bottom',
                 }
             },
-            
-            legend: {
-                show: true
+            yaxis: {
+                title: {
+                    text: 'Quantity'
+                },
             },
+            colors: ['#00BFFF', '#FF4560'],  // Colors for current and min quantities
             tooltip: {
                 shared: false,
                 intersect: true,
                 y: {
                     formatter: function (value, { dataPointIndex }) {
-                        // Compare current value with the minQuantity for each point
                         const minQuantity = rawMaterialData.series[1].data[dataPointIndex];
-                        return value < minQuantity ? `${value} (Low)` : `${value}`;
+                        return value < minQuantity ? `${value} (Low)` : `${value} units`;
                     }
                 }
+            },
+            legend: {
+                show: true,
+                position: 'top',  // Place legend at the top like the example
+                horizontalAlign: 'center',
+            },
+            grid: {
+                show: true,  // Show grid lines for better readability
+                borderColor: '#e7e7e7',
             }
         }
     });
@@ -325,7 +336,8 @@ const [deliveryStatusData, setDeliveryStatusData] = useState({
                 const minQuantities = filteredStocks.map(stock => stock.minQuantity);
         
                 // Step 5: Set chart data
-                setRawMaterialData({
+                setRawMaterialData(prevData => ({
+                    ...prevData,
                     series: [
                         {
                             name: 'Current Quantity',
@@ -337,71 +349,18 @@ const [deliveryStatusData, setDeliveryStatusData] = useState({
                         }
                     ],
                     options: {
-                        ...rawMaterialData.options,
-                        chart: {
-                            type: 'line',
-                            zoom: {
-                                enabled: true,
-                                type: 'x', // Enable horizontal zoom
-                            },
-                            toolbar: {
-                                autoSelected: 'zoom',
-                                tools: {
-                                    zoom: true,
-                                    zoomin: true,
-                                    zoomout: true,
-                                    reset: true,
-                                },
-                            }
-                        },
+                        ...prevData.options,
                         xaxis: {
-                            categories: materialNames,
-                            tickPlacement: 'on',
-                            title: {
-                                text: 'Raw Material Names',
-                            },
-                            labels: {
-                                rotate: -45, // Rotate labels for better visibility if there are many items
-                                style: {
-                                    fontSize: '12px',
-                                }
-                            },
-                            scrollbar: {
-                                enabled: true, // Enable horizontal scroll
-                            }
-                        },
-                        yaxis: {
-                            title: {
-                                text: 'Quantity',
-                            },
-                        },
-                        colors: ['#00BFFF', '#FF4560'], // Colors for current and min quantities
-                        stroke: {
-                            width: [2, 2],
-                        },
-                        tooltip: {
-                            shared: true,
-                            intersect: false,
-                            y: {
-                                formatter: function (val) {
-                                    return `${val} units`;
-                                }
-                            }
-                        },
-                        legend: {
-                            position: 'top',
-                            horizontalAlign: 'center',
-                        },
-                        grid: {
-                            show: true,
-                            borderColor: '#e7e7e7',
+                            ...prevData.options.xaxis,
+                            categories: materialNames,  // Set categories dynamically
                         }
                     }
-                });
+                }));
             } catch (error) {
                 console.error("Error fetching raw material data:", error);
             }
         };
+    
         
 
         fetchOrderStatus();
@@ -437,10 +396,10 @@ const [deliveryStatusData, setDeliveryStatusData] = useState({
                             border: '2px solid #D3D3D3',
                             transition: 'transform 0.3s, box-shadow 0.3s',
                             background: '#e1f5fe',
-                            '&:hover': {
-                                transform: 'scale(1.05)',
-                                boxShadow: '0 6px 20px rgba(0,0,0,0.2)',
-                            }
+                            // '&:hover': {
+                            //     transform: 'scale(1.05)',
+                            //     boxShadow: '0 6px 20px rgba(0,0,0,0.2)',
+                            // }
                         }}>
                         <CardContent>
                             <Typography variant="h6"><b>Raw Material Stock</b></Typography>
@@ -456,10 +415,10 @@ const [deliveryStatusData, setDeliveryStatusData] = useState({
                             border: '2px solid #D3D3D3',
                             transition: 'transform 0.3s, box-shadow 0.3s',
                             background: '#e1f5fe',
-                            '&:hover': {
-                                transform: 'scale(1.05)',
-                                boxShadow: '0 6px 20px rgba(0,0,0,0.2)'
-                            }
+                            // '&:hover': {
+                            //     transform: 'scale(1.05)',
+                            //     boxShadow: '0 6px 20px rgba(0,0,0,0.2)'
+                            // }
                         }}
                     >
                         <CardContent>
@@ -477,10 +436,10 @@ const [deliveryStatusData, setDeliveryStatusData] = useState({
                             border: '2px solid #D3D3D3',
                             transition: 'transform 0.3s, box-shadow 0.3s',
                             background: '#e1f5fe',
-                            '&:hover': {
-                                transform: 'scale(1.05)',
-                                boxShadow: '0 6px 20px rgba(0,0,0,0.2)'
-                            }
+                            // '&:hover': {
+                            //     transform: 'scale(1.05)',
+                            //     boxShadow: '0 6px 20px rgba(0,0,0,0.2)'
+                            // }
                         }}
                     >
                         <CardContent>
@@ -499,10 +458,10 @@ const [deliveryStatusData, setDeliveryStatusData] = useState({
                             height: 380, // Fixed height for the card
                             background: '#e1f5fe',
                             transition: 'transform 0.3s, box-shadow 0.3s',
-                            '&:hover': {
-                                transform: 'scale(1.02)',
-                                boxShadow: '0 6px 20px rgba(0,0,0,0.2)'
-                            }
+                            // '&:hover': {
+                            //     transform: 'scale(1.02)',
+                            //     boxShadow: '0 6px 20px rgba(0,0,0,0.2)'
+                            // }
                         }}
                     >
                         <CardContent sx={{ padding: '16px' }}>
@@ -557,10 +516,10 @@ const [deliveryStatusData, setDeliveryStatusData] = useState({
                             height: 380,
                             background: '#e1f5fe',
                             transition: 'transform 0.3s, box-shadow 0.3s',
-                            '&:hover': {
-                                transform: 'scale(1.02)',
-                                boxShadow: '0 6px 20px rgba(0,0,0,0.2)'
-                            }
+                            // '&:hover': {
+                            //     transform: 'scale(1.02)',
+                            //     boxShadow: '0 6px 20px rgba(0,0,0,0.2)'
+                            // }
                         }}
                     >
                         <CardContent sx={{ padding: '16px' }}>

@@ -12,12 +12,12 @@ const NotificationAlerts = () => {
                 // Step 1: Fetch the most commonly used raw materials
                 const topRawMaterialsResponse = await axios.get('http://localhost:8080/api/sales/top-raw-materials');
                 const topRawMaterials = topRawMaterialsResponse.data;
-                console.log('Top Raw Materials:', topRawMaterials);
+                // console.log('Top Raw Materials:', topRawMaterials);
 
                 // Step 2: Fetch all raw material stocks
                 const stockResponse = await axios.get('http://localhost:8080/api/rawMaterialStock');
                 const allStocks = stockResponse.data;
-                console.log('All Raw Material Stocks:', allStocks);
+                // console.log('All Raw Material Stocks:', allStocks);
 
                 // Step 3: Filter to get stocks of the top raw materials
                 const alerts = topRawMaterials.reduce((acc, material) => {

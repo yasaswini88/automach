@@ -19,6 +19,8 @@ import {
   TableSortLabel
 } from '@mui/material';
 import SwapVertIcon from '@mui/icons-material/SwapVert';
+import { Snackbar} from '@mui/material';
+
 
 const Stocks = ({ userDetails }) => {
   const [stocks, setStocks] = useState([]);
@@ -32,6 +34,7 @@ const Stocks = ({ userDetails }) => {
   const [searchValue, setSearchValue] = useState(null);
   const [sortColumn, setSortColumn] = useState('');
   const [sortDirection, setSortDirection] = useState('asc');
+  const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
 
   useEffect(() => {
     axios.get('http://localhost:8080/api/rawMaterialStock')
@@ -87,6 +90,10 @@ const Stocks = ({ userDetails }) => {
       });
   }, []);
   
+//snack bar 
+const handleSnackbarClose = () => {
+  setSnackbar({ ...snackbar, open: false });
+};
 
   // Handle when a user clicks one of the alert buttons
   const handleAlertClick = (alertType) => {
@@ -116,6 +123,9 @@ const Stocks = ({ userDetails }) => {
         const updatedStocks = [...stocks];
         updatedStocks[actualIndex] = response.data;
         setStocks(updatedStocks);
+
+        // Set success message in Snackbar
+        setSnackbar({ open: true, message: 'Stock updated successfully!', severity: 'success' });
 
         // Update the alerts after modification
         const categorizedAlerts = {
@@ -148,6 +158,8 @@ const Stocks = ({ userDetails }) => {
         setAlerts(categorizedAlerts);
       })
       .catch(error => {
+        // Set error message in Snackbar
+        setSnackbar({ open: true, message: 'Error updating stock.', severity: 'error' });
         console.error('Error updating stock:', error.response ? error.response.data : error.message);
       });
   };
@@ -260,6 +272,18 @@ const Stocks = ({ userDetails }) => {
             />
           </Box>
         )}
+  {/* Snackbar for update notifications */}
+  <Snackbar
+        open={snackbar.open}
+        autoHideDuration={6000}
+        onClose={handleSnackbarClose}
+        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+      >
+        <Alert onClose={handleSnackbarClose} severity={snackbar.severity} sx={{ width: '100%' }}>
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
+
 
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
           {/* Search by Raw Material Name */}

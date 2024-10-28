@@ -558,3 +558,152 @@ const Sales = ({ userDetails }) => {
 };
 
 export default Sales;
+
+
+
+
+
+
+
+
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import { 
+  Table, TableBody, TableCell, TableContainer, TableHead, TableRow, 
+  Paper, Button, IconButton, Dialog, DialogActions, DialogContent, DialogTitle, 
+  TablePagination, Autocomplete, Chip, useTheme, Typography, Box, Grid 
+} from '@mui/material';
+import { Edit, Delete, ExpandMore } from '@mui/icons-material';
+import { Snackbar, Alert } from '@mui/material';
+
+const Supplier = () => {
+  const theme = useTheme();
+  const [suppliers, setSuppliers] = useState([]);
+  const [open, setOpen] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState(false);
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [expandedDetails, setExpandedDetails] = useState({});
+  const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
+  
+  useEffect(() => {
+    fetchSuppliers();
+  }, []);
+
+  const fetchSuppliers = async () => {
+    try {
+      const response = await axios.get('http://localhost:8080/api/suppliers');
+      setSuppliers(response.data);
+    } catch (error) {
+      console.error('Error fetching suppliers:', error);
+    }
+  };
+
+  const handleSnackbarClose = () => {
+    setSnackbar({ ...snackbar, open: false });
+  };
+
+  const toggleDetails = (supplierId) => {
+    setExpandedDetails((prevState) => ({
+      ...prevState,
+      [supplierId]: !prevState[supplierId], // Toggle the visibility for the selected supplier
+    }));
+  };
+
+  return (
+    <Paper style={{ padding: '16px', backgroundColor: theme.palette.background.paper, color: theme.palette.text.primary }}>
+      <Button variant="contained" color="primary" onClick={() => setOpen(true)} style={{ marginBottom: '16px' }}>
+        Add New Supplier
+      </Button>
+
+      <TableContainer component={Paper}>
+        <Table>
+          <TableHead>
+            <TableRow>
+              <TableCell>Name</TableCell>
+              <TableCell>Email</TableCell>
+              <TableCell>Phone</TableCell>
+              <TableCell>Address</TableCell>
+              <TableCell>Actions</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {suppliers.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((supplier) => (
+              <TableRow key={supplier.id}>
+                <TableCell>{supplier.name}</TableCell>
+                <TableCell>{supplier.email}</TableCell>
+                <TableCell>{supplier.phone}</TableCell>
+                <TableCell>{`${supplier.addressLine1}, ${supplier.city}, ${supplier.state}, ${supplier.postalCode}`}</TableCell>
+                <TableCell>
+                  <Button variant="outlined" color="primary" onClick={() => setOpen(true)} startIcon={<Edit />}>
+                    Edit
+                  </Button>
+                  <Button variant="outlined" color="error" onClick={() => setConfirmDelete(true)} startIcon={<Delete />}>
+                    Delete
+                  </Button>
+                  <Button variant="outlined" color="secondary" onClick={() => toggleDetails(supplier.id)} startIcon={<ExpandMore />}>
+                    View Details
+                  </Button>
+                </TableCell>
+              </TableRow>
+            ))}
+
+            {/* Expanded Raw Materials Details */}
+            {suppliers.map((supplier) => (
+              expandedDetails[supplier.id] && (
+                <TableRow key={`details-${supplier.id}`}>
+                  <TableCell colSpan={5}>
+                    <Paper
+                      elevation={3}
+                      sx={{
+                        mt: 2,
+                        p: 1.5,
+                        backgroundColor: theme.palette.mode === 'light' ? '#f9f9f9' : theme.palette.background.paper,
+                        borderRadius: '8px',
+                        border: '1px solid #ccc',
+                        maxWidth: '400px',
+                        margin: '0 auto'
+                      }}
+                    >
+                      <Typography variant="h6">Raw Materials Supplied:</Typography>
+                      <Grid container spacing={1}>
+                        {supplier.rawMaterials.map((material) => (
+                          <Grid item xs={12} key={material.id}>
+                            <Chip label={material.materialName} variant="outlined" color="primary" />
+                          </Grid>
+                        ))}
+                      </Grid>
+                    </Paper>
+                  </TableCell>
+                </TableRow>
+              )
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
+
+      <TablePagination
+        component="div"
+        count={suppliers.length}
+        page={page}
+        onPageChange={(event, newPage) => setPage(newPage)}
+        rowsPerPage={rowsPerPage}
+        onRowsPerPageChange={(event) => setRowsPerPage(parseInt(event.target.value, 10))}
+      />
+
+      {/* Snackbar for notifications */}
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={6000}
+        onClose={handleSnackbarClose}
+        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+      >
+        <Alert onClose={handleSnackbarClose} severity={snackbar.severity} sx={{ width: '100%' }}>
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
+    </Paper>
+  );
+};
+
+export default Supplier;

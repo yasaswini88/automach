@@ -16,14 +16,12 @@ import axios from 'axios';
 import { formatDate } from '../utils/utilities';
 import { useTheme } from '@mui/material/styles';
 import { useNavigate } from 'react-router-dom';
-import { Snackbar, Alert } from '@mui/material';
-
 
 const Orders = ({ userDetails }) => {
 
   const theme = useTheme();
 
-  const navigate = useNavigate();
+  const navigate = useNavigate();  
 
 
   const [orders, setOrders] = useState([]);
@@ -62,13 +60,6 @@ const Orders = ({ userDetails }) => {
     updatedDate: '' // New field
   });
 
-
-  const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
-  const handleSnackbarClose = () => {
-    setSnackbar({ ...snackbar, open: false });
-};
-
-
   const dispatch = useDispatch();
   const rawMaterials = useSelector((state) => state.rawMaterials.rawMaterials);
 
@@ -104,11 +95,8 @@ const Orders = ({ userDetails }) => {
   const fetchOrders = async () => {
     try {
       const response = await axios.get('http://localhost:8080/api/orders');
-      const nonDeliveredOrders = response.data.filter(order => order.status !== 'Delivered');
-      setOrders(nonDeliveredOrders);
-      setFilteredOrders(nonDeliveredOrders); // Set filtered orders to non-delivered orders initially
-
-      // Set filtered orders to fetched orders initially
+      setOrders(response.data);
+      setFilteredOrders(response.data); // Set filtered orders to fetched orders initially
     } catch (error) {
       console.error('Error fetching orders:', error);
     }
@@ -155,12 +143,6 @@ const Orders = ({ userDetails }) => {
         // Sorting by numbers (rawMaterialQuantity)
         return isAsc ? a[column] - b[column] : b[column] - a[column];
       }
-      else if (column === 'createdDate') {
-        // Sorting by date (createdDate)
-        const dateA = new Date(a[column]);
-        const dateB = new Date(b[column]);
-        return newDirection === 'asc' ? dateA - dateB : dateB - dateA;
-      }
       return 0; // If no valid column is provided
     });
 
@@ -184,7 +166,7 @@ const Orders = ({ userDetails }) => {
   const handleAddOrder = async () => {
     try {
       if (!newOrder.rawMaterialId) {
-        setSnackbar({ open: true, message: 'Please select a raw material.', severity: 'warning' });
+        alert('Please select a raw material.');
         return;
       }
 
@@ -211,26 +193,22 @@ const Orders = ({ userDetails }) => {
 
       if (editMode) {
         setOrders(orders.map((order) => (order.orderId === response.data.orderId ? response.data : order)));
-        setSnackbar({ open: true, message: 'Order updated successfully!', severity: 'success' });
       } else {
         setOrders([...orders, response.data]);
-        setSnackbar({ open: true, message: 'Order added successfully!', severity: 'success' });
       }
 
-      // filterOrders(statusFilter, materialFilter);
-      fetchOrders(); // Refetch orders to exclude delivered ones
-
+      filterOrders(statusFilter, materialFilter);
       handleClose();
 
       // Notify user that stock was updated if the status is 'Delivered'
       if (newOrder.status === 'Delivered') {
-        setSnackbar({ open: true, message: 'Order delivered and stock updated successfully.', severity: 'info' });
+        alert('Order delivered and stock updated successfully.');
       }
 
     } catch (error) {
-      setSnackbar({ open: true, message: `Failed to ${editMode ? 'update' : 'add'} order. Please try again.`, severity: 'error' });
       console.error(`Error ${editMode ? 'updating' : 'adding'} order:`, error);
-  }
+      alert(`Failed to ${editMode ? 'update' : 'add'} order. Please try again.`);
+    }
   };
 
   const handleEditOrder = (order) => {
@@ -257,19 +235,17 @@ const Orders = ({ userDetails }) => {
     setDeleteDialogOpen(true); // Open the confirmation dialog
   };
 
- 
-const confirmDeleteOrder = async () => {
-  try {
+  const confirmDeleteOrder = async () => {
+    try {
       await axios.delete(`http://localhost:8080/api/orders/${orderToDelete}`);
       setOrders(orders.filter((order) => order.orderId !== orderToDelete));
       filterOrders(statusFilter, materialFilter); // Filter orders after deletion
-      setSnackbar({ open: true, message: 'Order deleted successfully!', severity: 'success' });
       setDeleteDialogOpen(false); // Close the confirmation dialog
-  } catch (error) {
-      setSnackbar({ open: true, message: 'Failed to delete order. Please try again.', severity: 'error' });
+    } catch (error) {
       console.error('Error deleting order:', error);
-  }
-};
+      alert('Failed to delete order. Please try again.');
+    }
+  };
 
   const filterOrders = (status, material) => {
     let filtered = orders;
@@ -333,53 +309,49 @@ const confirmDeleteOrder = async () => {
       </Typography>
 
       {/* Filter Inputs */}
-      <Box display="flex" gap={2} mb={3} alignItems="center" justifyContent="space-between">
-        {/* Left Side: Select and Autocomplete */}
-        <Box display="flex" gap={2}>
-          <Select
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
-            displayEmpty
-            variant="outlined"
-            sx={{
-              color: theme.palette.text.primary, // Adjust text color for dark mode
-              backgroundColor: theme.palette.background.paper,
-              width: '240px', // Set custom width
-              height: '50px' // Set custom height
-            }}
-          >
-            <MenuItem value="">All Statuses</MenuItem>
-            <MenuItem value="Pending">Pending</MenuItem>
-            <MenuItem value="Shipped">Shipped</MenuItem>
-          </Select>
-
-          <Autocomplete
-            options={rawMaterials}
-            getOptionLabel={(option) => option.materialName}
-            value={rawMaterials.find(material => material.id === newOrder.rawMaterialId) || null}
-            onChange={(event, newValue) => {
-              setNewOrder({ ...newOrder, rawMaterialId: newValue ? newValue.id : '' });
-              setMaterialFilter(newValue ? newValue.materialName : ''); // Update filter as well
-            }}
-            renderInput={(params) => (
-              <TextField {...params} label="Filter by Raw Material" variant="outlined" sx={{ width: '240px', height: '50px' }} />
-            )}
-          />
-        </Box>
-
-        {/* Right Side: View Delivered Orders Button */}
-        <Button
+      <Box display="flex" gap={2} mb={3}>
+        <Select
+          value={statusFilter}
+          onChange={(e) => setStatusFilter(e.target.value)}
+          displayEmpty
+          fullWidth
           variant="outlined"
-          color="secondary"
-          onClick={() => navigate('/delivered-orders')}
-          size="large"
-          sx={{ width: '240px', height: '50px' }} // Custom width and height
+          sx={{
+            color: theme.palette.text.primary, // Adjust text color for dark mode
+            backgroundColor: theme.palette.background.paper // Adjust background color
+          }}
         >
-          View Delivered Orders
-        </Button>
+          <MenuItem value="">All Statuses</MenuItem>
+          <MenuItem value="Pending">Pending</MenuItem>
+          <MenuItem value="Shipped">Shipped</MenuItem>
+          <MenuItem value="Delivered">Delivered</MenuItem>
+        </Select>
+
+        <Autocomplete
+          options={rawMaterials}
+          getOptionLabel={(option) => option.materialName}
+          value={rawMaterials.find(material => material.id === newOrder.rawMaterialId) || null}
+          onChange={(event, newValue) => {
+            setNewOrder({ ...newOrder, rawMaterialId: newValue ? newValue.id : '' });
+            setMaterialFilter(newValue ? newValue.materialName : ''); // Update filter as well
+          }}
+          renderInput={(params) => (
+            <TextField {...params} label="Filter by Raw Material" variant="outlined" />
+          )}
+          fullWidth
+        />
+
+        {/* View Delivered Orders Button */}
+      <Button 
+        variant="contained" 
+        color="primary" 
+        onClick={() => navigate('/delivered-orders')}  // Navigate to DeliveredOrders.js
+        sx={{ mt: 2 }}
+      >
+        View Delivered Orders
+      </Button>
+
       </Box>
-
-
 
       {/* Column Visibility Control */}
       <Box display="flex" gap={2} mb={2}>
@@ -421,11 +393,7 @@ const confirmDeleteOrder = async () => {
               )}
               {visibleColumns.rawMaterialQuantity && <TableCell>Quantity</TableCell>}
               {visibleColumns.createdBy && <TableCell>Created By</TableCell>}
-              {visibleColumns.createdDate && (
-      <TableCell onClick={() => handleSort('createdDate')} style={{ cursor: 'pointer' }}>
-        Created Date {sortColumn === 'createdDate' ? (sortDirection === 'asc' ? '↑' : '↓') : ''}
-      </TableCell>
-    )}
+              {visibleColumns.createdDate && <TableCell>Created Date</TableCell>}
               {visibleColumns.updatedBy && <TableCell>Updated By</TableCell>}
               {visibleColumns.updatedDate && <TableCell>Updated Date</TableCell>}
               <TableCell>Actions</TableCell> {/* Actions column always visible */}
@@ -449,10 +417,7 @@ const confirmDeleteOrder = async () => {
                   {visibleColumns.updatedBy && (
                     <TableCell>{getUserNameById(order.updatedBy)}</TableCell> // Replace user ID with name
                   )}
-       {visibleColumns.updatedDate && (
-  <TableCell>{order.updatedDate ? formatDate(order.updatedDate) : formatDate(order.createdDate)}</TableCell>
-)}
-
+                  {visibleColumns.updatedDate && <TableCell>{formatDate(order.updatedDate)}</TableCell>}
                   <TableCell>
                     <IconButton color="primary" onClick={() => handleEditOrder(order)}>
                       <Edit />
@@ -602,19 +567,6 @@ const confirmDeleteOrder = async () => {
           </Button>
         </DialogActions>
       </Dialog>
-
-      {/* Snackbar for notifications */}
-      <Snackbar
-            open={snackbar.open}
-            autoHideDuration={6000}
-            onClose={handleSnackbarClose}
-            anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
-        >
-            <Alert onClose={handleSnackbarClose} severity={snackbar.severity} sx={{ width: '100%' }}>
-                {snackbar.message}
-            </Alert>
-        </Snackbar>
-
     </Box>
   );
 

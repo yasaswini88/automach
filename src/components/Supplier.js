@@ -1,17 +1,27 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, IconButton, Paper, Button, TextField, Dialog, DialogActions, DialogContent, DialogTitle, TablePagination, Autocomplete } from '@mui/material';
+import {
+  Table, TableBody, TableCell, TableContainer, TableHead, TableRow, IconButton, Paper, Button, TextField, Dialog, DialogActions, DialogContent, DialogTitle, TablePagination, Autocomplete,
+  Typography, Grid, Box
+} from '@mui/material';
 import SwapVertIcon from '@mui/icons-material/SwapVert';
-import { Edit, Delete } from '@mui/icons-material';
+import { Edit, Delete, ExpandMore } from '@mui/icons-material';
 import {
   useLoadScript,
   StandaloneSearchBox,
 } from '@react-google-maps/api';
 import { useTheme } from '@mui/material/styles';
+import { Chip } from '@mui/material';
+
+import { Snackbar, Alert } from '@mui/material';
+
 
 const Supplier = () => {
   const theme = useTheme();
-
+  const [rawMaterials, setRawMaterials] = useState([]); // Raw materials state
+  const [selectedRawMaterials, setSelectedRawMaterials] = useState([]); // Selected raw materials
+  //to expnd details 
+  const [expandedDetails, setExpandedDetails] = useState({});
   const [suppliers, setSuppliers] = useState([]);
   const [selectedSupplier, setSelectedSupplier] = useState(null);
   const [filteredSuppliers, setFilteredSuppliers] = useState([]);
@@ -32,7 +42,21 @@ const Supplier = () => {
   const [searchBox, setSearchBox] = useState(null);
   const [placesLoaded, setPlacesLoaded] = useState(true);
 
+  //snack bar 
 
+  const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
+
+  const handleSnackbarClose = () => {
+    setSnackbar({ ...snackbar, open: false });
+  };
+
+
+  // Fetch raw materials when the component loads
+  useEffect(() => {
+    axios.get('http://localhost:8080/api/rawmaterials')
+      .then(response => setRawMaterials(response.data))
+      .catch(error => console.error('Error fetching raw materials:', error));
+  }, []);
 
 
   const { isLoaded, loadError } = useLoadScript({
@@ -90,15 +114,70 @@ const Supplier = () => {
     setOrders(response.data);
   };
 
+  // const handleAddOrEdit = async () => {
+  //   if (selectedSupplier.id) {
+  //     await axios.put(`http://localhost:8080/api/suppliers/${selectedSupplier.id}`, selectedSupplier);
+  //   } else {
+  //     await axios.post('http://localhost:8080/api/suppliers', selectedSupplier);
+  //   }
+  //   setOpen(false);
+  //   fetchSuppliers();
+  // };
+  // for raw materials
+
+  const [formErrors, setFormErrors] = useState({}); // State to store form validation errors
+
   const handleAddOrEdit = async () => {
-    if (selectedSupplier.id) {
-      await axios.put(`http://localhost:8080/api/suppliers/${selectedSupplier.id}`, selectedSupplier);
-    } else {
-      await axios.post('http://localhost:8080/api/suppliers', selectedSupplier);
+
+    // Define regular expressions for validation
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@gmail\.com$/; // Validates Gmail addresses
+    const phoneRegex = /^\d{10}$/; // Validates 10-digit phone numbers
+
+    // Initialize an empty errors object
+    let errors = {};
+
+    // Validate email
+    if (!emailRegex.test(selectedSupplier?.email)) {
+      errors.email = "Please enter a valid Gmail address.";
     }
-    setOpen(false);
-    fetchSuppliers();
+
+    // Validate phone number
+    if (!phoneRegex.test(selectedSupplier?.phone)) {
+      errors.phone = "Please enter a valid 10-digit phone number.";
+    }
+
+    // If there are errors, set them in the formErrors state and return early
+    if (Object.keys(errors).length > 0) {
+      setFormErrors(errors);
+      return;
+    }
+
+    // Clear any previous errors if validation passes
+    setFormErrors({});
+
+    const supplierData = {
+      ...selectedSupplier,
+      rawMaterialIds: selectedRawMaterials.map(material => material.id), // Add raw materials as an array of IDs
+    };
+
+    try {
+      if (selectedSupplier.id) {
+        // Update supplier
+        await axios.put(`http://localhost:8080/api/suppliers/${selectedSupplier.id}`, supplierData);
+        setSnackbar({ open: true, message: 'Supplier updated successfully!', severity: 'success' });
+      } else {
+        // Add new supplier
+        await axios.post('http://localhost:8080/api/suppliers', supplierData);
+        setSnackbar({ open: true, message: 'Supplier created successfully!', severity: 'success' });
+      }
+      setOpen(false);
+      fetchSuppliers();
+    } catch (error) {
+      setSnackbar({ open: true, message: 'Error saving supplier.', severity: 'error' });
+      console.error('Error saving supplier:', error);
+    }
   };
+
 
   const handleDelete = (id) => {
     setSelectedSupplier(suppliers.find(supplier => supplier.id === id));
@@ -155,22 +234,37 @@ const Supplier = () => {
 
 
 
+  // const confirmDeleteSupplier = async () => {
+  //   const openOrders = orders.filter(order =>
+  //     order.supplierName === selectedSupplier.name &&
+  //     (order.status === 'Pending' || order.status === 'Shipped')
+  //   );
+
+  //   if (openOrders.length > 0) {
+  //     alert("There are open orders associated with this supplier.");
+  //   } else {
+  //     await axios.delete(`http://localhost:8080/api/suppliers/${selectedSupplier.id}`);
+  //     fetchSuppliers();
+  //   }
+
+  //   setConfirmDelete(false);
+  //   setSelectedSupplier(null);
+  // };
   const confirmDeleteSupplier = async () => {
-    const openOrders = orders.filter(order =>
-      order.supplierName === selectedSupplier.name &&
-      (order.status === 'Pending' || order.status === 'Shipped')
-    );
-
-    if (openOrders.length > 0) {
-      alert("There are open orders associated with this supplier.");
-    } else {
+    try {
+      // Attempt to delete the supplier, regardless of open orders
       await axios.delete(`http://localhost:8080/api/suppliers/${selectedSupplier.id}`);
-      fetchSuppliers();
+      fetchSuppliers(); // Refresh the supplier list after deletion
+      setSnackbar({ open: true, message: 'Supplier deleted successfully!', severity: 'success' });
+    } catch (error) {
+      console.error('Error deleting supplier:', error);
+      alert('Failed to delete supplier. Please try again.');
+    } finally {
+      setConfirmDelete(false); // Close the confirmation dialog
+      setSelectedSupplier(null); // Clear the selected supplier state
     }
-
-    setConfirmDelete(false);
-    setSelectedSupplier(null);
   };
+
 
 
   const handleOpen = (supplier) => {
@@ -225,12 +319,22 @@ const Supplier = () => {
     }));
   };
 
+  //to add expanded details 
+  const toggleDetails = (supplierId) => {
+    setExpandedDetails((prevState) => ({
+      ...prevState,
+      [supplierId]: !prevState[supplierId], // Toggle the visibility for the selected supplier
+    }));
+  };
+
 
   if (!isLoaded) return <div>Loading...</div>;
   if (loadError) return <div>Error loading maps</div>;
   return (
-    <Paper style={{ padding: '16px' ,backgroundColor: theme.palette.background.paper,  // Use theme-based background color
-      color: theme.palette.text.primary  }}>
+    <Paper style={{
+      padding: '16px', backgroundColor: theme.palette.background.paper,  // Use theme-based background color
+      color: theme.palette.text.primary
+    }}>
       <Button variant="contained" color="primary"
         onClick={() => handleOpen(null)}
         style={{ marginLeft: '16px', marginBottom: '16px' }}
@@ -258,8 +362,9 @@ const Supplier = () => {
           onClick={handleSortByName}
           sx={{
             color: theme.palette.text.primary, // Adjust text color for dark mode
-            backgroundColor: theme.palette.background.paper ,// Adjust background color
-           display: 'flex', alignItems: 'center' }}
+            backgroundColor: theme.palette.background.paper,// Adjust background color
+            display: 'flex', alignItems: 'center'
+          }}
         >
           Sort by Name <SwapVertIcon style={{ marginLeft: '8px' }} />
         </Button>
@@ -268,10 +373,10 @@ const Supplier = () => {
 
 
       <TableContainer component={Paper}>
-      <Table sx={{ border: `1px solid ${theme.palette.divider}` }}> {/* Use dynamic border color */}
-    <TableHead sx={{ backgroundColor: theme.palette.background.default }}>
-      <TableRow>
-        <TableCell sx={{ color: theme.palette.text.primary }}>
+        <Table sx={{ border: `1px solid ${theme.palette.divider}` }}> {/* Use dynamic border color */}
+          <TableHead sx={{ backgroundColor: theme.palette.background.default }}>
+            <TableRow>
+              <TableCell sx={{ color: theme.palette.text.primary }}>
                 <Button
                   variant="contanied"
                   onClick={handleSortByName}
@@ -296,32 +401,67 @@ const Supplier = () => {
                 <TableCell>{supplier.phone}</TableCell>
                 <TableCell>{`${supplier.addressLine1}, ${supplier.addressLine2}, ${supplier.city}, ${supplier.state}, ${supplier.postalCode}`}</TableCell>
                 <TableCell>
-                  <Button
-                    variant="outlined"
-                    color="primary"
-                    onClick={() => handleOpen(supplier)}
-                    style={{ marginRight: '8px' }}
-                    startIcon={<Edit />} // Adds the Edit icon inside the button
-                  >
-                    Edit
-                  </Button>
+                  <Box display="flex" gap={2}>
+                    <Button
+                      variant="outlined"
+                      color="primary"
+                      onClick={() => handleOpen(supplier)}
+                      startIcon={<Edit />}
+                    >
+                      Edit
+                    </Button>
 
-                  <Button
-                    variant="outlined"
-                    color="error"
-                    onClick={() => {
-                      setSelectedSupplier(supplier);
-                      setConfirmDelete(true);
-                    }}
+                    <Button
+                      variant="outlined"
+                      color="error"
+                      onClick={() => {
+                        setSelectedSupplier(supplier);
+                        setConfirmDelete(true);
+                      }}
+                      startIcon={<Delete />}
+                    >
+                      Delete
+                    </Button>
 
-                    startIcon={<Delete />} // Adds the Delete icon inside the button
-                  >
-                    Delete
-                  </Button>
+                    <Button
+                      variant="outlined"
+                      color="secondary"
+                      onClick={() => toggleDetails(supplier.id)}
+                      startIcon={<ExpandMore />}
+                    >
+                      View Details
+                    </Button>
+                  </Box>
+
+                  {expandedDetails[supplier.id] && (
+  <Paper
+    elevation={3}
+    sx={{
+      mt: 1,
+      p: 1,
+      backgroundColor: theme.palette.mode === 'light' ? '#f9f9f9' : theme.palette.background.paper,
+      borderRadius: '8px',
+      border: '1px solid #ccc',
+      width: '50%', // Adjusted width to make it smaller
+      maxWidth: '300px', // Set a maximum width for consistency
+    }}
+  >
+    <Typography variant="h6" sx={{ mb: 1 }}>Raw Materials Supplied:</Typography>
+    <Grid container spacing={1}>
+      {supplier.rawMaterials.map((material) => (
+        <Grid item xs={6} key={material.id}> {/* xs={6} to display 2 items per row */}
+          <Typography variant="body2">{material.materialName}</Typography>
+        </Grid>
+      ))}
+    </Grid>
+  </Paper>
+)}
+
                 </TableCell>
 
               </TableRow>
             ))}
+
           </TableBody>
         </Table>
       </TableContainer>
@@ -339,7 +479,7 @@ const Supplier = () => {
         onClose={handleClose}
         PaperProps={{
           sx: {
-            padding: '16px', 
+            padding: '16px',
             borderRadius: '8px',
             border: `1px solid ${theme.palette.divider}`,  // Use theme-based border color
             backgroundColor: theme.palette.background.paper, // Use theme-based background color
@@ -354,7 +494,29 @@ const Supplier = () => {
           </span>
         </DialogTitle>
         <DialogContent>
+          {/* Display error messages if any */}
+          {Object.keys(formErrors).length > 0 && (
+            <div style={{ color: 'red', marginBottom: '16px' }}>
+              {formErrors.email && <div>{formErrors.email}</div>}
+              {formErrors.phone && <div>{formErrors.phone}</div>}
+            </div>
+          )}
           <TextField label="Name" fullWidth value={selectedSupplier?.name || ''} onChange={(e) => handleSupplierChange('name', e.target.value)} />
+          <Autocomplete
+            multiple
+            options={rawMaterials}
+            getOptionLabel={(option) => option.materialName}
+            value={selectedRawMaterials}
+            onChange={(event, newValue) => setSelectedRawMaterials(newValue)}
+            renderTags={(value, getTagProps) =>
+              value.map((option, index) => (
+                <Chip label={option.materialName} {...getTagProps({ index })} />
+              ))
+            }
+            renderInput={(params) => (
+              <TextField {...params} label="Raw Materials" variant="outlined" fullWidth />
+            )}
+          />
           <TextField label="Email" fullWidth value={selectedSupplier?.email || ''} onChange={(e) => handleSupplierChange('email', e.target.value)} />
           <TextField label="Phone" fullWidth value={selectedSupplier?.phone || ''} onChange={(e) => handleSupplierChange('phone', e.target.value)} />
 
@@ -423,6 +585,19 @@ const Supplier = () => {
           </Button>
         </DialogActions>
       </Dialog>
+
+
+      {/* Snackbar for notifications */}
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={6000}
+        onClose={handleSnackbarClose}
+        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+      >
+        <Alert onClose={handleSnackbarClose} severity={snackbar.severity} sx={{ width: '100%' }}>
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
 
     </Paper>
   );
