@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
-import { Box, Button, TextField, Typography, Alert, Grid } from "@mui/material";
-
+import { Box, Button, TextField, Typography, Alert, Grid, IconButton, InputAdornment } from "@mui/material";
+import { Visibility, VisibilityOff } from "@mui/icons-material";
 
 const ResetPassword = () => {
   const [newPassword, setNewPassword] = useState("");
@@ -13,6 +13,7 @@ const ResetPassword = () => {
     specialChar: false,
     uppercase: false,
   });
+  const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -29,33 +30,26 @@ const ResetPassword = () => {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-  
-    const email = location.state?.email;  // Ensure email is passed correctly
+    const email = location.state?.email;
     if (!email) {
       setMessage("Error: Email not found.");
       return;
     }
-  
-    // Check if passwords match
     if (newPassword !== confirmPassword) {
       setMessage("Passwords do not match.");
       return;
     }
-  
-    // Check password requirements
     if (!passwordValid.length || !passwordValid.specialChar || !passwordValid.uppercase) {
       setMessage("Password does not meet all requirements.");
       return;
     }
-  
     try {
       const response = await axios.post('http://localhost:8080/api/reset-password', {
         email,
         newPassword,
-        confirmPassword,  // Send confirmPassword as well
+        confirmPassword,
       });
-  
-      setMessage(response.data.message);  // Handle message from the backend
+      setMessage(response.data.message);
       if (response.status === 200) {
         navigate("/login");
       }
@@ -67,7 +61,10 @@ const ResetPassword = () => {
       }
     }
   };
-  
+
+  const togglePasswordVisibility = () => {
+    setShowPassword((prev) => !prev);
+  };
 
   return (
     <Box
@@ -97,7 +94,7 @@ const ResetPassword = () => {
               <TextField
                 fullWidth
                 label="New Password"
-                type="password"
+                type={showPassword ? "text" : "password"}
                 variant="outlined"
                 value={newPassword}
                 onChange={(e) => {
@@ -105,6 +102,15 @@ const ResetPassword = () => {
                   validatePassword(e.target.value);
                 }}
                 required
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton onClick={togglePasswordVisibility} edge="end">
+                        {showPassword ? <VisibilityOff /> : <Visibility />}
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                }}
               />
             </Grid>
 
@@ -112,11 +118,20 @@ const ResetPassword = () => {
               <TextField
                 fullWidth
                 label="Confirm Password"
-                type="password"
+                type={showPassword ? "text" : "password"}
                 variant="outlined"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 required
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton onClick={togglePasswordVisibility} edge="end">
+                        {showPassword ? <VisibilityOff /> : <Visibility />}
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                }}
               />
             </Grid>
 
@@ -165,7 +180,7 @@ const ResetPassword = () => {
                 sx={{
                   backgroundColor: "#6c63ff",
                   '&:hover': {
-                    backgroundColor: "#5848d9", // Optionally, a slightly darker color on hover
+                    backgroundColor: "#5848d9",
                   }
                 }}
               >

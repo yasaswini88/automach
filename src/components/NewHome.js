@@ -7,6 +7,7 @@ import dayjs from 'dayjs';
 import ErrorIcon from '@mui/icons-material/Error';
 
 
+
 const NewHome = ({ userDetails }) => {
     const navigate = useNavigate();
     const theme = useTheme();
@@ -43,7 +44,8 @@ const NewHome = ({ userDetails }) => {
                     }
                 }
             },
-            colors: ['#FFA500', '#00E396', '#FF4560'],
+            // colors: ['#FFA500', '#00E396', '#FF4560'],
+            colors: ['#FF4560', '#FFA500','#00E396'],
             responsive: [{
                 breakpoint: 400,
                 options: {
@@ -82,7 +84,7 @@ const [deliveryStatusData, setDeliveryStatusData] = useState({
             type: 'donut',
         },
         labels: ['Pending', 'Shipped', 'Delivered'],
-        colors: ['#FFA500', '#00E396', '#FF4560'],
+        colors: ['#FF4560', '#00E396','#FFA500'],
         plotOptions: {
             pie: {
                 donut: {
@@ -122,41 +124,46 @@ const [deliveryStatusData, setDeliveryStatusData] = useState({
 });
 
 
+const fetchSalesData = async () => {
+    try {
+        const response = await axios.get('http://localhost:8080/api/sales');
+        const sales = response.data;
 
-    const fetchSalesData = async () => {
-        try {
-            const response = await axios.get('http://localhost:8080/api/sales');
-            const sales = response.data;
+        // Get today's date and one week from today
+        const oneWeekFromToday = dayjs().add(7, 'days').endOf('day');
 
-            const oneWeekFromToday = dayjs().add(7, 'days').endOf('day');
+        // Filter sales to get only confirmed orders to be delivered within the next 7 days
+        const deliverySales = sales.filter(sale =>
+            dayjs(sale.orderDeliveryDate).isBefore(oneWeekFromToday) &&
+            dayjs(sale.orderDeliveryDate).isAfter(dayjs()) &&
+            sale.orderDecision?.toLowerCase() === "confirmed"  // Check for confirmed orders, ignoring case
+        );
 
-            // Filter sales to get orders that need to be delivered within the next 7 days
-            const deliverySales = sales.filter(sale =>
-                dayjs(sale.orderDeliveryDate).isBefore(oneWeekFromToday) &&
-                dayjs(sale.orderDeliveryDate).isAfter(dayjs())
-            );
+        // Count order statuses for filtered sales
+        const pendingCount = deliverySales.filter(order => order.orderStatus === 'Pending').length;
+        const shippedCount = deliverySales.filter(order => order.orderStatus === 'Shipped').length;
+        const deliveredCount = deliverySales.filter(order => order.orderStatus === 'Delivered').length;
 
-            setDeliveryOrders(deliverySales);
+        // Set deliveryStatusData with the new counts directly, similar to setDeliveryOrders
+        setDeliveryStatusData({
+            series: [
+                pendingCount,
+                shippedCount,
+                deliveredCount
+            ],
+            options: {
+                ...deliveryStatusData.options  // Ensure we keep existing options
+            }
+        });
 
-            // Count order statuses
-            const pendingCount = deliverySales.filter(order => order.orderStatus === 'Pending').length;
-            const shippedCount = deliverySales.filter(order => order.orderStatus === 'Shipped').length;
-            const deliveredCount = deliverySales.filter(order => order.orderStatus === 'Delivered').length;
+        // Update state for display in table
+        setDeliveryOrders(deliverySales);  // Set only the confirmed, next-week delivery orders
+    } catch (error) {
+        console.error("Error fetching sales data:", error);
+    }
+};
 
-            // Set the donut chart data
-            setDeliveryStatusData({
-                ...deliveryStatusData,
-                series: [
-                    Number(pendingCount) || 0,  // Ensure this is a number
-                    Number(shippedCount) || 0,  // Ensure this is a number
-                    Number(deliveredCount) || 0 // Ensure this is a number
-                ]
-            });
-        } catch (error) {
-            console.error("Error fetching sales data:", error);
-        }
-    };
- 
+
 
     useEffect(() => {
         fetchSalesData();  // Fetch sales data on component mount
@@ -288,7 +295,7 @@ const [deliveryStatusData, setDeliveryStatusData] = useState({
                 const response = await axios.get('http://localhost:8080/api/orders');
                 const orders = response.data;
 
-                const twoWeeksAgo = dayjs().subtract(14, 'days').startOf('day'); // get date 2 weeks ago
+                const twoWeeksAgo = dayjs().subtract(`14`, 'days').startOf('day'); // get date 2 weeks ago
                 const filteredOrders = orders.filter(order =>
                     dayjs(order.createdDate).isAfter(twoWeeksAgo)
                 );
@@ -428,7 +435,7 @@ const [deliveryStatusData, setDeliveryStatusData] = useState({
 
                     </Card>
                 </Grid>
-                <Grid item xs={12} md={6} sx={{ mt: 3 }}>
+                {/* <Grid item xs={12} md={6} sx={{ mt: 3 }}>
                     <Card
                         sx={{
                             mb: 3,
@@ -447,8 +454,62 @@ const [deliveryStatusData, setDeliveryStatusData] = useState({
                             <ApexCharts options={deliveryStatusData.options} series={deliveryStatusData.series} type="donut" height={300} />
                         </CardContent>
                     </Card>
-                </Grid>
+                </Grid> */}
                 <Grid item xs={12} sm={6} md={6}>
+                    <Card
+                        sx={{
+                            mb: 3,
+                            mt: 3,
+                            border: '2px solid #D3D3D3',
+                            borderRadius: '12px',
+                            height: 380,
+                            background: '#e1f5fe',
+                            transition: 'transform 0.3s, box-shadow 0.3s',
+                            // '&:hover': {
+                            //     transform: 'scale(1.02)',
+                            //     boxShadow: '0 6px 20px rgba(0,0,0,0.2)'
+                            // }
+                        }}
+                    >
+                        <CardContent sx={{ padding: '16px' }}>
+                            <Typography variant="h6"><b>Orders to be Delivered in Next 7 Days: {deliveryOrders.length}</b></Typography>
+                            <TableContainer component={Paper} sx={{ mt: 2, background: '#e1f5fe', }}>
+                                <Table>
+                                    <TableHead>
+                                        <TableRow>
+                                            <TableCell>Customer Name</TableCell>
+                                            <TableCell>Status</TableCell>
+                                            <TableCell>Delivery Date</TableCell>
+                                            <TableCell>Product Name</TableCell>
+                                            <TableCell>Quantity</TableCell>
+                                        </TableRow>
+                                    </TableHead>
+                                    <TableBody>
+                                        {deliveryOrders.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((order) => (
+                                            <TableRow key={order.saleId}>
+                                                <TableCell>{order.customerName}</TableCell>
+                                                <TableCell>{order.orderStatus}</TableCell>
+                                                <TableCell>{dayjs(order.orderDeliveryDate).format('YYYY-MM-DD')}</TableCell>
+                                                <TableCell>{order.products.map(product => product.prodName).join(", ")}</TableCell>
+                                                <TableCell>{order.quantities.join(", ")}</TableCell>
+                                            </TableRow>
+                                        ))}
+                                    </TableBody>
+                                </Table>
+                                <TablePagination
+                                    rowsPerPageOptions={[3]}
+                                    component="div"
+                                    count={deliveryOrders.length}
+                                    rowsPerPage={rowsPerPage}
+                                    page={page}
+                                    onPageChange={handleChangePage}
+                                    onRowsPerPageChange={handleChangeRowsPerPage}
+                                />
+                            </TableContainer>
+                        </CardContent>
+                    </Card>
+                </Grid>
+                {/* <Grid item xs={12} sm={6} md={6}>
                     <Card
                         sx={{
                             mb: 3,
@@ -559,7 +620,7 @@ const [deliveryStatusData, setDeliveryStatusData] = useState({
                             </TableContainer>
                         </CardContent>
                     </Card>
-                </Grid>
+                </Grid> */}
             </Grid>
         </Box>
     );

@@ -46,13 +46,14 @@ const Orders = ({ userDetails }) => {
   // New states for filters
   const [statusFilter, setStatusFilter] = useState('');
   const [materialFilter, setMaterialFilter] = useState('');
+  
 
   const [newOrder, setNewOrder] = useState({
     orderId: '', // Added orderId to the state
     // supplierName: '',
     supplierId: '',
     status: 'Pending',
-    trackingInfo: '',
+    // trackingInfo: '',
     notes: '',
     rawMaterialId: '',
     rawMaterialQuantity: 0,
@@ -76,7 +77,7 @@ const Orders = ({ userDetails }) => {
   const [visibleColumns, setVisibleColumns] = useState({
     supplierName: true,
     status: true,
-    trackingInfo: true,
+    // trackingInfo: true,
     notes: true,
     rawMaterialName: true,
     rawMaterialQuantity: true,
@@ -127,7 +128,7 @@ const Orders = ({ userDetails }) => {
       supplierName: suppliers.find(supplier => supplier.id === newOrder.supplierId)?.name || '', // Get supplier name by ID
 
       status: 'Pending',
-      trackingInfo: '',
+      // trackingInfo: '',
       notes: '',
       rawMaterialId: '',
       rawMaterialQuantity: 0,
@@ -195,7 +196,7 @@ const Orders = ({ userDetails }) => {
         supplierId: newOrder.supplierId,  // Include supplierId
         supplierName: newOrder.supplierName,
         status: newOrder.status,
-        trackingInfo: newOrder.trackingInfo,
+        // trackingInfo: newOrder.trackingInfo,
         notes: newOrder.notes,
         rawMaterialId: newOrder.rawMaterialId,
         rawMaterialQuantity: newOrder.rawMaterialQuantity,
@@ -239,7 +240,7 @@ const Orders = ({ userDetails }) => {
       orderId: order.orderId,
       supplierName: order.supplierName,
       status: order.status,
-      trackingInfo: order.trackingInfo,
+      // trackingInfo: order.trackingInfo,
       notes: order.notes,
       rawMaterialId: order.rawMaterialId,
       rawMaterialQuantity: order.rawMaterialQuantity,
@@ -397,7 +398,7 @@ const confirmDeleteOrder = async () => {
         ))}
       </Box>
 
-      <Button variant="contained" color="primary" onClick={handleOpen}>
+      <Button variant="outlined" color="secondary" onClick={handleOpen}>
         Add Order
       </Button>
 
@@ -412,7 +413,7 @@ const confirmDeleteOrder = async () => {
                 </TableCell>
               )}
               {visibleColumns.status && <TableCell>Status</TableCell>}
-              {visibleColumns.trackingInfo && <TableCell>Tracking Info</TableCell>}
+              {/* {visibleColumns.trackingInfo && <TableCell>Tracking Info</TableCell>} */}
               {visibleColumns.notes && <TableCell>Notes</TableCell>}
               {visibleColumns.rawMaterialName && (
                 <TableCell onClick={() => handleSort('rawMaterialName')} style={{ cursor: 'pointer' }}>
@@ -438,7 +439,7 @@ const confirmDeleteOrder = async () => {
                 <TableRow key={order.orderId}>
                   {visibleColumns.supplierName && <TableCell>{order.supplierName}</TableCell>}
                   {visibleColumns.status && <TableCell>{order.status}</TableCell>}
-                  {visibleColumns.trackingInfo && <TableCell>{order.trackingInfo}</TableCell>}
+                  {/* {visibleColumns.trackingInfo && <TableCell>{order.trackingInfo}</TableCell>} */}
                   {visibleColumns.notes && <TableCell>{order.notes}</TableCell>}
                   {visibleColumns.rawMaterialName && <TableCell>{order.rawMaterialName}</TableCell>}
                   {visibleColumns.rawMaterialQuantity && <TableCell>{order.rawMaterialQuantity}</TableCell>}
@@ -539,14 +540,14 @@ const confirmDeleteOrder = async () => {
             <MenuItem value="Shipped">Shipped</MenuItem>
             <MenuItem value="Delivered">Delivered</MenuItem>
           </Select>
-          <TextField
+          {/* <TextField
             margin="normal"
             label="Tracking Info"
             fullWidth
             variant="outlined"
             value={newOrder.trackingInfo}
             onChange={(e) => setNewOrder({ ...newOrder, trackingInfo: e.target.value })}
-          />
+          /> */}
           <TextField
             margin="normal"
             label="Notes"

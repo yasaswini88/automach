@@ -47,6 +47,12 @@ const Products = () => {
   const [sortColumn, setSortColumn] = useState(null);
   const [sortDirection, setSortDirection] = useState('asc');
   const [sortedProducts, setSortedProducts] = useState([...products]);
+  // for checking product duplicates 
+  const [productError, setProductError] = useState('');
+  //for validating price check number 
+
+  const [priceError, setPriceError] = useState('');
+
 
   const [newProduct, setNewProduct] = useState({
     prodName: '',
@@ -82,7 +88,7 @@ const Products = () => {
 
   const handleSnackbarClose = () => {
     setSnackbar({ ...snackbar, open: false });
-};
+  };
 
 
   useEffect(() => {
@@ -99,15 +105,15 @@ const Products = () => {
 
   useEffect(() => {
     let filteredProductsList = products;
-    
+
     if (categoryFilter) {
       filteredProductsList = products.filter(prod => prod.category.name === categoryFilter.name);
     }
 
     if (tagFilter && tagFilter.length > 0) {
       filteredProductsList = filteredProductsList.filter(prod => {
-        const prodTags = prod.tags.map(tag => {return tag.name.toLowerCase()});
-        const filterTags = tagFilter.map(tag => {return tag.name.toLowerCase()});
+        const prodTags = prod.tags.map(tag => { return tag.name.toLowerCase() });
+        const filterTags = tagFilter.map(tag => { return tag.name.toLowerCase() });
         return prodTags.some((prodTag) => filterTags.indexOf(prodTag) > -1);
       });
     }
@@ -218,6 +224,10 @@ const Products = () => {
   };
 
   const handleAddProduct = () => {
+    if (productError || priceError || checkDuplicateProductName(newProduct.prodName)) {
+      setSnackbar({ open: true, message: 'Please fix errors before adding the product', severity: 'error' });
+      return;
+    }
     const rawMaterialQuantities = {};
     newProduct.rawMaterials.forEach((material) => {
       const rawMaterialId = material.materialId;
@@ -251,6 +261,12 @@ const Products = () => {
         console.error('Error adding product:', error);
       });
   };
+
+  // for checking duplicate product name
+  const checkDuplicateProductName = (name) => {
+    return products.some((product) => product.prodName.toLowerCase() === name.toLowerCase());
+  };
+
 
   if (loading) {
     return <Typography>Loading...</Typography>;
@@ -370,7 +386,7 @@ const Products = () => {
               <DialogContentText>
                 To add a new product, please enter the product name, select a category, assign tags, and specify the raw materials with their quantities.
               </DialogContentText>
-              <TextField
+              {/* <TextField
                 autoFocus
                 margin="dense"
                 label="Product Name"
@@ -378,15 +394,78 @@ const Products = () => {
                 fullWidth
                 value={newProduct.prodName}
                 onChange={(e) => setNewProduct({ ...newProduct, prodName: e.target.value })}
-              />
+              /> */}
               <TextField
+                autoFocus
+                margin="dense"
+                label="Product Name"
+                type="text"
+                fullWidth
+                value={newProduct.prodName}
+                onChange={(e) => {
+                  setNewProduct({ ...newProduct, prodName: e.target.value });
+                  setProductError(''); // Clear error when typing
+                }}
+                onBlur={() => {
+                  if (checkDuplicateProductName(newProduct.prodName)) {
+                    setProductError('Product name already exists');
+                  }
+                }}
+                error={Boolean(productError)}
+                helperText={productError}
+              />
+
+              {/* <TextField
                 margin="dense"
                 label="Price"
                 type="number"
                 fullWidth
                 value={newProduct.price}
                 onChange={(e) => setNewProduct({ ...newProduct, price: e.target.value })}
+              /> */}
+
+              {/* <TextField
+                margin="dense"
+                label="Price"
+                type="number"
+                fullWidth
+                value={newProduct.price}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  if (!isNaN(value) && Number(value) >= 0) {
+                    setNewProduct({ ...newProduct, price: value });
+                    setPriceError(''); // Clear error if input is valid
+                  } else {
+                    setPriceError('Price must be a valid number');
+                  }
+                }}
+                error={Boolean(priceError)}
+                helperText={priceError}
+              /> */}
+
+              <TextField
+                margin="dense"
+                label="Price"
+                type="text"  // Change to text to allow custom validation
+                fullWidth
+                value={newProduct.price}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  const isValidNumber = /^[0-9]*\.?[0-9]*$/.test(value);  // Regex for valid numeric input with optional decimal point
+
+                  if (isValidNumber) {
+                    setNewProduct({ ...newProduct, price: value });
+                    setPriceError(''); // Clear error if input is valid
+                  } else {
+                    setPriceError('Price must be a valid number without letters or special characters');
+                  }
+                }}
+                error={Boolean(priceError)}
+                helperText={priceError}
               />
+
+
+
               <Autocomplete
                 options={categories}
                 getOptionLabel={(option) => option.name}
@@ -505,7 +584,7 @@ const Products = () => {
           {selectedProduct && (
             <>
               <Typography variant="h6" component="h4" mt={4} gutterBottom>
-              Raw Materials for {products.find(product => product.prodId === selectedProduct)?.prodName || 'Selected Product'}
+                Raw Materials for {products.find(product => product.prodId === selectedProduct)?.prodName || 'Selected Product'}
               </Typography>
               <TableContainer component={Paper} sx={{ mt: 3, border: '1px solid #ccc' }}>
                 <Table>
@@ -533,15 +612,15 @@ const Products = () => {
 
         </Container>
         <Snackbar
-    open={snackbar.open}
-    autoHideDuration={6000}
-    onClose={handleSnackbarClose}
-    anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
->
-    <Alert onClose={handleSnackbarClose} severity={snackbar.severity} sx={{ width: '100%' }}>
-        {snackbar.message}
-    </Alert>
-</Snackbar>
+          open={snackbar.open}
+          autoHideDuration={6000}
+          onClose={handleSnackbarClose}
+          anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+        >
+          <Alert onClose={handleSnackbarClose} severity={snackbar.severity} sx={{ width: '100%' }}>
+            {snackbar.message}
+          </Alert>
+        </Snackbar>
 
       </Box>
     </Box>

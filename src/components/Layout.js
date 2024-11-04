@@ -17,6 +17,7 @@ import SmartToyIcon from '@mui/icons-material/SmartToy';
 import ProductionQuantityLimitsIcon from '@mui/icons-material/ProductionQuantityLimits';
 import Typography from '@mui/material/Typography';
 import NotificationsIcon from '@mui/icons-material/Notifications';
+import Person3Icon from '@mui/icons-material/Person3';
 
 const drawerWidth = 240;
 
@@ -146,6 +147,21 @@ const Layout = ({ userDetails }) => {
             <ListItemText primary="Inventory" />
           </ListItem>
           
+          <ListItem
+            button
+            component={Link}
+            to="/customers"
+            sx={{
+              '&:hover': {
+                backgroundColor: '#0f172a', // Darker blue on hover
+              },
+            }}
+          >
+            <ListItemIcon sx={{ color: '#10b981' /* Green color for icon */ }}>
+              <Person3Icon />
+            </ListItemIcon>
+            <ListItemText primary="Customers" />
+          </ListItem>
 
           {/* Chatbot */}
          

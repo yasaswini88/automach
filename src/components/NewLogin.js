@@ -161,13 +161,13 @@ const NewLogin = () => {
                     Forgot Password?
                 </Button>
             </form>
-            <Button
+            {/* <Button
                 onClick={handleRegister}
                 color="primary"
                 className="register-button"
             >
                 Register
-            </Button>
+            </Button> */}
 
             <Snackbar
                 open={open}

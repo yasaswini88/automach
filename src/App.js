@@ -39,6 +39,8 @@ import ChatIcon from '@mui/icons-material/Chat';  // Import chat icon
 import FloatingChatButton from './components/FloatingChatButton';
 import DeliveredOrders from './components/DeliveredOrders';
 import RequiredProductsStockAlerts from './components/RequiredProductsStockAlerts';
+import Customers from './components/Customers';
+
 
 const App = () => {
   
@@ -256,7 +258,7 @@ const App = () => {
 
 
             {/* Theme Switcher */}
-            <Tooltip title={mode === 'light' ? 'Switch to dark mode' : 'Switch to light mode'}>
+            {/* <Tooltip title={mode === 'light' ? 'Switch to dark mode' : 'Switch to light mode'}>
               <Button
                 color="inherit"
                 onClick={toggleTheme}
@@ -279,7 +281,7 @@ const App = () => {
               >
                 {mode === 'light' ? <DarkModeIcon /> : <LightModeIcon />}
               </Button>
-            </Tooltip>
+            </Tooltip> */}
 
             {/* Profile Icon */}
             {authState.isLoggedIn &&
@@ -417,7 +419,7 @@ const App = () => {
         <Route path="sales" element={authState.isLoggedIn ? <Sales userDetails={authState.userDetails} /> : <Navigate to="/login" />} />
         <Route path="inventory" element={authState.isLoggedIn ? <Inventory userDetails={authState.userDetails} /> : <Navigate to="/login" />} />
         <Route path="supplier" element={authState.isLoggedIn ? <Supplier /> : <Navigate to="/login" />} />
-        
+        <Route path="customers" element={authState.isLoggedIn ? <Customers /> : <Navigate to="/login" />} />
         <Route path="delivered-orders" element={authState.isLoggedIn ? <DeliveredOrders userDetails={authState.userDetails} /> : <Navigate to="/login" />} />
         <Route path="products" element={authState.isLoggedIn ? <Products /> : <Navigate to="/login" />} />
         <Route path="/required-products-stock-alerts" element={<RequiredProductsStockAlerts />} />

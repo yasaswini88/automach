@@ -15,6 +15,8 @@ import { Chip } from '@mui/material';
 
 import { Snackbar, Alert } from '@mui/material';
 
+import { Stack } from '@mui/material';
+
 
 const Supplier = () => {
   const theme = useTheme();
@@ -114,16 +116,7 @@ const Supplier = () => {
     setOrders(response.data);
   };
 
-  // const handleAddOrEdit = async () => {
-  //   if (selectedSupplier.id) {
-  //     await axios.put(`http://localhost:8080/api/suppliers/${selectedSupplier.id}`, selectedSupplier);
-  //   } else {
-  //     await axios.post('http://localhost:8080/api/suppliers', selectedSupplier);
-  //   }
-  //   setOpen(false);
-  //   fetchSuppliers();
-  // };
-  // for raw materials
+ 
 
   const [formErrors, setFormErrors] = useState({}); // State to store form validation errors
 
@@ -234,22 +227,6 @@ const Supplier = () => {
 
 
 
-  // const confirmDeleteSupplier = async () => {
-  //   const openOrders = orders.filter(order =>
-  //     order.supplierName === selectedSupplier.name &&
-  //     (order.status === 'Pending' || order.status === 'Shipped')
-  //   );
-
-  //   if (openOrders.length > 0) {
-  //     alert("There are open orders associated with this supplier.");
-  //   } else {
-  //     await axios.delete(`http://localhost:8080/api/suppliers/${selectedSupplier.id}`);
-  //     fetchSuppliers();
-  //   }
-
-  //   setConfirmDelete(false);
-  //   setSelectedSupplier(null);
-  // };
   const confirmDeleteSupplier = async () => {
     try {
       // Attempt to delete the supplier, regardless of open orders
@@ -335,7 +312,7 @@ const Supplier = () => {
       padding: '16px', backgroundColor: theme.palette.background.paper,  // Use theme-based background color
       color: theme.palette.text.primary
     }}>
-      <Button variant="contained" color="primary"
+      <Button variant="outlined" color="secondary"
         onClick={() => handleOpen(null)}
         style={{ marginLeft: '16px', marginBottom: '16px' }}
       >Add New Supplier</Button>
@@ -434,28 +411,28 @@ const Supplier = () => {
                   </Box>
 
                   {expandedDetails[supplier.id] && (
-  <Paper
-    elevation={3}
-    sx={{
-      mt: 1,
-      p: 1,
-      backgroundColor: theme.palette.mode === 'light' ? '#f9f9f9' : theme.palette.background.paper,
-      borderRadius: '8px',
-      border: '1px solid #ccc',
-      width: '50%', // Adjusted width to make it smaller
-      maxWidth: '300px', // Set a maximum width for consistency
-    }}
-  >
-    <Typography variant="h6" sx={{ mb: 1 }}>Raw Materials Supplied:</Typography>
-    <Grid container spacing={1}>
-      {supplier.rawMaterials.map((material) => (
-        <Grid item xs={6} key={material.id}> {/* xs={6} to display 2 items per row */}
-          <Typography variant="body2">{material.materialName}</Typography>
-        </Grid>
-      ))}
-    </Grid>
-  </Paper>
-)}
+                    <Paper
+                      elevation={3}
+                      sx={{
+                        mt: 1,
+                        p: 1,
+                        backgroundColor: theme.palette.mode === 'light' ? '#f9f9f9' : theme.palette.background.paper,
+                        borderRadius: '8px',
+                        border: '1px solid #ccc',
+                        width: '50%', // Adjusted width to make it smaller
+                        maxWidth: '300px', // Set a maximum width for consistency
+                      }}
+                    >
+                      <Typography variant="h6" sx={{ mb: 1 }}>Raw Materials Supplied:</Typography>
+                      <Grid container spacing={1}>
+                        {supplier.rawMaterials.map((material) => (
+                          <Grid item xs={6} key={material.id}> {/* xs={6} to display 2 items per row */}
+                            <Typography variant="body2">{material.materialName}</Typography>
+                          </Grid>
+                        ))}
+                      </Grid>
+                    </Paper>
+                  )}
 
                 </TableCell>
 
@@ -485,6 +462,7 @@ const Supplier = () => {
             backgroundColor: theme.palette.background.paper, // Use theme-based background color
             color: theme.palette.text.primary, // Use theme-based text color
             boxShadow: '0px 4px 20px rgba(0, 0, 0, 0.1)', // Adds a shadow for depth
+            width:"75%"
           }
         }}
       >
@@ -501,6 +479,8 @@ const Supplier = () => {
               {formErrors.phone && <div>{formErrors.phone}</div>}
             </div>
           )}
+
+<Stack spacing={2} sx={{ width: '95%' }}>
           <TextField label="Name" fullWidth value={selectedSupplier?.name || ''} onChange={(e) => handleSupplierChange('name', e.target.value)} />
           <Autocomplete
             multiple
@@ -549,6 +529,7 @@ const Supplier = () => {
           <TextField label="City" fullWidth value={selectedSupplier?.city || ''} onChange={(e) => handleSupplierChange('city', e.target.value)} />
           <TextField label="State" fullWidth value={selectedSupplier?.state || ''} onChange={(e) => handleSupplierChange('state', e.target.value)} />
           <TextField label="Postal Code" fullWidth value={selectedSupplier?.postalCode || ''} onChange={(e) => handleSupplierChange('postalCode', e.target.value)} />
+          </Stack>
         </DialogContent>
 
         <DialogActions>

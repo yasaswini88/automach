@@ -4,6 +4,9 @@ import { fetchChatbotResponse } from './chatbotFetching'; // Import the fetching
 import axios from 'axios';
 import SmartToyIcon from '@mui/icons-material/SmartToy';
 import Person4Icon from '@mui/icons-material/Person4';
+import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
+import SendIcon from '@mui/icons-material/Send';
+import IconButton from '@mui/material/IconButton';
 
 const Chatbot = ({ userDetails }) => {
   const [userMessage, setUserMessage] = useState('');
@@ -14,71 +17,54 @@ const Chatbot = ({ userDetails }) => {
   const [error, setError] = useState(null); // Error state
   const [typing, setTyping] = useState(false); // Typing indicator state
 
+  const chatBotImageUrl = 'https://botnation.ai/site/wp-content/uploads/2022/02/meilleur-chatbot.jpg';
+
+
   // Function to handle API calls based on URL
   const handleApiCall = async (url, queryContext = {}) => {
     try {
       let response;
-
-      // Use switch-case to handle different URL patterns
+  
       switch (true) {
         // Raw Materials
         case url === 'http://localhost:8080/api/rawmaterials':
           response = await axios.get(url);
           return response.data.map((material) => material.materialName || 'Unknown').join(', ');
-
+  
         case url.includes('/api/rawMaterialStock/material/'):
-          // Extract the material name from the URL
           const materialName = url.split('/').pop();
-
-          // Make the API call
           response = await axios.get(url);
-
-          // Check the user's query to determine whether it's for 'min quantity' or 'current quantity'
           const queryLowerRawmaterial = queryContext.query.toLowerCase();
-
           if (queryLowerRawmaterial.includes('min quantity')) {
             return `Material: ${response.data.rawMaterial.materialName}, Min Quantity: ${response.data.minQuantity}`;
           } else if (queryLowerRawmaterial.includes('current quantity')) {
             return `Material: ${response.data.rawMaterial.materialName}, Current Quantity: ${response.data.quantity}`;
           } else {
-            // If no specific quantity type is requested, return both
             return `Material: ${response.data.rawMaterial.materialName}, Min Quantity: ${response.data.minQuantity}, Current Quantity: ${response.data.quantity}`;
           }
-
+  
         // Suppliers
         case url === 'http://localhost:8080/api/suppliers':
-          // Fetch the list of suppliers
           response = await axios.get(url);
           return response.data.map((supplier) => supplier.name || 'Unknown').join(', ');
-
+  
         case url.includes('/api/suppliers/supplierName/'):
-          // Extract the supplier name from the URL
           const supplierName = url.split('/').pop();
-
-          // Fetch supplier details by name
           response = await axios.get(url);
-
-          // Check if user is asking for a specific supplier's address
           if (queryContext.query.toLowerCase().includes('address')) {
             return `Supplier: ${response.data.name}, Address: ${response.data.addressLine1}, ${response.data.addressLine2}, ${response.data.city}, ${response.data.state}, ${response.data.postalCode}`;
           } else {
-            // Return general details if no specific field is asked
             return `Supplier: ${response.data.name}, Email: ${response.data.email}, Phone: ${response.data.phone}`;
           }
+  
+        // Products
         case url === 'http://localhost:8080/api/products':
-          // Fetch the list of products
           response = await axios.get(url);
           return response.data.map((product) => product.prodName || 'Unknown').join(', ');
-
-        // Case for fetching product details by name
+  
         case url.includes('/api/products/name/'):
-          // Extract the product name from the URL
           const productName = url.split('/').pop();
-
-          // Fetch product details by name
           response = await axios.get(url);
-
-          // Extract details from the response
           const productDetails = {
             name: response.data.prodName,
             price: response.data.price,
@@ -86,11 +72,7 @@ const Chatbot = ({ userDetails }) => {
             tags: response.data.tags.map(tag => tag.name).join(', '),
             rawMaterials: response.data.rawMaterials.map(mat => `${mat.rawMaterial.materialName} (${mat.rawMaterialQuantity})`).join(', ')
           };
-
-          // Check the user's query context for specific field requests
           const queryLower = queryContext.query.toLowerCase();
-
-          // Return specific product details based on the user's query
           if (queryLower.includes('price')) {
             return `Product: ${productDetails.name}, Price: ${productDetails.price}`;
           } else if (queryLower.includes('category')) {
@@ -100,62 +82,74 @@ const Chatbot = ({ userDetails }) => {
           } else if (queryLower.includes('raw materials')) {
             return `Product: ${productDetails.name}, Raw Materials: ${productDetails.rawMaterials}`;
           } else {
-            // Default: Return all details if no specific field is requested
             return `Product: ${productDetails.name}, Price: ${productDetails.price}, Category: ${productDetails.category}, Tags: ${productDetails.tags}, Raw Materials: ${productDetails.rawMaterials}`;
           }
+  
+        // Most Commonly Used Raw Materials
+        case url === 'http://localhost:8080/api/sales/top-raw-materials':
+          response = await axios.get(url);
+          const topMaterials = response.data.rawMaterials.map((material) => material.rawMaterial.materialName || 'Unknown').join(', ');
+          return `Most commonly used raw materials: ${topMaterials}.`;
+        
+        // To check quantity of the product
+        case url.includes('/api/inventory/product/'):
+        // case url=== 'http://localhost:8080/api/inventory/product/${encodeURIComponent(productName)}/quantity' :
+      //  case url ="http://localhost:8080/api/inventory/product/${encodeURIComponent(productName)}/quantity":
+          response = await axios.get(url);
+          if (!response.data || response.data.length === 0) {
+            return `No inventory data found for ${queryContext.prodName}.`;
+          }
+          const inventoryData = response.data[0]; // Assume it returns an array with one inventory item
+          const inventoryMessage = ` Available Quantity: ${inventoryData.quantity}, Blocked Quantity: ${inventoryData.blockedQuantity}, Required Quantity: ${inventoryData.requiredQuantity}`;
+          return inventoryMessage;
 
-          const handleApiCall = async (url, queryContext = {}) => {
-            try {
-              let response;
+          //To check the order status of raw material with supplier name 
+           // New case for Raw Material Order Status
+        case url.includes('/api/orders/'):
+          response = await axios.get(url);
+          if (!response.data || response.data.length === 0) {
+            return `No order data found for ${queryContext.rawMaterialName} with ${queryContext.supplierName}.`;
+          }
+          const orderData = response.data[0]; // Assuming the first result is the required order data
+          const orderMessage = `The order status of ${orderData.rawMaterialName} with ${orderData.supplierName} is "${orderData.status}" with a quantity of ${orderData.rawMaterialQuantity} units.`;
+          return orderMessage;
+        
+// For orders related to raw materials 
+          case url.includes('/api/orders') && queryContext.orderStatus:
+        const statusUrl = `http://localhost:8080/api/orders?status=${queryContext.orderStatus}`;
+        response = await axios.get(statusUrl);
 
-              switch (true) {
-                // Case for most commonly used raw materials
-                case url === 'http://localhost:8080/api/sales/top-raw-materials':
-                  response = await axios.get(url);
-                  console.log(response)
-                  // Extract raw material names from the response data
-                  const topMaterials = response.data.rawMaterials.map((material) => material.rawMaterial.materialName || 'Unknown').join(', ');
-                  return `Most commonly used raw materials: ${topMaterials}.`;
+        if (!response.data || response.data.length === 0) {
+          return `No orders found with status ${queryContext.orderStatus}.`;
+        }
 
-                // Case for low stock alerts among commonly used raw materials
-                case url === 'http://localhost:8080/api/sales/top-raw-materials/low-stock':
-                  // Step 1: Fetch the most commonly used raw materials
-                  const topRawMaterialsResponse = await axios.get('http://localhost:8080/api/sales/top-raw-materials');
-                  const topRawMaterials = topRawMaterialsResponse.data;
+        // Format each order item into the specified format
+        const ordersMessage = response.data.map((order, index) => {
+          return `${index + 1}. ${order.rawMaterialName}, Quantity: ${order.rawMaterialQuantity} units, Supplier: ${order.supplierName}`;
+        }).join(" | "); // Use a separator (|) to format nicely in one line
 
-                  // Step 2: Fetch all raw material stocks
-                  const stockResponse = await axios.get('http://localhost:8080/api/rawMaterialStock');
-                  const allStocks = stockResponse.data;
-
-                  // Step 3: Filter to get stocks of the top raw materials with low quantities
-                  const lowStockAlerts = topRawMaterials.reduce((acc, material) => {
-                    const stock = allStocks.find(stock =>
-                      stock.rawMaterial.materialName.toLowerCase() === material.rawMaterialName.toLowerCase()
-                    );
-
-                    if (stock && stock.quantity < stock.minQuantity) {
-                      acc.push(`${material.rawMaterialName} has ${stock.quantity} units, below minimum of ${stock.minQuantity} units.`);
-                    }
-                    return acc;
-                  }, []);
-
-                  // Format the response
-                  return lowStockAlerts.length
-                    ? `Low stock alerts for commonly used raw materials: ${lowStockAlerts.join('; ')}.`
-                    : 'No low stock alerts for the commonly used raw materials.';
-
-                default:
-                  return 'No valid API URL provided.';
-              }
-            } catch (error) {
-              console.error(`Error fetching data from ${url}:`, error);
-              return 'Sorry, there was an issue fetching the data. Please try again later.';
+        return `Raw Materials with ${queryContext.orderStatus} order status are: ${ordersMessage}.`;
+  
+        // Low Stock Alerts for Commonly Used Raw Materials
+        case url === 'http://localhost:8080/api/sales/top-raw-materials/low-stock':
+          const topRawMaterialsResponse = await axios.get('http://localhost:8080/api/sales/top-raw-materials');
+          const topRawMaterials = topRawMaterialsResponse.data;
+          const stockResponse = await axios.get('http://localhost:8080/api/rawMaterialStock');
+          const allStocks = stockResponse.data;
+          const lowStockAlerts = topRawMaterials.reduce((acc, material) => {
+            const stock = allStocks.find(stock =>
+              stock.rawMaterial.materialName.toLowerCase() === material.rawMaterialName.toLowerCase()
+            );
+            if (stock && stock.quantity < stock.minQuantity) {
+              acc.push(`${material.rawMaterialName} has ${stock.quantity} units, below minimum of ${stock.minQuantity} units.`);
             }
-          };
-
-
+            return acc;
+          }, []);
+          return lowStockAlerts.length
+            ? `Low stock alerts for commonly used raw materials: ${lowStockAlerts.join('; ')}.`
+            : 'No low stock alerts for the commonly used raw materials.';
+  
         default:
-          // If the URL doesn't match any of the cases, return an error message
           return 'No valid API URL provided.';
       }
     } catch (error) {
@@ -163,7 +157,7 @@ const Chatbot = ({ userDetails }) => {
       return 'Sorry, there was an issue fetching the data. Please try again later.';
     }
   };
-
+  
   const handleSendMessage = async () => {
     if (!userMessage) return;
 
@@ -176,9 +170,10 @@ const Chatbot = ({ userDetails }) => {
       console.log('Chatbot response:', response);
 
       // Extract URL from the chatbot response (more robust regex to handle URL within axios.get())
-      const urlMatch = response.match(/axios\.get\('([^']+)'\)/);
+      // const urlMatch = response.match(/axios\.get\('([^']+)'\)/);
+      // const url = urlMatch ? urlMatch[1] : null;
+      const urlMatch = response.match(/"apiURL"\s*:\s*"([^"]+)"/);
       const url = urlMatch ? urlMatch[1] : null;
-
       // Extract raw material name or supplier name from the user's query (fallback to 'wood' for raw materials)
       const rawMaterialMatch = userMessage.match(/quantity of ([a-zA-Z]+)/i);
       const rawMaterial = rawMaterialMatch ? rawMaterialMatch[1].toLowerCase() : 'wood'; // Default to 'wood'
@@ -190,10 +185,20 @@ const Chatbot = ({ userDetails }) => {
       const productMatch = userMessage.match(/price of ([a-zA-Z\s]+)/i);
       const productName = productMatch ? productMatch[1].toLowerCase() : null;
 
+      const productQuantity = userMessage.match(/quantity of ([a-zA-Z\s]+)/i);
+      const prodName = productQuantity ? productQuantity[1] : null;
+
+      //for finding orders with raw material status pending 
+
+      const orderStatusMatch = response.match(/"orderStatus"\s*:\s*"([^"]+)"/);
+    const orderStatus = orderStatusMatch ? orderStatusMatch[1] : null;
+  
       const queryContext = {
         rawMaterial: rawMaterial,
         supplierName: supplierName,
         productName: productName,
+        prodName: prodName,
+        orderStatus: orderStatus,
         query: userMessage.toLowerCase(),
       };
 
@@ -214,114 +219,175 @@ const Chatbot = ({ userDetails }) => {
   };
 
   return (
-    <Box
-      display="flex"
-      flexDirection="column"
-      alignItems="center"
-      justifyContent="center"
-      sx={{ padding: 2, maxWidth: 600, margin: '0 auto' }}
+    <Paper
+    elevation={4}
+  sx={{
+    position: 'relative', // Allow absolute positioning within
+    padding: 6,
+    maxWidth: 900,
+    margin: '0 auto',
+    textAlign: 'center',
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    backgroundColor: '#f9f9f9',
+  }}
+>
+  {/* Icon in Top Right Corner */}
+  <Box
+    sx={{
+      position: 'absolute',
+      top: 16,
+      left: 16,
+    }}
+  >
+    <AutoAwesomeIcon 
+      sx={{ 
+        fontSize: 40, 
+        color: "#388e3c"
+      }} 
+    />
+  </Box>
+
+  {/* Chatbot Image in Center */}
+  <img 
+    src="https://botnation.ai/site/wp-content/uploads/2022/02/meilleur-chatbot.jpg" 
+    alt="Chatbot Icon" 
+    style={{ width: '160px', height: '160px', marginBottom: '20px' }} // Increase image size
+  />
+
+
+  
+    {/* Prompt Text */}
+    <Typography variant="h6" sx={{ marginBottom: 4 ,color:"#388e3c" }}>
+      What do you want to know about Automach?
+    </Typography>
+  
+    {/* Chat History */}
+    <Paper
+      elevation={3}
+      sx={{
+        width: '100%',
+        maxHeight: 400,
+        overflowY: 'auto',
+        padding: 2,
+        marginBottom: 2,
+        backgroundColor: '#f9f9f9',
+        border: '2px solid #388e3c', // Add border here with desired color
+    borderRadius: '8px', // Optional: Add rounded corners for a smoother look
+      }}
     >
-      {/* Chat History */}
-      <Paper
-        elevation={3}
-        sx={{
-          width: '100%',
-          maxHeight: 400,
-          overflowY: 'auto',
-          padding: 2,
-          marginBottom: 2,
-          backgroundColor: '#f9f9f9',
-        }}
-      >
-        {chatHistory.map((chat, index) => (
-          <Box key={index} sx={{ marginBottom: 2 }}>
-            {/* User Message */}
-            {chat.user && (
+      {chatHistory.map((chat, index) => (
+        <Box key={index} sx={{ marginBottom: 2 }}>
+          {/* User Message */}
+          {chat.user && (
+            <Box
+              sx={{
+                display: 'flex',
+                justifyContent: 'flex-start',
+                alignItems: 'center',
+                gap: 1,
+                marginBottom: 1,
+              }}
+            >
+              <Person4Icon sx={{ color: '#1976d2' }} /> 
               <Box
                 sx={{
-                  display: 'flex',
-                  justifyContent: 'flex-start', // Align to the right for user messages
-                  alignItems: 'center',
-                  gap: 1, // Space between icon and text
-                  marginBottom: 1,
+                  maxWidth: '75%',
+                  padding: 1.5,
+                  borderRadius: 3,
+                  backgroundColor: '#4aedc4',
+                  color: '#fff',
+                  textAlign: 'right',
                 }}
               >
-                {/* User Icon */}
-                <Person4Icon sx={{ color: '#1976d2' }} /> 
-
-                <Box
-                  sx={{
-                    maxWidth: '75%',
-                    padding: 1.5,
-                    borderRadius: 3,
-                    backgroundColor: '#4aedc4', // background for user messages
-                    color: '#fff',
-                    textAlign: 'right',
-                  }}
-                >
-                  <Typography variant="body1">
-                    {chat.user}
-                  </Typography>
-                </Box>
-
+                <Typography variant="body1">
+                  {chat.user}
+                </Typography>
               </Box>
-            )}
-            {/* Bot Message */}
-            {chat.bot && (
+            </Box>
+          )}
+          {/* Bot Message */}
+          {chat.bot && (
+            <Box
+              sx={{
+                display: 'flex',
+                justifyContent: 'flex-end',
+                alignItems: 'center',
+                gap: 1,
+              }}
+            >
+              <SmartToyIcon sx={{ color: '#555' }} />
               <Box
                 sx={{
-                  display: 'flex',
-                  justifyContent: 'flex-end', // Align to the left for bot messages
-                  alignItems: 'center',
-                  gap: 1, // Space between icon and text
+                  maxWidth: '75%',
+                  padding: 1.5,
+                  borderRadius: 3,
+                  backgroundColor: '#e0e0e0',
+                  color: '#000',
+                  textAlign: 'left',
                 }}
               >
-                <SmartToyIcon sx={{ color: '#555' }} />
-                <Box
-                  sx={{
-                    maxWidth: '75%',
-                    padding: 1.5,
-                    borderRadius: 3,
-                    backgroundColor: '#e0e0e0', // Gray background for bot messages
-                    color: '#000',
-                    textAlign: 'left',
-                  }}
-                >
-                  <Typography variant="body1">
-                    {chat.bot}
-                  </Typography>
-                </Box>
+                <Typography variant="body1">
+                  {chat.bot}
+                </Typography>
               </Box>
-            )}
-          </Box>
-        ))}
+            </Box>
+          )}
+        </Box>
+      ))}
+  
+      {/* Typing Indicator */}
+      {typing && (
+        <Typography variant="body2" sx={{ textAlign: 'left', marginTop: 1 }}>
+          <em>Bot is typing...</em>
+        </Typography>
+      )}
+    </Paper>
+  
+    {/* Error Message */}
+    {error && <Typography color="error" variant="body2">{error}</Typography>}
+  
+    {/* Input Field and Send Button */}
+    <Box display="flex" width="100%" gap={2}>
+  <TextField
+    label="Type your message"
+    variant="outlined"
+    fullWidth
+    value={userMessage}
+    onChange={(e) => setUserMessage(e.target.value)}
+    disabled={loading}
+    sx={{
+      '& .MuiOutlinedInput-root': {
+        '&.Mui-focused fieldset': {
+          borderColor: '#388e3c', // Border color when focused
+        },
+      },
+      '& .MuiInputLabel-root.Mui-focused': {
+        color: '#388e3c', // Label color when focused
+      },
+    }}
+  />
+    <IconButton 
+    color="primary" 
+    onClick={handleSendMessage} 
+    disabled={loading || !userMessage}
+    sx={{
+      // backgroundColor: '#388e3c', // Icon background color
+      '&:hover': {
+        backgroundColor: '#2e7d32', // Slightly darker green on hover
+      },
+      color: '#388e3c', // Icon color
+      maxWidth:"75px"
+    }}
+  >
+    {loading ? <CircularProgress size={24} /> : <SendIcon />} {/* Use icon here */}
+  </IconButton>
+</Box>
 
-        {/* Typing Indicator */}
-        {typing && (
-          <Typography variant="body2" sx={{ textAlign: 'left', marginTop: 1 }}>
-            <em>Bot is typing...</em>
-          </Typography>
-        )}
-      </Paper>
-
-      {/* Error Message */}
-      {error && <Typography color="error" variant="body2">{error}</Typography>}
-
-      {/* Input Field and Send Button */}
-      <Box display="flex" width="100%" gap={2}>
-        <TextField
-          label="Type your message"
-          variant="outlined"
-          fullWidth
-          value={userMessage}
-          onChange={(e) => setUserMessage(e.target.value)}
-          disabled={loading} // Disable input while loading
-        />
-        <Button variant="contained" color="primary" onClick={handleSendMessage} disabled={loading || !userMessage}>
-          {loading ? <CircularProgress size={24} /> : 'Send'}
-        </Button>
-      </Box>
-    </Box>
+  </Paper>
+  
+  
   );
 };
 

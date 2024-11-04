@@ -58,33 +58,6 @@ const Inventory = ({ userDetails }) => {
     
     
 
-    // useEffect(() => {
-    //     axios.get('http://localhost:8080/api/inventory/')
-    //         .then(inventoryResponse => {
-    //             console.log("Inventory Data: ", inventoryResponse.data);
-
-    //             axios.get('http://localhost:8080/api/products')
-    //                 .then(productsResponse => {
-    //                     console.log("Products Data: ", productsResponse.data);
-
-    //                     const products = productsResponse.data;
-    //                     const inventoryWithProductNames = inventoryResponse.data.map(item => {
-    //                         const product = products.find(p => p.prodId === item.productId);
-    //                         console.log("Matching Product: ", product);
-    //                         return {
-    //                             ...item,
-    //                             productName: product ? product.prodName : 'Unknown Product',
-    //                             blockedQuantity: item.blockedQuantity || 0,   // Ensure blockedQuantity is shown
-    //                             requiredQuantity: item.requiredQuantity || 0, // Ensure requiredQuantity is shown
-    //                         };
-    //                     });
-    //                     setInventory(inventoryWithProductNames);
-    //                     setFilteredInventory(inventoryWithProductNames);
-    //                 })
-    //                 .catch(error => console.error('Error fetching products:', error));
-    //         })
-    //         .catch(error => console.error('Error fetching inventory:', error));
-    // }, []);
 
     useEffect(() => {
         axios.get('http://localhost:8080/api/inventory/')
@@ -111,38 +84,6 @@ const Inventory = ({ userDetails }) => {
    
 
 
-    //handle update along with user messages 
-    // const handleUpdate = (index) => {
-    //     const actualIndex = page * rowsPerPage + index;
-    //     const updatedItem = filteredInventory[actualIndex];
-    
-    //     if (!updatedItem.inventoryId) {
-    //         console.error('Error: updatedItem.inventoryId is undefined');
-    //         return;
-    //     }
-    
-    //     setLoading(true);
-    //     const payload = {
-    //         quantity: updatedItem.quantity,
-    //     };
-    
-        
-    //     axios.put(`http://localhost:8080/api/inventory/${updatedItem.inventoryId}/quantity`, payload)
-    //         .then(response => {
-    //             const updatedInventory = [...inventory];
-    //             updatedInventory[actualIndex] = response.data;
-    //             setInventory(updatedInventory);
-    //             setFilteredInventory(updatedInventory);
-    //             setSnackbar({ open: true, message: 'Stock updated successfully!', severity: 'success' });
-    //         })
-    //         .catch(error => {
-    //             const errorMessage = error.response?.data?.message || 'Error updating inventory. Please check stock availability.';
-    //             setSnackbar({ open: true, message: errorMessage, severity: 'error' });
-    //         })
-    //         .finally(() => {
-    //             setLoading(false);
-    //         });
-    // };
     
 
     const handleUpdate = (index) => {
@@ -155,6 +96,8 @@ const Inventory = ({ userDetails }) => {
         }
     
         setLoading(true);
+
+        const oldQuantity = inventory[actualIndex].quantity; 
         const payload = {
             quantity: updatedItem.quantity,
         };
@@ -163,7 +106,7 @@ const Inventory = ({ userDetails }) => {
             .then(response => {
                 const updatedInventory = [...inventory];
                 updatedInventory[actualIndex] = response.data;
-    
+
                 // Reapply product names using the helper function
                 const mappedInventory = mapInventoryWithProductNames(updatedInventory, products);
     
@@ -293,7 +236,7 @@ const Inventory = ({ userDetails }) => {
                                 <TableCell>Available Quanity</TableCell>
                                 <TableCell>Blocked Quanity</TableCell>
                                 <TableCell>Required Quanity</TableCell>
-                                <TableCell>Modified By</TableCell>
+                                {/* <TableCell>Modified By</TableCell> */}
                                 <TableCell>Last Modified</TableCell>
                                 <TableCell style={{textAlign: 'center'}}>Alerts</TableCell>
                             </TableRow>
@@ -319,7 +262,7 @@ const Inventory = ({ userDetails }) => {
                                     <TableCell style={{ color: item.requiredQuantity > 0 ? 'red' : 'currentcolor' }}>
                                         {item.requiredQuantity}  {/* Display Required Quantity */}
                                     </TableCell>
-                                    <TableCell>{userDetails?.firstName} {userDetails?.lastName}</TableCell>
+                                    {/* <TableCell>{userDetails?.firstName} {userDetails?.lastName}</TableCell> */}
                                     <TableCell>{new Date(item.modifiedDate).toLocaleString()}</TableCell>
                                     <TableCell style={{textAlign: 'center'}}>
                                         {item.requiredQuantity > 0 ? (<Button

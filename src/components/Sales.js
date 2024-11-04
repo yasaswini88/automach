@@ -3,7 +3,7 @@ import axios from 'axios';
 import {
   Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper,
   TablePagination, IconButton, Dialog, DialogActions, DialogContent, DialogContentText, Select, MenuItem, Box,
-  DialogTitle, Button, TextField, useTheme, Chip, Grid, Autocomplete, InputLabel, FormControl, OutlinedInput, Typography
+  DialogTitle, Button, TextField, useTheme, Chip, Grid, Autocomplete, InputLabel, FormControl, OutlinedInput, Typography, Link,
 } from '@mui/material';
 import { Edit, Delete, KeyboardArrowDown, KeyboardArrowUp } from '@mui/icons-material';
 import dayjs from "dayjs";
@@ -13,7 +13,7 @@ import { formatDate } from '../utils/utilities';
 import ExpandMore from '@mui/icons-material/ExpandMore';
 import { TableSortLabel } from '@mui/material';
 import { Snackbar, Alert } from '@mui/material';
-
+import CustomersDialog from './CustomersDialog';
 
 
 
@@ -24,13 +24,14 @@ const Sales = ({ userDetails }) => {
   const [orderStatus, setOrderStatus] = useState('');
 
   const [expandedRow, setExpandedRow] = useState(null);
+  const [shippingOptions, setShippingOptions] = useState(['Pending', 'Shipped', 'Delivered']);
 
   //snackbar
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
 
 
   const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
   const [editSale, setEditSale] = useState(null);
   const [products, setProducts] = useState([]);
   const [inventory, setInventory] = useState([]);
@@ -43,6 +44,10 @@ const Sales = ({ userDetails }) => {
   const [sortedSales, setSortedSales] = useState([...sales]);
   const [orderStatusFilter, setOrderStatusFilter] = useState('');  // Filter for order status
   const [orderDecisionFilter, setOrderDecisionFilter] = useState('');  // Filter for order decision
+
+  // For Customer Names 
+  const [customers, setCustomers] = useState([]);
+
 
   // Separate state for Edit dialog
   const [formData, setFormData] = useState({
@@ -62,18 +67,43 @@ const Sales = ({ userDetails }) => {
     // productIds: [],
     // quantities: "",
     discountPercent: "",
-    orderStatus: "",
+    orderStatus: "Pending",
     orderCreatedDate: new Date(),
     createdUserId: userDetails.userId,
     orderDeliveryDate: "",
   });
 
+  // For New Customer Adding Dialog Box 
+
+  const [isCustomerDialogOpen, setIsCustomerDialogOpen] = useState(false);
+
+  const handleOpenCustomerDialog = () => {
+    setIsCustomerDialogOpen(true);
+  };
+
+  const handleCloseCustomerDialog = () => {
+    setIsCustomerDialogOpen(false);
+  };
+
+
+  const handleSaveCustomer = (customerData) => {
+    axios.post('http://localhost:8080/api/customers', customerData)
+      .then(() => {
+        setSnackbar({ open: true, message: 'Customer added successfully!', severity: 'success' });
+        handleCloseCustomerDialog();
+      })
+      .catch((error) => {
+        setSnackbar({ open: true, message: 'Error adding customer.', severity: 'error' });
+        console.error('Error adding customer:', error);
+      });
+  };
+
+
   //snack bar 
 
   const handleSnackbarClose = () => {
     setSnackbar({ ...snackbar, open: false });
-};
-
+  };
 
 
   // Fetch sales data
@@ -134,6 +164,28 @@ const Sales = ({ userDetails }) => {
 
   //     setSortedSales(sorted);
   // };
+
+  const filteredSales = sortedSales
+    .filter((sale) => !orderStatusFilter || sale.orderStatus.toLowerCase() === orderStatusFilter.toLowerCase())
+    .filter((sale) => !orderDecisionFilter || sale.orderDecision.toLowerCase() === orderDecisionFilter.toLowerCase());
+
+  //Fetching Customer Names 
+  useEffect(() => {
+    axios.get('http://localhost:8080/api/customers')
+      .then(response => setCustomers(response.data))
+      .catch(error => console.error('Error fetching customers:', error));
+  }, []);
+
+
+  //for pagination , not navigating to next page
+
+  useEffect(() => {
+    if (page > 0 && page * rowsPerPage >= filteredSales.length) {
+      setPage(0); // Reset page to 0 if filtered rows are fewer than the current page
+    }
+  }, [filteredSales.length, page, rowsPerPage]);
+
+
   const handleOrderStatusFilterChange = (event) => {
     setOrderStatusFilter(event.target.value);
   };
@@ -144,8 +196,9 @@ const Sales = ({ userDetails }) => {
 
 
   const handleSort = (column) => {
-    const isAsc = sortColumn === column && sortDirection === 'asc';
-    const newDirection = isAsc ? 'desc' : 'asc';
+    const isDesc = sortColumn === column && sortDirection === 'desc';
+    const newDirection = isDesc ? 'asc' : 'desc';
+
     setSortColumn(column);
     setSortDirection(newDirection);
 
@@ -165,7 +218,7 @@ const Sales = ({ userDetails }) => {
         return 0;
       }
 
-      return isAsc ? (aValue > bValue ? 1 : -1) : (aValue < bValue ? 1 : -1);
+      return isDesc ? (aValue > bValue ? 1 : -1) : (aValue < bValue ? 1 : -1);
     });
 
     setSortedSales(sorted);
@@ -178,6 +231,16 @@ const Sales = ({ userDetails }) => {
     setOpenDeleteDialog(true); // Open confirmation dialog
   };
 
+  // Handle delete button click
+  // const handleDelete = (sale) => {
+  //   if (sale.orderDecision.toLowerCase() === "confirmed") {
+  //     setSnackbar({ open: true, message: 'Order cannot be deleted', severity: 'error' });
+  //   } else {
+  //     setSaleToDelete(sale.saleId);       // Set sale ID
+  //     setOpenDeleteDialog(true); // Open confirmation dialog
+  //   }
+  // };
+
   // Confirm delete method
   const confirmDelete = () => {
     axios.delete(`http://localhost:8080/api/sales/${saleToDelete}`)
@@ -188,9 +251,66 @@ const Sales = ({ userDetails }) => {
         setSaleToDelete(null);  // Reset saleToDelete
       })
       .catch(error => {
-            setSnackbar({ open: true, message: 'Error deleting order.', severity: 'error' });
-        });
+        setSnackbar({ open: true, message: 'Error deleting order.', severity: 'error' });
+      });
   };
+
+  // useEffect(() => {
+  //   if (editSale) {
+  //     axios.get(`http://localhost:8080/api/sales/${editSale?.saleId}/ready-to-ship`).then(resp => {
+  //       if (resp) {
+  //         setShippingOptions(['Pending', 'Shipped', 'Delivered']);
+  //       } else {
+  //         setShippingOptions(['Pending']);
+  //       }
+  //       setOpenEdit(true);
+  //     });
+
+  //     console.log(shippingOptions)
+  //   }
+  // }, [editSale])
+
+  useEffect(() => {
+    if (editSale) {
+      axios.get(`http://localhost:8080/api/sales/${editSale?.saleId}/ready-to-ship`)
+        .then(resp => {
+          let options = [];
+          switch (editSale.orderStatus.toLowerCase()) {
+            case 'pending':
+              options = resp.data ? ['Pending', 'Shipped', 'Delivered'] : ['Pending'];
+              break;
+            case 'shipped':
+              options = ['Shipped', 'Delivered'];
+              break;
+            case 'delivered':
+              options = ['Delivered'];
+              break;
+            default:
+              options = ['Pending'];
+          }
+          setShippingOptions(options);
+          setOpenEdit(true); // Open edit dialog after setting the options
+        })
+        .catch(error => {
+          console.error('Error fetching ready-to-ship status:', error);
+          // Set shipping options based on the current status
+          let options = [];
+          switch (editSale.orderStatus.toLowerCase()) {
+            case 'shipped':
+              options = ['Delivered'];
+              break;
+            case 'delivered':
+              options = ['Delivered'];
+              break;
+            default:
+              options = ['Pending'];
+          }
+          setShippingOptions(options);
+          setOpenEdit(true);
+        });
+    }
+  }, [editSale]);
+
 
   // Handle dialog open for editing
   const handleEdit = (sale) => {
@@ -205,69 +325,73 @@ const Sales = ({ userDetails }) => {
       orderStatus: sale.orderStatus,
       orderDeliveryDate: new Date(sale.orderDeliveryDate).toISOString().split('T')[0],
     });
-    setOpenEdit(true);
   };
 
-  
+
 
   // Handle save (PUT request)
-// const handleSave = () => {
-//   const updatedSale = {
-//     ...formData,
-//     updatedUserId: userDetails.userId,
-//     updatedDate: new Date().toISOString(),
-//     quantities: Array.isArray(formData.quantities) ? formData.quantities : formData.quantities.split(',').map(Number), // Ensure quantities is an array before saving
-//   };
+  // const handleSave = () => {
+  //   const updatedSale = {
+  //     ...formData,
+  //     updatedUserId: userDetails.userId,
+  //     updatedDate: new Date().toISOString(),
+  //     quantities: Array.isArray(formData.quantities) ? formData.quantities : formData.quantities.split(',').map(Number), // Ensure quantities is an array before saving
+  //   };
 
-//   axios.put(`http://localhost:8080/api/sales/${editSale.saleId}`, updatedSale)
-//     .then(response => {
-//       setSales(sales.map(sale => (sale.saleId === editSale.saleId ? response.data : sale)));
-//       setOpenEdit(false);
-//     })
-//     .catch(error => console.error("Error updating sale:", error));
-// };
+  //   axios.put(`http://localhost:8080/api/sales/${editSale.saleId}`, updatedSale)
+  //     .then(response => {
+  //       setSales(sales.map(sale => (sale.saleId === editSale.saleId ? response.data : sale)));
+  //       setOpenEdit(false);
+  //     })
+  //     .catch(error => console.error("Error updating sale:", error));
+  // };
 
-// Handle save (PUT request)
-// Handle save (PUT request)
-const handleSave = () => {
+  // Handle save (PUT request)
+  // Handle save (PUT request)
+  const handleSave = () => {
 
-  // Extract the old quantities and product IDs from the sale being edited
-  const oldQuantities = editSale.quantities || [];
-  const productIds = editSale.products.map(product => product.prodId);
-  console.log(oldQuantities)
-  console.log(productIds )
+    // Extract the old quantities and product IDs from the sale being edited
+    const oldQuantities = editSale.quantities || [];
+    const productIds = editSale.products.map(product => product.prodId);
+    console.log(oldQuantities)
+    console.log(productIds)
 
-  // Check if `orderDecision` is changing from "Quoted" to "Confirmed"
-  const orderDecisionChangedToConfirmed = editSale.orderDecision.toLowerCase() === 'quoted' && formData.orderDecision.toLowerCase() === 'confirmed';
-console.log(orderDecisionChangedToConfirmed)
-  const updatedSale = {
-    ...formData,
-    updatedUserId: userDetails.userId,
-    updatedDate: new Date().toISOString(),
-    
-    quantities: Array.isArray(formData.quantities) ? formData.quantities : formData.quantities.split(',').map(Number), // Ensure quantities is an array before saving
-    oldQuantities: oldQuantities, // Add old quantities here
-    // productIds: productIds // Add product IDs here if needed
-    orderDecisionChangedToConfirmed: orderDecisionChangedToConfirmed // Flag to indicate change
-  
+    // Check if `orderDecision` is changing from "Quoted" to "Confirmed"
+    const orderDecisionChangedToConfirmed = editSale.orderDecision.toLowerCase() === 'quoted' && formData.orderDecision.toLowerCase() === 'confirmed';
+    console.log(orderDecisionChangedToConfirmed)
+    const updatedSale = {
+      ...formData,
+      updatedUserId: userDetails.userId,
+      updatedDate: new Date().toISOString(),
 
+      quantities: Array.isArray(formData.quantities) ? formData.quantities : formData.quantities.split(',').map(Number), // Ensure quantities is an array before saving
+      oldQuantities: oldQuantities, // Add old quantities here
+      // productIds: productIds // Add product IDs here if needed
+      orderDecisionChangedToConfirmed: orderDecisionChangedToConfirmed,// Flag to indicate change
+      orderStatus: formData.orderStatus.toLowerCase()
+    };
+
+    axios.put(`http://localhost:8080/api/sales/${editSale.saleId}`, updatedSale)
+      .then(response => {
+        setSales(sales.map(sale => (sale.saleId === editSale.saleId ? response.data : sale)));
+        axios.get('http://localhost:8080/api/sales')
+          .then(response => {
+            setSales(response.data);
+            setSortedSales(response.data);  // Initialize sortedSales
+          })
+          .catch(error => console.error('Error fetching sales:', error));
+        // Refresh inventory to reflect updated blocked/required quantities
+        axios.get('http://localhost:8080/api/inventory/')
+          .then(inventoryResponse => {
+            setInventory(inventoryResponse.data);
+            setSnackbar({ open: true, message: 'Order updated successfully!', severity: 'success' });
+          });
+        setOpenEdit(false);
+      })
+      .catch(error => {
+        setSnackbar({ open: true, message: 'Error updating order.', severity: 'error' });
+      });
   };
-
-  axios.put(`http://localhost:8080/api/sales/${editSale.saleId}`, updatedSale)
-    .then(response => {
-      setSales(sales.map(sale => (sale.saleId === editSale.saleId ? response.data : sale)));
-      // Refresh inventory to reflect updated blocked/required quantities
-      axios.get('http://localhost:8080/api/inventory/')
-        .then(inventoryResponse => {
-          setInventory(inventoryResponse.data);
-          setSnackbar({ open: true, message: 'Order updated successfully!', severity: 'success' });
-        });
-      setOpenEdit(false);
-    })
-    .catch(error => {
-      setSnackbar({ open: true, message: 'Error updating order.', severity: 'error' });
-  });
-};
 
 
 
@@ -327,31 +451,7 @@ console.log(orderDecisionChangedToConfirmed)
     setNewSale({ ...newSale, products: [...newSale.products, { prodId: '', quantity: '' }] });
   }
 
-  // // Handle form submission to add new order
-  // const handleAddOrder = () => {
-  //   const saleData = {
-  //     customerName: newSale.customerName,
-  //     orderDecision: newSale.orderDecision,
-  //     productIds: newSale.products.map(p => p.prodId),  // Product IDs from the dropdown
-  //     quantities: newSale.products.map(p => p.quantity),
-  //     discountPercent: newSale.discountPercent,
-  //     orderStatus: newSale.orderStatus,
-  //     orderCreatedDate: newSale.orderCreatedDate,
-  //     createdUserId: Number(newSale.createdUserId),
-  //     orderDeliveryDate: newSale.orderDeliveryDate,
-  //   };
 
-
-  //   axios.post("http://localhost:8080/api/sales", saleData)
-  //     .then(() => {
-  //       setSales([...sales, saleData]);
-  //       // setSales([...sales, response.data]);  // Add new sale to the sales list
-  //       handleCloseAdd(); // Close the add dialog
-  //     })
-  //     .catch((error) => {
-  //       console.error("Error adding new order:", error);
-  //     });
-  // };
 
   const handleAddOrder = () => {
     const saleData = {
@@ -359,7 +459,8 @@ console.log(orderDecisionChangedToConfirmed)
       orderDecision: newSale.orderDecision,
       productIds: newSale.products.map(p => p.prodId),
       quantities: newSale.products.map(p => p.quantity),
-      discountPercent: newSale.discountPercent,
+      // discountPercent: newSale.discountPercent,
+      discountPercent: newSale.discountPercent ? Number(newSale.discountPercent) : 0,
       orderStatus: newSale.orderStatus,
       orderCreatedDate: newSale.orderCreatedDate,
       createdUserId: Number(newSale.createdUserId),
@@ -367,21 +468,26 @@ console.log(orderDecisionChangedToConfirmed)
     };
 
     axios.post("http://localhost:8080/api/sales", saleData)
-    .then(() => {
+      .then(() => {
         axios.get('http://localhost:8080/api/sales')
-            .then(response => {
-                setSales(response.data);  
-                setSnackbar({ open: true, message: 'Order added successfully!', severity: 'success' });
-                handleCloseAdd();
-            })
-            .catch(error => {
-                setSnackbar({ open: true, message: 'Error fetching updated sales.', severity: 'error' });
-            });
-    })
-    .catch((error) => {
+          .then(response => {
+            setSales(response.data);
+            setSnackbar({ open: true, message: 'Order added successfully!', severity: 'success' });
+            axios.get('http://localhost:8080/api/sales') // Fetch orders again
+              .then(response => {
+                setSales(response.data);
+                setSortedSales(response.data); // Update sortedSales
+              })
+            handleCloseAdd();
+          })
+          .catch(error => {
+            setSnackbar({ open: true, message: 'Error fetching updated sales.', severity: 'error' });
+          });
+      })
+      .catch((error) => {
         setSnackbar({ open: true, message: 'Error adding new order.', severity: 'error' });
-    });
-};
+      });
+  };
 
   // Handle status updates for delivered orders
   const handleStatusUpdate = (saleId, newStatus) => {
@@ -395,11 +501,11 @@ console.log(orderDecisionChangedToConfirmed)
   };
 
 
-// Styling adjustments for light and dark modes
-const tableRowStyles = {
-  backgroundColor: theme.palette.mode === 'dark' ? '#424242' : '#f0f0f0',
-  borderBottom: `1px solid ${theme.palette.divider}`,
-};
+  // Styling adjustments for light and dark modes
+  const tableRowStyles = {
+    backgroundColor: theme.palette.mode === 'dark' ? '#424242' : '#f0f0f0',
+    borderBottom: `1px solid ${theme.palette.divider}`,
+  };
 
   const handleExpandClick = (saleId) => {
     setExpandedRow(expandedRow === saleId ? null : saleId);
@@ -418,45 +524,45 @@ const tableRowStyles = {
     <Paper>
       <h1 sx={{ ml: 3 }}>Sales Orders</h1>
       <Box display="flex" justifyContent="space-between" alignItems="center" sx={{ ml: 3, mt: 2 }}>
-  {/* Add New Order Button */}
-  <Button variant="contained" color="primary" onClick={handleClickOpenAdd}>
-    Add New Order
-  </Button>
+        {/* Add New Order Button */}
+        <Button variant="contained" color="primary" onClick={handleClickOpenAdd}>
+          Add New Order
+        </Button>
 
-  {/* Filters */}
-  <Box display="flex" gap={2} alignItems="center">
-    {/* Filter by Order Status */}
-    <FormControl sx={{ minWidth: 200 }}>
-      <InputLabel id="order-status-filter-label">Filter by Order Status</InputLabel>
-      <Select
-        labelId="order-status-filter-label"
-        value={orderStatusFilter}
-        onChange={handleOrderStatusFilterChange}
-        label="Filter by Order Status"
-      >
-        <MenuItem value="">All</MenuItem>
-        <MenuItem value="Pending">Pending</MenuItem>
-        <MenuItem value="Shipped">Shipped</MenuItem>
-        <MenuItem value="Delivered">Delivered</MenuItem>
-      </Select>
-    </FormControl>
+        {/* Filters */}
+        <Box display="flex" gap={2} alignItems="center">
+          {/* Filter by Order Status */}
+          <FormControl sx={{ minWidth: 200 }}>
+            <InputLabel id="order-status-filter-label">Filter by Order Status</InputLabel>
+            <Select
+              labelId="order-status-filter-label"
+              value={orderStatusFilter}
+              onChange={handleOrderStatusFilterChange}
+              label="Filter by Order Status"
+            >
+              <MenuItem value="">All</MenuItem>
+              <MenuItem value="Pending">Pending</MenuItem>
+              <MenuItem value="Shipped">Shipped</MenuItem>
+              <MenuItem value="Delivered">Delivered</MenuItem>
+            </Select>
+          </FormControl>
 
-    {/* Filter by Order Decision */}
-    <FormControl sx={{ minWidth: 200, mr: 3 }}> {/* Added margin-right to space it out */}
-      <InputLabel id="order-decision-filter-label">Filter by Order Decision</InputLabel>
-      <Select
-        labelId="order-decision-filter-label"
-        value={orderDecisionFilter}
-        onChange={handleOrderDecisionFilterChange}
-        label="Filter by Order Decision"
-      >
-        <MenuItem value="">All</MenuItem>
-        <MenuItem value="Quoted">Quoted</MenuItem>
-        <MenuItem value="Confirmed">Confirmed</MenuItem>
-      </Select>
-    </FormControl>
-  </Box>
-</Box>
+          {/* Filter by Order Decision */}
+          <FormControl sx={{ minWidth: 200, mr: 3 }}> {/* Added margin-right to space it out */}
+            <InputLabel id="order-decision-filter-label">Filter by Order Decision</InputLabel>
+            <Select
+              labelId="order-decision-filter-label"
+              value={orderDecisionFilter}
+              onChange={handleOrderDecisionFilterChange}
+              label="Filter by Order Decision"
+            >
+              <MenuItem value="">All</MenuItem>
+              <MenuItem value="Quoted">Quoted</MenuItem>
+              <MenuItem value="Confirmed">Confirmed</MenuItem>
+            </Select>
+          </FormControl>
+        </Box>
+      </Box>
 
 
       {/* <FormControl sx={{ ml: 3, minWidth: 200 }}>
@@ -475,13 +581,40 @@ const tableRowStyles = {
       <Dialog open={openAdd} onClose={handleCloseAdd}>
         <DialogTitle>Add New Order</DialogTitle>
         <DialogContent>
-          <TextField
+          {/* <TextField
             margin="dense"
             label="Customer Name"
             name="customerName"
             fullWidth
             onChange={handleInputChange}
+            sx={{ mb: 1 }}
+          /> */}
+
+          <Autocomplete
+            options={customers}
+            getOptionLabel={(option) => option.customerName}
+            onChange={(event, newValue) => {
+              setNewSale({ ...newSale, customerName: newValue ? newValue.customerName : '' });
+            }}
+            renderInput={(params) => (
+              <TextField {...params} label="Customer Name" margin="dense" fullWidth />
+            )}
+            sx={{ mb: 1 }}
           />
+
+
+
+          <Box display="flex" justifyContent="space-between" alignItems="center" sx={{ mb: 2 }}>
+
+            <Link
+              component="button"
+              variant="body2"
+              onClick={handleOpenCustomerDialog}
+              sx={{ cursor: 'pointer', color: 'primary.main', ml: 50 }}
+            >
+              Add New Customer
+            </Link>
+          </Box>
           <FormControl fullWidth>
             <InputLabel id="order-decision-label">Order Decision</InputLabel>
             <Select
@@ -546,7 +679,7 @@ const tableRowStyles = {
             onChange={handleInputChange}
           />
 
-          <FormControl fullWidth>
+          {/* <FormControl fullWidth>
             <InputLabel id="order-status-label">Order Status</InputLabel>
             <Select
               labelId="order-status-label"
@@ -556,29 +689,36 @@ const tableRowStyles = {
               onChange={(e) => setNewSale({ ...newSale, orderStatus: e.target.value })}
             >
               <MenuItem value="Pending">Pending</MenuItem>
-              {/* {/* <MenuItem value="Shipped">Shipped</MenuItem> */}
-              <MenuItem value="Delivered">Delivered</MenuItem> 
+          
             </Select>
-          </FormControl>
+          </FormControl> */}
+
+
 
 
 
           <TextField
-            type='date'
+            type="date"
             margin="dense"
-            label="Order Delivery Date"
+            label="Promised Delivery Date"
             InputLabelProps={{ shrink: true }}
             name="orderDeliveryDate"
             fullWidth
             onChange={handleInputChange}
+            // Set minimum date to today's date to restrict past dates
+            inputProps={{
+              min: dayjs().format("YYYY-MM-DD") // Ensure only future dates are selectable   
+            }}
           />
+
+
           <p>Order Creating Time: {new Date().toLocaleDateString() + ", " + new Date().toLocaleTimeString()}</p>
         </DialogContent>
         <DialogActions>
           <Button onClick={handleCloseAdd} color="secondary">
             Cancel
           </Button>
-          <Button onClick={handleAddOrder} color="primary">
+          <Button onClick={handleAddOrder} color="secondary">
             Add Order
           </Button>
         </DialogActions>
@@ -599,6 +739,7 @@ const tableRowStyles = {
                 >
                   Customer Name
                 </TableSortLabel>
+
               </TableCell>
               <TableCell>Order Decision</TableCell>
 
@@ -628,6 +769,11 @@ const tableRowStyles = {
             </TableRow>
           </TableHead>
           <TableBody>
+            {/* {sortedSales
+              .filter((sale) => !orderStatusFilter || sale.orderStatus.toLowerCase() === orderStatusFilter.toLowerCase())
+              .filter((sale) => !orderDecisionFilter || sale.orderDecision.toLowerCase() === orderDecisionFilter.toLowerCase())
+              .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+              .map((sale) => ( */}
             {sortedSales
               .filter((sale) => !orderStatusFilter || sale.orderStatus.toLowerCase() === orderStatusFilter.toLowerCase())
               .filter((sale) => !orderDecisionFilter || sale.orderDecision.toLowerCase() === orderDecisionFilter.toLowerCase())
@@ -637,7 +783,7 @@ const tableRowStyles = {
                   <TableCell>{sale.customerName}</TableCell>
                   <TableCell>
                     <Chip
-                      label={sale.orderDecision}
+                      label={sale.orderDecision.toUpperCase()}
                       color={
                         sale.orderDecision === 'confirmed' || sale.orderDecision === 'Confirmed'
                           ? 'success'
@@ -651,7 +797,7 @@ const tableRowStyles = {
 
                   <TableCell>
                     <Chip
-                      label={sale.orderStatus}
+                      label={sale.orderStatus.toUpperCase()}
                       color={
                         sale.orderStatus === 'pending' || sale.orderStatus === 'Pending'
                           ? 'warning'
@@ -690,6 +836,16 @@ const tableRowStyles = {
                       >
 
                       </Button>
+
+                      {/* <Button
+                        variant="outlined"
+                        color="error"
+                        onClick={() => handleDelete(sale)}
+                        startIcon={<Delete />}
+                        sx={{ width: '10%', padding: '6px 6px' }}
+                        disabled={sale.orderDecision.toLowerCase() === "confirmed"} // Disable if orderDecision is "confirmed"
+                      /> */}
+
                       {/* New View Details Dropdown */}
                       <Button
                         variant="outlined"
@@ -752,14 +908,24 @@ const tableRowStyles = {
       </TableContainer>
 
 
-      <TablePagination
+      {/* <TablePagination
         component="div"
         count={sales.length}
         page={page}
         onPageChange={handleChangePage}
         rowsPerPage={rowsPerPage}
         onRowsPerPageChange={handleChangeRowsPerPage}
+      /> */}
+
+      <TablePagination
+        component="div"
+        count={filteredSales.length}  // Use filtered sales count
+        page={page}
+        onPageChange={handleChangePage}
+        rowsPerPage={rowsPerPage}
+        onRowsPerPageChange={handleChangeRowsPerPage}
       />
+
 
       {/* Dialog for deleting sale */}
       <Dialog
@@ -845,9 +1011,7 @@ const tableRowStyles = {
               label="Order Status"
               name="orderStatus"
             >
-              <MenuItem value="Pending">Pending</MenuItem>
-              <MenuItem value="Shipped">Shipped</MenuItem>
-              <MenuItem value="Delivered">Delivered</MenuItem>
+              {shippingOptions.map((opt, idx) => <MenuItem key={idx} value={opt}>{opt}</MenuItem>)}
             </Select>
           </FormControl>
 
@@ -870,22 +1034,28 @@ const tableRowStyles = {
           </Button>
         </DialogActions>
       </Dialog>
+      {/* Customer Dialog */}
+      <CustomersDialog
+        open={isCustomerDialogOpen}
+        onClose={handleCloseCustomerDialog}
+        onSave={(customerData) => {
+          handleSaveCustomer(customerData);
+          setIsCustomerDialogOpen(false);
+        }}
+      />
       <Snackbar
-    open={snackbar.open}
-    autoHideDuration={6000}
-    onClose={handleSnackbarClose}
->
-    <Alert onClose={handleSnackbarClose} severity={snackbar.severity} sx={{ width: '100%' }}>
-        {snackbar.message}
-    </Alert>
-</Snackbar>
+        open={snackbar.open}
+        autoHideDuration={6000}
+        onClose={handleSnackbarClose}
+      >
+        <Alert onClose={handleSnackbarClose} severity={snackbar.severity} sx={{ width: '100%' }}>
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
     </Paper>
-    
+
   );
-  
 
-
-  
 
 };
 
