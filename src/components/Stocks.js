@@ -19,7 +19,7 @@ import {
   TableSortLabel
 } from '@mui/material';
 import SwapVertIcon from '@mui/icons-material/SwapVert';
-import { Snackbar} from '@mui/material';
+import { Snackbar } from '@mui/material';
 
 
 const Stocks = ({ userDetails }) => {
@@ -41,37 +41,37 @@ const Stocks = ({ userDetails }) => {
       .then(response => {
         setStocks(response.data);
         setFilteredStocks(response.data); // Initialize filtered stocks
-  
+
         // Filter only the materials with quantity below minimum and categorize them
         const categorizedAlerts = {
           critical: [],
           medium: [],
           low: []
         };
-  
+
         response.data.forEach(stock => {
           const { materialName } = stock.rawMaterial;
           const { quantity, minQuantity } = stock;
-  
+
           // Only consider materials below the minimum quantity
           if (quantity < minQuantity) {
             if (quantity < minQuantity / 2) {
               categorizedAlerts.critical.push(
-                  `Critical stock alert: ${materialName} is critically low with ${quantity} units remaining.`
+                `Critical stock alert: ${materialName} is critically low with ${quantity} units remaining.`
               );
-          } else if (quantity < minQuantity && quantity >= minQuantity / 1.5) {
+            } else if (quantity < minQuantity && quantity >= minQuantity / 1.5) {
               categorizedAlerts.medium.push(
-                  `Medium stock alert: ${materialName} is close to the threshold with ${quantity} units remaining.`
+                `Medium stock alert: ${materialName} is close to the threshold with ${quantity} units remaining.`
               );
-          } else if (quantity < minQuantity) {
+            } else if (quantity < minQuantity) {
               categorizedAlerts.low.push(
-                  `Low stock alert: ${materialName} is below threshold with ${quantity} units remaining.`
+                `Low stock alert: ${materialName} is below threshold with ${quantity} units remaining.`
               );
-          }
-          
+            }
+
           }
         });
-  
+
         // Sort the alerts alphabetically by the raw material name
         Object.keys(categorizedAlerts).forEach(category => {
           categorizedAlerts[category] = categorizedAlerts[category]
@@ -82,18 +82,18 @@ const Stocks = ({ userDetails }) => {
               return aName > bName ? 1 : -1;
             });
         });
-  
+
         setAlerts(categorizedAlerts);
       })
       .catch(error => {
         console.error('Error fetching stocks:', error.response ? error.response.data : error.message);
       });
   }, []);
-  
-//snack bar 
-const handleSnackbarClose = () => {
-  setSnackbar({ ...snackbar, open: false });
-};
+
+  //snack bar 
+  const handleSnackbarClose = () => {
+    setSnackbar({ ...snackbar, open: false });
+  };
 
   // Handle when a user clicks one of the alert buttons
   const handleAlertClick = (alertType) => {
@@ -272,17 +272,17 @@ const handleSnackbarClose = () => {
             />
           </Box>
         )}
-  {/* Snackbar for update notifications */}
-  <Snackbar
-        open={snackbar.open}
-        autoHideDuration={6000}
-        onClose={handleSnackbarClose}
-        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
-      >
-        <Alert onClose={handleSnackbarClose} severity={snackbar.severity} sx={{ width: '100%' }}>
-          {snackbar.message}
-        </Alert>
-      </Snackbar>
+        {/* Snackbar for update notifications */}
+        <Snackbar
+          open={snackbar.open}
+          autoHideDuration={6000}
+          onClose={handleSnackbarClose}
+          anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+        >
+          <Alert onClose={handleSnackbarClose} severity={snackbar.severity} sx={{ width: '100%' }}>
+            {snackbar.message}
+          </Alert>
+        </Snackbar>
 
 
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
@@ -321,7 +321,11 @@ const handleSnackbarClose = () => {
             <TableBody>
               {filteredStocks.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((stock, index) => (
                 <TableRow key={stock.raw_material_stock_id} sx={{ borderBottom: '1px solid lightgray' }}>
-                  <TableCell>{stock.rawMaterial.materialName}</TableCell>
+                  {/* <TableCell>{stock.rawMaterial.materialName}</TableCell> */}
+                  <TableCell>
+                    {stock.rawMaterial.materialName.charAt(0).toUpperCase() + stock.rawMaterial.materialName.slice(1).toLowerCase()}
+                  </TableCell>
+
                   <TableCell>{stock.quantity}</TableCell>
                   <TableCell>{stock.minQuantity}</TableCell>
                   <TableCell>

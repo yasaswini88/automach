@@ -34,7 +34,7 @@ import ForgotPassword from './components/ForgotPassword';
 import VerifyCode from './components/VerifyCode';
 import ResetPassword from './components/ResetPassword';
 import { Navigate } from 'react-router-dom';
-import {   Fab } from '@mui/material';
+import { Fab } from '@mui/material';
 import ChatIcon from '@mui/icons-material/Chat';  // Import chat icon
 import FloatingChatButton from './components/FloatingChatButton';
 import DeliveredOrders from './components/DeliveredOrders';
@@ -43,22 +43,22 @@ import Customers from './components/Customers';
 
 
 const App = () => {
-  
+
   const authState = useSelector((state) => state.auth);
   const dispatch = useDispatch();
 
   const [authChecked, setAuthChecked] = useState(false);
-  
+
   // Loading the auth state
   useEffect(() => {
     const loadAuthState = async () => {
       await dispatch(loadAuth());
       setAuthChecked(true);
     };
-  
+
     loadAuthState();
   }, [dispatch]);
-  
+
 
 
   const navigate = useNavigate();
@@ -105,7 +105,7 @@ const App = () => {
     fetchTopRawMaterials();
   }, []);
 
-  
+
 
   useEffect(() => {
     console.log("url changed");
@@ -166,34 +166,34 @@ const App = () => {
     setDrawerOpen(open);
   };
 
-    // State to control chatbot dialog open/close
-    const [chatOpen, setChatOpen] = useState(false);
+  // State to control chatbot dialog open/close
+  const [chatOpen, setChatOpen] = useState(false);
 
-    const handleChatOpen = () => {
-      setChatOpen(true);
-    };
-  
-    const handleChatClose = () => {
-      setChatOpen(false);
-    };
-  
-    // Floating Action Button (Chatbot)
-    <Fab
-      color="primary"
-      aria-label="chat"
-      onClick={handleChatOpen}
-      sx={{ position: 'fixed', bottom: 16, right: 16 }}  // Position FAB at bottom-right
-    >
-      <ChatIcon />
-    </Fab>
-  
-    {/* Chatbot dialog */}
-    <Dialog open={chatOpen} onClose={handleChatClose}>
-      <DialogContent>
-        <Chatbot userDetails={authState.userDetails} />
-      </DialogContent>
-    </Dialog>
-  
+  const handleChatOpen = () => {
+    setChatOpen(true);
+  };
+
+  const handleChatClose = () => {
+    setChatOpen(false);
+  };
+
+  // Floating Action Button (Chatbot)
+  <Fab
+    color="primary"
+    aria-label="chat"
+    onClick={handleChatOpen}
+    sx={{ position: 'fixed', bottom: 16, right: 16 }}  // Position FAB at bottom-right
+  >
+    <ChatIcon />
+  </Fab>
+
+  {/* Chatbot dialog */ }
+  <Dialog open={chatOpen} onClose={handleChatClose}>
+    <DialogContent>
+      <Chatbot userDetails={authState.userDetails} />
+    </DialogContent>
+  </Dialog>
+
 
   // Loading indicator while waiting for auth check
   if (!authChecked) {
@@ -216,7 +216,25 @@ const App = () => {
 
           <Box sx={{ display: 'flex', alignItems: 'center' }}>
             {/* Hamburger Menu */}
-            <Tooltip title={'Click to get more sections'}>
+            {/* Hamburger Menu - only show when logged in */}
+            {authState.isLoggedIn && (
+              <Tooltip title={'Click to get more sections'}>
+                <IconButton
+                  edge="start"
+                  color="inherit"
+                  aria-label="menu"
+                  onClick={toggleDrawer(true)}
+                  sx={{
+                    marginRight: '16px',
+                    color: '#fff',
+                  }}
+                >
+                  <MenuIcon />
+                </IconButton>
+              </Tooltip>
+            )}
+
+            {/* <Tooltip title={'Click to get more sections'}>
               <IconButton
                 edge="start"
                 color="inherit"
@@ -232,7 +250,7 @@ const App = () => {
               >
                 <MenuIcon />
               </IconButton>
-            </Tooltip>
+            </Tooltip> */}
             <Typography
               color="inherit"
               component={Link}
@@ -434,20 +452,34 @@ const App = () => {
 
       {/* User Profile Dialog */}
 
-      <CustomDialog open={openDialog} onClose={handleClose}>
+      <CustomDialog
+        open={openDialog}
+        onClose={handleClose}
+        fullWidth
+        PaperProps={{
+          sx: {
+            width: '1000px', // Set a specific width to avoid dynamic scaling
+            padding: 2,
+            overflow: 'visible', // Prevent overflow
+          },
+        }}
+      >
         <UserProfile userDetails={authState.userDetails} />
       </CustomDialog>
+
+
+
       <CustomDialog open={notificationDialogOpen} onClose={handleNotificationClose}>
         <NotificationAlerts alerts={stockAlerts} />
       </CustomDialog>
 
       {authState.isLoggedIn && (
-      <FloatingChatButton userDetails={authState.userDetails} />
-    )}
+        <FloatingChatButton userDetails={authState.userDetails} />
+      )}
 
 
     </ThemeProvider>
-    
+
   );
 };
 

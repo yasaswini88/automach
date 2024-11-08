@@ -1,15 +1,19 @@
 /* UserProfile.css */
 
 /* Style for the container box */
+/* Style for the container box */
 .profile-container {
   background-color: #f9f9f9; /* Light grey background for the profile box */
   border-radius: 12px; /* Slightly more rounded corners for a modern look */
   padding: 24px; /* Increase padding for better spacing */
   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1); /* Slightly deeper shadow for depth */
-  max-width: 600px; /* Limit the width of the profile box */
+  /* width: 500px; Increase the width to make it more spacious horizontally */
+  width: 100%;
+  max-width: 1000px;/* Set a larger max width to prevent scroll bar */
   margin: 30px auto; /* Center the box horizontally with more vertical space */
   border: 1px solid #ddd; /* Add a subtle border */
 }
+
 
 /* Style for the header */
 .profile-header {

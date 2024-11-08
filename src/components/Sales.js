@@ -49,6 +49,8 @@ const Sales = ({ userDetails }) => {
   const [customers, setCustomers] = useState([]);
 
 
+
+
   // Separate state for Edit dialog
   const [formData, setFormData] = useState({
     customerName: '',
@@ -86,17 +88,31 @@ const Sales = ({ userDetails }) => {
   };
 
 
+  // const handleSaveCustomer = (customerData) => {
+  //   axios.post('http://localhost:8080/api/customers', customerData)
+  //     .then(() => {
+  //       setSnackbar({ open: true, message: 'Customer added successfully!', severity: 'success' });
+  //       handleCloseCustomerDialog();
+  //     })
+  //     .catch((error) => {
+  //       setSnackbar({ open: true, message: 'Error adding customer.', severity: 'error' });
+  //       console.error('Error adding customer:', error);
+  //     });
+  // };
+
+
   const handleSaveCustomer = (customerData) => {
-    axios.post('http://localhost:8080/api/customers', customerData)
-      .then(() => {
-        setSnackbar({ open: true, message: 'Customer added successfully!', severity: 'success' });
-        handleCloseCustomerDialog();
-      })
-      .catch((error) => {
-        setSnackbar({ open: true, message: 'Error adding customer.', severity: 'error' });
-        console.error('Error adding customer:', error);
-      });
-  };
+  axios.post('http://localhost:8080/api/customers', customerData)
+    .then(() => {
+      setSnackbar({ open: true, message: 'Customer added successfully!', severity: 'success' });
+      fetchCustomers();
+      handleCloseCustomerDialog();
+    })
+    .catch((error) => {
+      console.error('Error adding customer:', error); // Log the exact error for debugging
+      setSnackbar({ open: true, message: 'Error adding customer.', severity: 'error' });
+    });
+};
 
 
   //snack bar 
@@ -170,12 +186,15 @@ const Sales = ({ userDetails }) => {
     .filter((sale) => !orderDecisionFilter || sale.orderDecision.toLowerCase() === orderDecisionFilter.toLowerCase());
 
   //Fetching Customer Names 
-  useEffect(() => {
+  const fetchCustomers = () => {
     axios.get('http://localhost:8080/api/customers')
-      .then(response => setCustomers(response.data))
-      .catch(error => console.error('Error fetching customers:', error));
+    .then(response => setCustomers(response.data))
+    .catch(error => console.error('Error fetching customers:', error));
+  };
+  useEffect(() => {
+    fetchCustomers();
   }, []);
-
+  
 
   //for pagination , not navigating to next page
 
@@ -603,7 +622,7 @@ const Sales = ({ userDetails }) => {
           />
 
 
-
+ 
           <Box display="flex" justifyContent="space-between" alignItems="center" sx={{ mb: 2 }}>
 
             <Link
@@ -614,7 +633,8 @@ const Sales = ({ userDetails }) => {
             >
               Add New Customer
             </Link>
-          </Box>
+            
+          </Box> 
           <FormControl fullWidth>
             <InputLabel id="order-decision-label">Order Decision</InputLabel>
             <Select
@@ -1038,9 +1058,10 @@ const Sales = ({ userDetails }) => {
       <CustomersDialog
         open={isCustomerDialogOpen}
         onClose={handleCloseCustomerDialog}
-        onSave={(customerData) => {
-          handleSaveCustomer(customerData);
+        onSave={async (customerData) => {
+        await  handleSaveCustomer(customerData);
           setIsCustomerDialogOpen(false);
+          return null;
         }}
       />
       <Snackbar

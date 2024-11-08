@@ -63,8 +63,8 @@ const Supplier = () => {
 
   const { isLoaded, loadError } = useLoadScript({
     googleMapsApiKey: 'AIzaSyDGHTc6OClMANPGNji-8fwLoxvNkwqdhF0',
-    libraries: ['places'],
-    onLoad: () => setPlacesLoaded(true),
+    libraries: ['places'], // Loading the "places" tool from Google.
+    onLoad: () => setPlacesLoaded(true), // This means once loaded, it sets a value to let the rest of your code know it's ready.
   });
 
   // useEffect(() => {
@@ -76,18 +76,23 @@ const Supplier = () => {
 
   // added this for trying autocomplete places
   const fetchPlaceSuggestions = async (inputValue) => {
-    if (!inputValue) return;
+    if (!inputValue) return; // If the input is empty, do nothing.
 
+    // Create a service to get address suggestions
     const service = new window.google.maps.places.AutocompleteService();
+
+     // Use this service to get suggestions based on what was typed
     service.getPlacePredictions(
       { input: inputValue, componentRestrictions: { country: "us" } },
       (predictions, status) => {
-        if (status === window.google.maps.places.PlacesServiceStatus.OK) {
+        if (status === window.google.maps.places.PlacesServiceStatus.OK) 
+          {
+            // This is the suggested address.
           const suggestions = predictions.map(prediction => ({
             description: prediction.description,
-            placeId: prediction.place_id,
+            placeId: prediction.place_id, // This is a unique ID for each suggested place.
           }));
-          setAddressSuggestions(suggestions);
+          setAddressSuggestions(suggestions); // Store the suggestions so we can show them to the user.
         }
       }
     );
@@ -180,10 +185,13 @@ const Supplier = () => {
 
   // Handle place changed to autofill the address details
   const fetchSelectedPlaceDetails = (placeId) => {
+
+   // Create a service to get detailed address information based on placeId
     const service = new window.google.maps.places.PlacesService(document.createElement('div'));
 
     service.getDetails({ placeId }, (place, status) => {
       if (status === window.google.maps.places.PlacesServiceStatus.OK) {
+        // Create an empty object to store address parts
         const addressComponents = {
           addressLine1: '',
           addressLine2: '',
@@ -192,6 +200,8 @@ const Supplier = () => {
           postalCode: '',
         };
 
+
+        // Loop through the components of the address and fill the appropriate fields
         place.address_components.forEach(component => {
           const types = component.types;
 
@@ -215,6 +225,7 @@ const Supplier = () => {
           }
         });
 
+          // Update the selected supplier’s details with the complete address information
         setSelectedSupplier((prevSupplier) => ({
           ...prevSupplier,
           ...addressComponents,

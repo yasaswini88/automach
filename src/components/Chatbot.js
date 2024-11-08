@@ -115,20 +115,31 @@ const Chatbot = ({ userDetails }) => {
           return orderMessage;
         
 // For orders related to raw materials 
-          case url.includes('/api/orders') && queryContext.orderStatus:
-        const statusUrl = `http://localhost:8080/api/orders?status=${queryContext.orderStatus}`;
-        response = await axios.get(statusUrl);
+        //   case url.includes('/api/orders') && queryContext.orderStatus:
+        // const statusUrl = `http://localhost:8080/api/orders?status=${queryContext.orderStatus}`;
+        // response = await axios.get(statusUrl);
 
-        if (!response.data || response.data.length === 0) {
-          return `No orders found with status ${queryContext.orderStatus}.`;
-        }
+        // if (!response.data || response.data.length === 0) {
+        //   return `No orders found with status ${queryContext.orderStatus}.`;
+        // }
 
-        // Format each order item into the specified format
-        const ordersMessage = response.data.map((order, index) => {
-          return `${index + 1}. ${order.rawMaterialName}, Quantity: ${order.rawMaterialQuantity} units, Supplier: ${order.supplierName}`;
-        }).join(" | "); // Use a separator (|) to format nicely in one line
+        // // Format each order item into the specified format
+        // const ordersMessage = response.data.map((order, index) => {
+        //   return `${index + 1}. ${order.rawMaterialName}, Quantity: ${order.rawMaterialQuantity} units, Supplier: ${order.supplierName}`;
+        // }).join(" | "); // Use a separator (|) to format nicely in one line
 
-        return `Raw Materials with ${queryContext.orderStatus} order status are: ${ordersMessage}.`;
+        // return `Raw Materials with ${queryContext.orderStatus} order status are: ${ordersMessage}.`;
+
+        case url.includes('/api/orders') && url.includes('?status='):
+  response = await axios.get(url);
+  if (!response.data || response.data.length === 0) {
+    return `No orders found with status ${queryContext.orderStatus}.`;
+  }
+  const ordersMessage = response.data.map((order, index) => {
+    return `${index + 1}. ${order.rawMaterialName}, Quantity: ${order.rawMaterialQuantity} units, Supplier: ${order.supplierName}`;
+  }).join(" | ");
+  return `Raw Materials with ${queryContext.orderStatus} order status are: ${ordersMessage}.`;
+
   
         // Low Stock Alerts for Commonly Used Raw Materials
         case url === 'http://localhost:8080/api/sales/top-raw-materials/low-stock':
@@ -253,7 +264,7 @@ const Chatbot = ({ userDetails }) => {
   <img 
     src="https://botnation.ai/site/wp-content/uploads/2022/02/meilleur-chatbot.jpg" 
     alt="Chatbot Icon" 
-    style={{ width: '160px', height: '160px', marginBottom: '20px' }} // Increase image size
+    style={{ width: '160px', height: '100px', marginBottom: '10px' }} // Increase image size
   />
 
 
@@ -273,7 +284,7 @@ const Chatbot = ({ userDetails }) => {
         padding: 2,
         marginBottom: 2,
         backgroundColor: '#f9f9f9',
-        border: '2px solid #388e3c', // Add border here with desired color
+       
     borderRadius: '8px', // Optional: Add rounded corners for a smoother look
       }}
     >
