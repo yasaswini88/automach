@@ -175,7 +175,7 @@ const NewHome = ({ userDetails }) => {
 
     const fetchSalesData = async () => {
         try {
-            const response = await axios.get('http://localhost:8080/api/sales');
+            const response = await axios.get('/api/sales');
             const sales = response.data;
 
             // Get today's date, one week from today, and two weeks from today
@@ -356,7 +356,7 @@ const NewHome = ({ userDetails }) => {
 
     const fetchOrders = async () => {
         try {
-            const response = await axios.get('http://localhost:8080/api/orders');
+            const response = await axios.get('/api/orders');
             const fetchedOrders = response.data;
             setOrders(fetchedOrders);
             filterPendingOrders(fetchedOrders);
@@ -383,7 +383,7 @@ const NewHome = ({ userDetails }) => {
     useEffect(() => {
         const fetchOrderStatus = async () => {
             try {
-                const response = await axios.get('http://localhost:8080/api/orders');
+                const response = await axios.get('/api/orders');
                 const orders = response.data;
 
                 const twoWeeksAgo = dayjs().subtract(`14`, 'days').startOf('day'); // get date 2 weeks ago
@@ -411,12 +411,12 @@ const NewHome = ({ userDetails }) => {
         const fetchRawMaterialData = async () => {
             try {
                 // Step 1: Fetch the top 10 most commonly used raw materials
-                const topRawMaterialsResponse = await axios.get('http://localhost:8080/api/sales/top-raw-materials');
+                const topRawMaterialsResponse = await axios.get('/api/sales/top-raw-materials');
                 const topRawMaterials = topRawMaterialsResponse.data.slice(0, 10); // Limit to top 10
                 console.log('Top Raw Materials:', topRawMaterials);
 
                 // Step 2: Fetch all raw material stocks
-                const stockResponse = await axios.get('http://localhost:8080/api/rawMaterialStock');
+                const stockResponse = await axios.get('/api/rawMaterialStock');
                 const allStocks = stockResponse.data;
                 console.log('All Raw Material Stocks:', allStocks);
 

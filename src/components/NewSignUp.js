@@ -15,8 +15,12 @@ import Alert from '@mui/material/Alert';
 import { Typography } from "@mui/material";
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import { IconButton, InputAdornment } from '@mui/material';
+import { useNavigate } from "react-router-dom";
+
 
 const NewSignUp = () => {
+
+  const navigate = useNavigate();
 
   const genders = [
     { label: "Male", value: "male" },
@@ -65,7 +69,7 @@ const NewSignUp = () => {
     if (!formData.email) return; // Skip check if email is empty
 
     try {
-      const response = await axios.get("http://localhost:8080/api/users");
+      const response = await axios.get("/api/users");
       const existingUser = response.data.find(user => user.email === formData.email);
 
       if (existingUser) {
@@ -176,7 +180,7 @@ const NewSignUp = () => {
     }
 
     try {
-      const response = await axios.post('http://localhost:8080/api/users', {
+      const response = await axios.post('/api/users', {
         firstName: formData.firstName,
         lastName: formData.lastName,
         gender: formData.gender,
@@ -189,6 +193,10 @@ const NewSignUp = () => {
       });
       console.log('User successfully signed up:', response.data);
       setSnackbar({ open: true, message: 'Signup successful!', severity: 'success' });
+      setTimeout(() => {
+        navigate('/login');  // Automatically navigate after showing success message
+    }, 2000);  // 2-second delay for user to read the Snackbar message
+
     } catch (error) {
       console.error('There was an error submitting the form:', error);
       setSnackbar({ open: true, message: 'Signup failed. Please try again.', severity: 'error' });

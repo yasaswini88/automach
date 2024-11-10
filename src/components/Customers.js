@@ -20,7 +20,7 @@ const Customers = () => {
 
   const fetchCustomers = async () => {
     try {
-      const response = await axios.get('http://localhost:8080/api/customers');
+      const response = await axios.get('/api/customers');
       setCustomers(response.data);
     } catch (error) {
       console.error('Error fetching customers:', error);
@@ -40,10 +40,10 @@ const Customers = () => {
   const handleSaveCustomer = async (customer) => {
     try {
       if (selectedCustomer) {
-        await axios.put(`http://localhost:8080/api/customers/${selectedCustomer.id}`, customer);
+        await axios.put(`/api/customers/${selectedCustomer.id}`, customer);
         setSnackbar({ open: true, message: 'Customer updated successfully!', severity: 'success' });
       } else {
-        await axios.post('http://localhost:8080/api/customers', customer);
+        await axios.post('/api/customers', customer);
         setSnackbar({ open: true, message: 'Customer added successfully!', severity: 'success' });
       }
       fetchCustomers();
@@ -61,7 +61,7 @@ const Customers = () => {
 
   const confirmDeleteCustomer = async () => {
     try {
-      await axios.delete(`http://localhost:8080/api/customers/${customerToDelete}`);
+      await axios.delete(`/api/customers/${customerToDelete}`);
       setSnackbar({ open: true, message: 'Customer deleted successfully!', severity: 'success' });
       fetchCustomers();
     } catch (error) {

@@ -25,7 +25,7 @@ const DeliveredOrders = ({ userDetails }) => {
 
     useEffect(() => {
         // Fetch delivered orders
-        axios.get('http://localhost:8080/api/orders?status=Delivered')
+        axios.get('/api/orders?status=Delivered')
             .then(response => setDeliveredOrders(response.data))
             .catch(error => console.error('Error fetching delivered orders:', error));
 
@@ -35,7 +35,7 @@ const DeliveredOrders = ({ userDetails }) => {
 
     const fetchUsers = async () => {
         try {
-            const response = await axios.get('http://localhost:8080/api/users');
+            const response = await axios.get('/api/users');
             setUsers(response.data); // Store users data in state
         } catch (error) {
             console.error('Error fetching users:', error);

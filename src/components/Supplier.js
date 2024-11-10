@@ -55,14 +55,14 @@ const Supplier = () => {
 
   // Fetch raw materials when the component loads
   useEffect(() => {
-    axios.get('http://localhost:8080/api/rawmaterials')
+    axios.get('/api/rawmaterials')
       .then(response => setRawMaterials(response.data))
       .catch(error => console.error('Error fetching raw materials:', error));
   }, []);
 
 
   const { isLoaded, loadError } = useLoadScript({
-    googleMapsApiKey: 'AIzaSyDGHTc6OClMANPGNji-8fwLoxvNkwqdhF0',
+    googleMapsApiKey: process.env.REACT_APP_GOOGLE_API_KEY,
     libraries: ['places'], // Loading the "places" tool from Google.
     onLoad: () => setPlacesLoaded(true), // This means once loaded, it sets a value to let the rest of your code know it's ready.
   });
@@ -111,13 +111,13 @@ const Supplier = () => {
   }, []);
 
   const fetchSuppliers = async () => {
-    const response = await axios.get('http://localhost:8080/api/suppliers');
+    const response = await axios.get('/api/suppliers');
     setSuppliers(response.data);
     setFilteredSuppliers(response.data); // Initialize filtered suppliers
   };
 
   const fetchOrders = async () => {
-    const response = await axios.get('http://localhost:8080/api/orders');
+    const response = await axios.get('/api/orders');
     setOrders(response.data);
   };
 
@@ -161,11 +161,11 @@ const Supplier = () => {
     try {
       if (selectedSupplier.id) {
         // Update supplier
-        await axios.put(`http://localhost:8080/api/suppliers/${selectedSupplier.id}`, supplierData);
+        await axios.put(`/api/suppliers/${selectedSupplier.id}`, supplierData);
         setSnackbar({ open: true, message: 'Supplier updated successfully!', severity: 'success' });
       } else {
         // Add new supplier
-        await axios.post('http://localhost:8080/api/suppliers', supplierData);
+        await axios.post('/api/suppliers', supplierData);
         setSnackbar({ open: true, message: 'Supplier created successfully!', severity: 'success' });
       }
       setOpen(false);
@@ -241,7 +241,7 @@ const Supplier = () => {
   const confirmDeleteSupplier = async () => {
     try {
       // Attempt to delete the supplier, regardless of open orders
-      await axios.delete(`http://localhost:8080/api/suppliers/${selectedSupplier.id}`);
+      await axios.delete(`/api/suppliers/${selectedSupplier.id}`);
       fetchSuppliers(); // Refresh the supplier list after deletion
       setSnackbar({ open: true, message: 'Supplier deleted successfully!', severity: 'success' });
     } catch (error) {

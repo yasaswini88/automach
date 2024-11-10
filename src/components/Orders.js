@@ -95,7 +95,7 @@ const Orders = ({ userDetails }) => {
 
   const fetchSuppliers = async () => {
     try {
-      const response = await axios.get('http://localhost:8080/api/suppliers');
+      const response = await axios.get('/api/suppliers');
       setSuppliers(response.data);
     } catch (error) {
       console.error('Error fetching suppliers:', error);
@@ -104,7 +104,7 @@ const Orders = ({ userDetails }) => {
 
   const fetchOrders = async () => {
     try {
-      const response = await axios.get('http://localhost:8080/api/orders');
+      const response = await axios.get('/api/orders');
       const nonDeliveredOrders = response.data.filter(order => order.status !== 'Delivered');
       setOrders(nonDeliveredOrders);
       setFilteredOrders(nonDeliveredOrders); // Set filtered orders to non-delivered orders initially
@@ -174,7 +174,7 @@ const Orders = ({ userDetails }) => {
 
     // Fetch suppliers that supply the selected raw material
     if (newValue) {
-      axios.get(`http://localhost:8080/api/suppliers/by-raw-material/${newValue.id}`)
+      axios.get(`/api/suppliers/by-raw-material/${newValue.id}`)
         .then(response => setFilteredSuppliers(response.data))
         .catch(error => console.error('Error fetching suppliers:', error));
     } else {
@@ -207,8 +207,8 @@ const Orders = ({ userDetails }) => {
       };
 
       const response = editMode
-        ? await axios.put(`http://localhost:8080/api/orders/${newOrder.orderId}`, orderData)
-        : await axios.post('http://localhost:8080/api/orders', orderData);
+        ? await axios.put(`/api/orders/${newOrder.orderId}`, orderData)
+        : await axios.post('/api/orders', orderData);
 
       if (editMode) {
         setOrders(orders.map((order) => (order.orderId === response.data.orderId ? response.data : order)));
@@ -261,7 +261,7 @@ const Orders = ({ userDetails }) => {
  
 const confirmDeleteOrder = async () => {
   try {
-      await axios.delete(`http://localhost:8080/api/orders/${orderToDelete}`);
+      await axios.delete(`/api/orders/${orderToDelete}`);
       setOrders(orders.filter((order) => order.orderId !== orderToDelete));
       filterOrders(statusFilter, materialFilter); // Filter orders after deletion
       setSnackbar({ open: true, message: 'Order deleted successfully!', severity: 'success' });
@@ -312,7 +312,7 @@ const confirmDeleteOrder = async () => {
 
   const fetchUsers = async () => {
     try {
-      const response = await axios.get('http://localhost:8080/api/users');
+      const response = await axios.get('/api/users');
       setUsers(response.data); // Store users data in state
     } catch (error) {
       console.error('Error fetching users:', error);

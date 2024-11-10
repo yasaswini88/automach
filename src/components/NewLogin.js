@@ -52,7 +52,7 @@ const NewLogin = () => {
         event.preventDefault();
     
         try {
-            const response = await axios.post('http://localhost:8080/api/login', { email: username, password });
+            const response = await axios.post('/api/login', { email: username, password });
     
             if (response.status === 200) {
                 const userDetails = response.data;

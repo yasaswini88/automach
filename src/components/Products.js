@@ -92,7 +92,7 @@ const Products = () => {
 
 
   useEffect(() => {
-    axios.get('http://localhost:8080/api/rawmaterials')
+    axios.get('/api/rawmaterials')
       .then(response => {
         setMaterialOptions(response.data);
       })
@@ -126,7 +126,7 @@ const Products = () => {
   }, [searchQuery, categoryFilter, tagFilter]);
 
   // useEffect(() => {
-  //   axios.get('http://localhost:8080/api/products')
+  //   axios.get('/api/products')
   //     .then(response => {
   //       setProducts(response.data);
   //       setLoading(false);
@@ -139,7 +139,7 @@ const Products = () => {
   // }, []);
 
   useEffect(() => {
-    axios.get('http://localhost:8080/api/products')
+    axios.get('/api/products')
       .then(response => {
         setProducts(response.data);
         setLoading(false);
@@ -154,7 +154,7 @@ const Products = () => {
 
 
   useEffect(() => {
-    axios.get('http://localhost:8080/api/categories')
+    axios.get('/api/categories')
       .then(response => {
         setCategories(response.data);
       })
@@ -162,7 +162,7 @@ const Products = () => {
         console.error('There was an error fetching the categories!', error);
       });
 
-    axios.get('http://localhost:8080/api/tags')
+    axios.get('/api/tags')
       .then(response => {
         setTags(response.data);
       })
@@ -173,7 +173,7 @@ const Products = () => {
 
   const fetchRawMaterials = async (prodId) => {
     try {
-      const response = await axios.get(`http://localhost:8080/api/products/${prodId}/materials`);
+      const response = await axios.get(`/api/products/${prodId}/materials`);
       setRawMaterials(response.data);
       setSelectedProduct(prodId);
     } catch (error) {
@@ -251,7 +251,7 @@ const Products = () => {
 
     console.log('Payload being sent:', payload);
 
-    axios.post('http://localhost:8080/api/products', payload)
+    axios.post('/api/products', payload)
       .then(response => {
         setProducts([...products, response.data]);
         setSnackbar({ open: true, message: 'Product created successfully!', severity: 'success' });

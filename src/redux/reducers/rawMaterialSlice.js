@@ -5,7 +5,7 @@ import axios from "axios";
 export const fetchRawMaterials = createAsyncThunk(
   "rawMaterials/fetchRawMaterials",
   async () => {
-    const response = await axios.get("http://localhost:8080/api/rawmaterials");
+    const response = await axios.get("/api/rawmaterials");
     return response.data;
   }
 );
@@ -13,7 +13,7 @@ export const fetchRawMaterials = createAsyncThunk(
 export const addRawMaterial = createAsyncThunk(
   "rawMaterials/addRawMaterial",
   async (newMaterial) => {
-    const response = await axios.post("http://localhost:8080/api/rawmaterials", newMaterial);
+    const response = await axios.post("/api/rawmaterials", newMaterial);
     return response.data;
   }
 );
@@ -21,7 +21,7 @@ export const addRawMaterial = createAsyncThunk(
 export const updateRawMaterial = createAsyncThunk(
   "rawMaterials/updateRawMaterial",
   async (updatedMaterial) => {
-    const response = await axios.put(`http://localhost:8080/api/rawmaterials/${updatedMaterial.id}`, updatedMaterial);
+    const response = await axios.put(`/api/rawmaterials/${updatedMaterial.id}`, updatedMaterial);
     return response.data;
   }
 );
@@ -29,7 +29,7 @@ export const updateRawMaterial = createAsyncThunk(
 export const deleteRawMaterial = createAsyncThunk(
   "rawMaterials/deleteRawMaterial",
   async (id) => {
-    await axios.delete(`http://localhost:8080/api/rawmaterials/${id}`);
+    await axios.delete(`/api/rawmaterials/${id}`);
     return id;
   }
 );

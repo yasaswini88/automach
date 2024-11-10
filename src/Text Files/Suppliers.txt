@@ -9,9 +9,9 @@ const RequiredProductsStockAlerts = () => {
         const fetchData = async () => {
             try {
                 // Fetch all products and inventory data
-                const productsResponse = await axios.get('http://localhost:8080/api/products');
-                const inventoryResponse = await axios.get('http://localhost:8080/api/inventory');
-                const rawMaterialStockResponse = await axios.get('http://localhost:8080/api/rawMaterialStock');
+                const productsResponse = await axios.get('/api/products');
+                const inventoryResponse = await axios.get('/api/inventory');
+                const rawMaterialStockResponse = await axios.get('/api/rawMaterialStock');
 
                 const products = productsResponse.data;
                 const inventory = inventoryResponse.data;

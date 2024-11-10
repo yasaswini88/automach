@@ -44,7 +44,7 @@ const NewSignUp = () => {
         if (!formData.email) return; // Skip check if email is empty
 
         try {
-            const response = await axios.get("http://localhost:8080/api/users");
+            const response = await axios.get("/api/users");
             const existingUser = response.data.find(user => user.email === formData.email);
             
             if (existingUser) {
@@ -115,7 +115,7 @@ const NewSignUp = () => {
         if (!validateForm()) return;  // Validate form fields
 
         try {
-            const response = await axios.post('http://localhost:8080/api/users', {
+            const response = await axios.post('/api/users', {
                 ...formData,
                 dateOfBirth: formData.dateOfBirth.format('YYYY-MM-DD'), 
             });

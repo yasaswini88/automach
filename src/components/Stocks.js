@@ -37,7 +37,7 @@ const Stocks = ({ userDetails }) => {
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
 
   useEffect(() => {
-    axios.get('http://localhost:8080/api/rawMaterialStock')
+    axios.get('/api/rawMaterialStock')
       .then(response => {
         setStocks(response.data);
         setFilteredStocks(response.data); // Initialize filtered stocks
@@ -82,6 +82,16 @@ const Stocks = ({ userDetails }) => {
               return aName > bName ? 1 : -1;
             });
         });
+        // Sort the alerts alphabetically by the raw material name
+        // Object.keys(categorizedAlerts).forEach(category => {
+        //   categorizedAlerts[category].sort((a, b) => {
+        //     // Extract the material name part from the alert string for comparison
+        //     const aName = a.match(/: (.*?) is/)[1].toLowerCase();
+        //     const bName = b.match(/: (.*?) is/)[1].toLowerCase();
+        //     return aName.localeCompare(bName);
+        //   });
+        // });
+
 
         setAlerts(categorizedAlerts);
       })
@@ -118,7 +128,7 @@ const Stocks = ({ userDetails }) => {
       minQuantity: updatedStock.minQuantity
     };
 
-    axios.put(`http://localhost:8080/api/rawMaterialStock/${updatedStock.raw_material_stock_id}`, payload)
+    axios.put(`/api/rawMaterialStock/${updatedStock.raw_material_stock_id}`, payload)
       .then(response => {
         const updatedStocks = [...stocks];
         updatedStocks[actualIndex] = response.data;

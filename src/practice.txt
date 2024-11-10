@@ -42,7 +42,7 @@ const Sales = () => {
   // Fetch sales from the backend
   useEffect(() => {
     axios
-      .get("http://localhost:8080/api/sales")
+      .get("/api/sales")
       .then((response) => setSales(response.data))
       .catch((error) => console.error(error));
   }, []);
@@ -61,7 +61,7 @@ const Sales = () => {
   // Handle delete sale
   const handleDelete = (saleId) => {
     axios
-      .delete(`http://localhost:8080/api/sales/${saleId}`)
+      .delete(`/api/sales/${saleId}`)
       .then(() => {
         setSales(sales.filter((sale) => sale.id !== saleId));
       })
@@ -101,7 +101,7 @@ const Sales = () => {
     };
 
     axios
-      .put(`http://localhost:8080/api/sales/${editSale.id}`, updatedSale)
+      .put(`/api/sales/${editSale.id}`, updatedSale)
       .then((response) => {
         const updatedSales = sales.map((sale) =>
           sale.id === editSale.id ? response.data : sale
@@ -115,7 +115,7 @@ const Sales = () => {
   // Handle adding a new sale
   const handleAddOrder = () => {
     axios
-      .post("http://localhost:8080/api/sales", newSale)
+      .post("/api/sales", newSale)
       .then((response) => {
         setSales([...sales, response.data]); // Use response data for consistency
         handleCloseAdd();

@@ -34,11 +34,11 @@ const Inventory = ({ userDetails }) => {
 
 
     useEffect(() => {
-        axios.get('http://localhost:8080/api/inventory/')
+        axios.get('/api/inventory/')
             .then(inventoryResponse => {
                 console.log("Inventory Data: ", inventoryResponse.data);
 
-                axios.get('http://localhost:8080/api/products')
+                axios.get('/api/products')
                     .then(productsResponse => {
                         console.log("Products Data: ", productsResponse.data);
 
@@ -74,7 +74,7 @@ const Inventory = ({ userDetails }) => {
     //     };
     
     //     // Updated the endpoint to correctly use the quantity update API
-    //     axios.put(`http://localhost:8080/api/inventory/${updatedItem.inventoryId}/quantity`, payload)
+    //     axios.put(`/api/inventory/${updatedItem.inventoryId}/quantity`, payload)
     //         .then(response => {
     //             const updatedInventory = [...inventory];
     //             updatedInventory[actualIndex] = response.data;
@@ -99,7 +99,7 @@ const Inventory = ({ userDetails }) => {
             blockedQuantity: updatedItem.blockedQuantity
         };
     
-        axios.put(`http://localhost:8080/api/inventory/${updatedItem.inventoryId}/quantity`, payload)
+        axios.put(`/api/inventory/${updatedItem.inventoryId}/quantity`, payload)
             .then(response => {
                 const updatedInventory = [...inventory];
                 updatedInventory[page * rowsPerPage + index] = response.data;

@@ -12,7 +12,7 @@ const VerifyCode = () => {
   const handleSubmit = async (event) => {
     event.preventDefault();
     try {
-      const response = await axios.post('http://localhost:8080/api/verify-code', { 
+      const response = await axios.post('/api/verify-code', { 
         email: location.state.email, code 
       });
       setMessage("Code verified, proceed to reset password.");

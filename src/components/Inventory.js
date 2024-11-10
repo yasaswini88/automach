@@ -60,9 +60,9 @@ const Inventory = ({ userDetails }) => {
 
 
     useEffect(() => {
-        axios.get('http://localhost:8080/api/inventory/')
+        axios.get('/api/inventory/')
             .then(inventoryResponse => {
-                axios.get('http://localhost:8080/api/products')
+                axios.get('/api/products')
                     .then(productsResponse => {
                         const products = productsResponse.data;
                         const mappedInventory = mapInventoryWithProductNames(inventoryResponse.data, products);
@@ -102,7 +102,7 @@ const Inventory = ({ userDetails }) => {
             quantity: updatedItem.quantity,
         };
     
-        axios.put(`http://localhost:8080/api/inventory/${updatedItem.inventoryId}/quantity`, payload)
+        axios.put(`/api/inventory/${updatedItem.inventoryId}/quantity`, payload)
             .then(response => {
                 const updatedInventory = [...inventory];
                 updatedInventory[actualIndex] = response.data;

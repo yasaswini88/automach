@@ -66,7 +66,7 @@ const NewHome = ({ userDetails }) => {
 
     const fetchOrders = async () => {
         try {
-            const response = await axios.get('http://localhost:8080/api/orders');
+            const response = await axios.get('/api/orders');
             const fetchedOrders = response.data;
             setOrders(fetchedOrders);
             filterPendingOrders(fetchedOrders);
@@ -89,7 +89,7 @@ const NewHome = ({ userDetails }) => {
     useEffect(() => {
         const fetchOrderStatus = async () => {
             try {
-                const response = await axios.get('http://localhost:8080/api/orders');
+                const response = await axios.get('/api/orders');
                 const orders = response.data;
 
                 const pendingCount = orders.filter(order => order.status === 'Pending').length;

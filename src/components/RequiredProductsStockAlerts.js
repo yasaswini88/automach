@@ -12,8 +12,8 @@ const RequiredProductsStockAlerts = () => {
             try {
                 // Fetch product and raw material stock data
                 const productName = searchParams.get('productName'); // Replace this with dynamic product selection if necessary
-                const productResponse = await axios.get(`http://localhost:8080/api/products/name/${encodeURIComponent(productName)}`);
-                const rawMaterialStockResponse = await axios.get('http://localhost:8080/api/rawMaterialStock');
+                const productResponse = await axios.get(`/api/products/name/${encodeURIComponent(productName)}`);
+                const rawMaterialStockResponse = await axios.get('/api/rawMaterialStock');
 
                 const product = productResponse.data;
                 const rawMaterialStock = rawMaterialStockResponse.data;

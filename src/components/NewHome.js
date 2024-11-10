@@ -9,6 +9,10 @@ const NewHome = ({ userDetails }) => {
     const navigate = useNavigate();
     const theme = useTheme();
 
+    //Table Pagination
+    const [page, setPage] = useState(0); // Current page
+    const [rowsPerPage, setRowsPerPage] = useState(3); // Rows per page
+
     const [deliveryOrders, setDeliveryOrders] = useState([]);
     const [overdueOrders, setOverdueOrders] = useState([]);
     const [next14DaysOrderStatusData, setNext14DaysOrderStatusData] = useState({
@@ -21,7 +25,7 @@ const NewHome = ({ userDetails }) => {
                 show: true,
                 onItemHover: {
                     highlightDataSeries: false
-                },
+                },
             },
             labels: ['Pending', 'Shipped', 'Delivered'],
             colors: ['#FF4560', '#FFA500', '#00E396'],
@@ -37,7 +41,7 @@ const NewHome = ({ userDetails }) => {
                                 formatter: function (w) {
                                     if (w?.globals?.seriesTotals) {
                                         const total = w.globals.seriesTotals.reduce((a, b) => a + b, 0);
-                                        console.log({total})
+                                        console.log({ total })
                                         return total ? total.toString() : "0";
                                     }
                                     return "0";
@@ -50,7 +54,7 @@ const NewHome = ({ userDetails }) => {
             tooltip: {
                 y: {
                     formatter: function (val) {
-                        console.log({val})
+                        console.log({ val })
                         return val?.toString() ?? "0";
                     }
                 }
@@ -63,7 +67,7 @@ const NewHome = ({ userDetails }) => {
                     },
                     legend: {
                         position: 'bottom',
-                       
+
                     }
                 }
             }],
@@ -82,7 +86,7 @@ const NewHome = ({ userDetails }) => {
                 show: true,
                 onItemHover: {
                     highlightDataSeries: false
-                },
+                },
             },
             plotOptions: {
                 pie: {
@@ -96,7 +100,7 @@ const NewHome = ({ userDetails }) => {
                                 formatter: function (w) {
                                     if (w?.globals?.seriesTotals) {
                                         const total = w.globals.seriesTotals.reduce((a, b) => a + b, 0);
-                                        
+
                                         return total ? total.toString() : "0";
                                     }
                                     return "0";
@@ -109,7 +113,7 @@ const NewHome = ({ userDetails }) => {
             tooltip: {
                 y: {
                     formatter: function (val) {
-                        console.log({val})
+                        console.log({ val })
                         return val?.toString() ?? "0";
                     }
                 }
@@ -216,7 +220,7 @@ const NewHome = ({ userDetails }) => {
 
     const fetchSalesData = async () => {
         try {
-            const response = await axios.get('http://localhost:8080/api/sales');
+            const response = await axios.get('/api/sales');
             const sales = response.data;
 
             const today = dayjs().startOf('day');
@@ -264,7 +268,7 @@ const NewHome = ({ userDetails }) => {
 
     const fetchLast2WeeksOrdersData = async () => {
         try {
-            const response = await axios.get('http://localhost:8080/api/orders');
+            const response = await axios.get('/api/orders');
             const orders = response.data;
             const twoWeeksAgo = dayjs().subtract(14, 'days').startOf('day');
 
@@ -293,11 +297,11 @@ const NewHome = ({ userDetails }) => {
 
     const fetchRawMaterialData = async () => {
         try {
-            const topRawMaterialsResponse = await axios.get('http://localhost:8080/api/sales/top-raw-materials');
+            const topRawMaterialsResponse = await axios.get('/api/sales/top-raw-materials');
             const topRawMaterials = topRawMaterialsResponse.data.slice(0, 10);
             console.log('Top Raw Materials:', topRawMaterials);
 
-            const stockResponse = await axios.get('http://localhost:8080/api/rawMaterialStock');
+            const stockResponse = await axios.get('/api/rawMaterialStock');
             const allStocks = stockResponse.data;
             console.log('All Raw Material Stocks:', allStocks);
 
@@ -346,6 +350,13 @@ const NewHome = ({ userDetails }) => {
         fetchLast2WeeksOrdersData();
         fetchRawMaterialData();
     }, []);
+    const handleChangePage = (event, newPage) => {
+        setPage(newPage);
+    };
+    const handleChangeRowsPerPage = (event) => {
+        setRowsPerPage(parseInt(event.target.value, 10));
+        setPage(0); // Reset to first page when rows per page changes
+    };
 
     return (
         <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', ml: 5, mr: 5, bgcolor: theme.palette.background.default }}>
@@ -390,23 +401,6 @@ const NewHome = ({ userDetails }) => {
                             background: '#e1f5fe',
                         }}>
                         <CardContent sx={{ padding: '16px' }}>
-                            {console.log({next14DaysOrderStatusData})}
-                            <Typography variant="h6"><b>Order Status for Deliveries in Next 14 Days</b></Typography>
-                            <ApexCharts options={next14DaysOrderStatusData.options} series={next14DaysOrderStatusData.series} type="donut" height={300} />
-                        </CardContent>
-                    </Card>
-                </Grid>
-                <Grid item xs={12} sm={6} md={6}>
-                    <Card
-                        sx={{
-                            mb: 3,
-                            mt: 3,
-                            border: '2px solid #D3D3D3',
-                            borderRadius: '12px',
-                            height: 380,
-                            background: '#e1f5fe',
-                        }}>
-                        <CardContent sx={{ padding: '16px' }}>
                             <Typography variant="h6"><b>Orders to be Delivered in Next 7 Days: {deliveryOrders.length}</b></Typography>
                             <TableContainer component={Paper} sx={{ mt: 2, background: '#e1f5fe', }}>
                                 <Table>
@@ -420,7 +414,7 @@ const NewHome = ({ userDetails }) => {
                                         </TableRow>
                                     </TableHead>
                                     <TableBody>
-                                        {deliveryOrders.map((order) => (
+                                        {deliveryOrders.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((order) => (
                                             <TableRow key={order.saleId}>
                                                 <TableCell>{order.customerName}</TableCell>
                                                 <TableCell>{order.orderStatus}</TableCell>
@@ -431,10 +425,39 @@ const NewHome = ({ userDetails }) => {
                                         ))}
                                     </TableBody>
                                 </Table>
+                                <TablePagination
+                                    rowsPerPageOptions={[3]}
+                                    component="div"
+                                    count={deliveryOrders.length} // For Delivery Orders Table
+                                    rowsPerPage={rowsPerPage}
+                                    page={page}
+                                    onPageChange={handleChangePage}
+                                    onRowsPerPageChange={handleChangeRowsPerPage}
+                                />
+
                             </TableContainer>
                         </CardContent>
                     </Card>
+
                 </Grid>
+                <Grid item xs={12} sm={6} md={6}>
+                    <Card
+                        sx={{
+                            mb: 3,
+                            mt: 3,
+                            border: '2px solid #D3D3D3',
+                            borderRadius: '12px',
+                            height: 380,
+                            background: '#e1f5fe',
+                        }}>
+                        <CardContent sx={{ padding: '16px' }}>
+                            {console.log({ next14DaysOrderStatusData })}
+                            <Typography variant="h6"><b>Order Status for Deliveries in Next 14 Days</b></Typography>
+                            <ApexCharts options={next14DaysOrderStatusData.options} series={next14DaysOrderStatusData.series} type="donut" height={300} />
+                        </CardContent>
+                    </Card>
+                </Grid>
+               
                 <Grid item xs={12} sm={6} md={6}>
                     <Card
                         sx={{
@@ -473,6 +496,7 @@ const NewHome = ({ userDetails }) => {
                             </TableContainer>
                         </CardContent>
                     </Card>
+
                 </Grid>
             </Grid>
         </Box>

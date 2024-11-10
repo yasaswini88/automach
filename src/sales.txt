@@ -59,13 +59,13 @@ const Sales = ({ userDetails }) => {
 
   // Fetch sales data
   useEffect(() => {
-    axios.get('http://localhost:8080/api/sales')
+    axios.get('/api/sales')
       .then(response => setSales(response.data))
       .catch(error => console.error('Error fetching sales:', error));
   }, []);
 
   useEffect(() => {
-    axios.get('http://localhost:8080/api/products')
+    axios.get('/api/products')
       .then(response => setProducts(response.data))
       .catch(error => console.error('Error fetching products:', error));
   }, []);
@@ -114,7 +114,7 @@ const Sales = ({ userDetails }) => {
 
   // Confirm delete method
   const confirmDelete = () => {
-    axios.delete(`http://localhost:8080/api/sales/${saleToDelete}`)
+    axios.delete(`/api/sales/${saleToDelete}`)
       .then(() => {
         setSales(sales.filter(sale => sale.saleId !== saleToDelete)); // Update sales list
         setOpenDeleteDialog(false);  // Close the dialog
@@ -148,7 +148,7 @@ const Sales = ({ userDetails }) => {
       quantities: Array.isArray(formData.quantities) ? formData.quantities : formData.quantities.split(',').map(Number), // Ensure quantities is an array before saving
     };
 
-    axios.put(`http://localhost:8080/api/sales/${editSale.saleId}`, updatedSale)
+    axios.put(`/api/sales/${editSale.saleId}`, updatedSale)
       .then(response => {
         setSales(sales.map(sale => (sale.saleId === editSale.saleId ? response.data : sale)));
         setOpenEdit(false);
@@ -226,7 +226,7 @@ const Sales = ({ userDetails }) => {
     };
 
 
-    axios.post("http://localhost:8080/api/sales", saleData)
+    axios.post("/api/sales", saleData)
       .then(() => {
         setSales([...sales, saleData]);
         // setSales([...sales, response.data]);  // Add new sale to the sales list

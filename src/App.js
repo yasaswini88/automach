@@ -42,6 +42,10 @@ import RequiredProductsStockAlerts from './components/RequiredProductsStockAlert
 import Customers from './components/Customers';
 
 
+axios.defaults.baseURL=`http://localhost:8080`;
+
+console.log(process.env)
+
 const App = () => {
 
   const authState = useSelector((state) => state.auth);
@@ -78,10 +82,10 @@ const App = () => {
   useEffect(() => {
     const fetchTopRawMaterials = async () => {
       try {
-        const topRawMaterialsResponse = await axios.get('http://localhost:8080/api/sales/top-raw-materials');
+        const topRawMaterialsResponse = await axios.get('/api/sales/top-raw-materials');
         const topRawMaterials = topRawMaterialsResponse.data;
 
-        const stockResponse = await axios.get('http://localhost:8080/api/rawMaterialStock');
+        const stockResponse = await axios.get('/api/rawMaterialStock');
         const allStocks = stockResponse.data;
 
         const alerts = topRawMaterials.reduce((acc, material) => {

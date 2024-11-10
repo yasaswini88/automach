@@ -27,7 +27,7 @@ const Chatbot = ({ userDetails }) => {
   
       switch (true) {
         // Raw Materials
-        case url === 'http://localhost:8080/api/rawmaterials':
+        case url === '/api/rawmaterials':
           response = await axios.get(url);
           return response.data.map((material) => material.materialName || 'Unknown').join(', ');
   
@@ -44,7 +44,7 @@ const Chatbot = ({ userDetails }) => {
           }
   
         // Suppliers
-        case url === 'http://localhost:8080/api/suppliers':
+        case url === '/api/suppliers':
           response = await axios.get(url);
           return response.data.map((supplier) => supplier.name || 'Unknown').join(', ');
   
@@ -58,7 +58,7 @@ const Chatbot = ({ userDetails }) => {
           }
   
         // Products
-        case url === 'http://localhost:8080/api/products':
+        case url === '/api/products':
           response = await axios.get(url);
           return response.data.map((product) => product.prodName || 'Unknown').join(', ');
   
@@ -86,15 +86,15 @@ const Chatbot = ({ userDetails }) => {
           }
   
         // Most Commonly Used Raw Materials
-        case url === 'http://localhost:8080/api/sales/top-raw-materials':
+        case url === '/api/sales/top-raw-materials':
           response = await axios.get(url);
           const topMaterials = response.data.rawMaterials.map((material) => material.rawMaterial.materialName || 'Unknown').join(', ');
           return `Most commonly used raw materials: ${topMaterials}.`;
         
         // To check quantity of the product
         case url.includes('/api/inventory/product/'):
-        // case url=== 'http://localhost:8080/api/inventory/product/${encodeURIComponent(productName)}/quantity' :
-      //  case url ="http://localhost:8080/api/inventory/product/${encodeURIComponent(productName)}/quantity":
+        // case url=== '/api/inventory/product/${encodeURIComponent(productName)}/quantity' :
+      //  case url ="/api/inventory/product/${encodeURIComponent(productName)}/quantity":
           response = await axios.get(url);
           if (!response.data || response.data.length === 0) {
             return `No inventory data found for ${queryContext.prodName}.`;
@@ -116,7 +116,7 @@ const Chatbot = ({ userDetails }) => {
         
 // For orders related to raw materials 
         //   case url.includes('/api/orders') && queryContext.orderStatus:
-        // const statusUrl = `http://localhost:8080/api/orders?status=${queryContext.orderStatus}`;
+        // const statusUrl = `/api/orders?status=${queryContext.orderStatus}`;
         // response = await axios.get(statusUrl);
 
         // if (!response.data || response.data.length === 0) {
@@ -142,10 +142,10 @@ const Chatbot = ({ userDetails }) => {
 
   
         // Low Stock Alerts for Commonly Used Raw Materials
-        case url === 'http://localhost:8080/api/sales/top-raw-materials/low-stock':
-          const topRawMaterialsResponse = await axios.get('http://localhost:8080/api/sales/top-raw-materials');
+        case url === '/api/sales/top-raw-materials/low-stock':
+          const topRawMaterialsResponse = await axios.get('/api/sales/top-raw-materials');
           const topRawMaterials = topRawMaterialsResponse.data;
-          const stockResponse = await axios.get('http://localhost:8080/api/rawMaterialStock');
+          const stockResponse = await axios.get('/api/rawMaterialStock');
           const allStocks = stockResponse.data;
           const lowStockAlerts = topRawMaterials.reduce((acc, material) => {
             const stock = allStocks.find(stock =>

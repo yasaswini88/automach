@@ -11,7 +11,7 @@ const handleUpdate = (index) => {
         quantity: updatedItem.quantity // Update the available quantity only
     };
 
-    axios.put(`http://localhost:8080/api/inventory/${updatedItem.inventoryId}/quantity`, payload)
+    axios.put(`/api/inventory/${updatedItem.inventoryId}/quantity`, payload)
         .then(response => {
             const updatedInventory = [...inventory];
             updatedInventory[actualIndex] = response.data; // Update the state with new inventory data

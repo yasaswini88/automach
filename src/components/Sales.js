@@ -89,7 +89,7 @@ const Sales = ({ userDetails }) => {
 
 
   // const handleSaveCustomer = (customerData) => {
-  //   axios.post('http://localhost:8080/api/customers', customerData)
+  //   axios.post('/api/customers', customerData)
   //     .then(() => {
   //       setSnackbar({ open: true, message: 'Customer added successfully!', severity: 'success' });
   //       handleCloseCustomerDialog();
@@ -102,7 +102,7 @@ const Sales = ({ userDetails }) => {
 
 
   const handleSaveCustomer = (customerData) => {
-  axios.post('http://localhost:8080/api/customers', customerData)
+  axios.post('/api/customers', customerData)
     .then(() => {
       setSnackbar({ open: true, message: 'Customer added successfully!', severity: 'success' });
       fetchCustomers();
@@ -124,7 +124,7 @@ const Sales = ({ userDetails }) => {
 
   // Fetch sales data
   useEffect(() => {
-    axios.get('http://localhost:8080/api/sales')
+    axios.get('/api/sales')
       .then(response => {
         setSales(response.data);
         setSortedSales(response.data);  // Initialize sortedSales
@@ -134,13 +134,13 @@ const Sales = ({ userDetails }) => {
 
 
   useEffect(() => {
-    axios.get('http://localhost:8080/api/inventory/')
+    axios.get('/api/inventory/')
       .then(response => setInventory(response.data))
       .catch(error => console.error('Error fetching sales:', error));
   }, []);
 
   useEffect(() => {
-    axios.get('http://localhost:8080/api/products')
+    axios.get('/api/products')
       .then(response => setProducts(response.data))
       .catch(error => console.error('Error fetching products:', error));
   }, []);
@@ -187,7 +187,7 @@ const Sales = ({ userDetails }) => {
 
   //Fetching Customer Names 
   const fetchCustomers = () => {
-    axios.get('http://localhost:8080/api/customers')
+    axios.get('/api/customers')
     .then(response => setCustomers(response.data))
     .catch(error => console.error('Error fetching customers:', error));
   };
@@ -262,7 +262,7 @@ const Sales = ({ userDetails }) => {
 
   // Confirm delete method
   const confirmDelete = () => {
-    axios.delete(`http://localhost:8080/api/sales/${saleToDelete}`)
+    axios.delete(`/api/sales/${saleToDelete}`)
       .then(() => {
         setSales(sales.filter(sale => sale.saleId !== saleToDelete)); // Update sales list
         setSnackbar({ open: true, message: 'Order deleted successfully!', severity: 'success' });
@@ -276,7 +276,7 @@ const Sales = ({ userDetails }) => {
 
   // useEffect(() => {
   //   if (editSale) {
-  //     axios.get(`http://localhost:8080/api/sales/${editSale?.saleId}/ready-to-ship`).then(resp => {
+  //     axios.get(`/api/sales/${editSale?.saleId}/ready-to-ship`).then(resp => {
   //       if (resp) {
   //         setShippingOptions(['Pending', 'Shipped', 'Delivered']);
   //       } else {
@@ -291,7 +291,7 @@ const Sales = ({ userDetails }) => {
 
   useEffect(() => {
     if (editSale) {
-      axios.get(`http://localhost:8080/api/sales/${editSale?.saleId}/ready-to-ship`)
+      axios.get(`/api/sales/${editSale?.saleId}/ready-to-ship`)
         .then(resp => {
           let options = [];
           switch (editSale.orderStatus.toLowerCase()) {
@@ -357,7 +357,7 @@ const Sales = ({ userDetails }) => {
   //     quantities: Array.isArray(formData.quantities) ? formData.quantities : formData.quantities.split(',').map(Number), // Ensure quantities is an array before saving
   //   };
 
-  //   axios.put(`http://localhost:8080/api/sales/${editSale.saleId}`, updatedSale)
+  //   axios.put(`/api/sales/${editSale.saleId}`, updatedSale)
   //     .then(response => {
   //       setSales(sales.map(sale => (sale.saleId === editSale.saleId ? response.data : sale)));
   //       setOpenEdit(false);
@@ -390,17 +390,17 @@ const Sales = ({ userDetails }) => {
       orderStatus: formData.orderStatus.toLowerCase()
     };
 
-    axios.put(`http://localhost:8080/api/sales/${editSale.saleId}`, updatedSale)
+    axios.put(`/api/sales/${editSale.saleId}`, updatedSale)
       .then(response => {
         setSales(sales.map(sale => (sale.saleId === editSale.saleId ? response.data : sale)));
-        axios.get('http://localhost:8080/api/sales')
+        axios.get('/api/sales')
           .then(response => {
             setSales(response.data);
             setSortedSales(response.data);  // Initialize sortedSales
           })
           .catch(error => console.error('Error fetching sales:', error));
         // Refresh inventory to reflect updated blocked/required quantities
-        axios.get('http://localhost:8080/api/inventory/')
+        axios.get('/api/inventory/')
           .then(inventoryResponse => {
             setInventory(inventoryResponse.data);
             setSnackbar({ open: true, message: 'Order updated successfully!', severity: 'success' });
@@ -486,13 +486,13 @@ const Sales = ({ userDetails }) => {
       orderDeliveryDate: newSale.orderDeliveryDate,
     };
 
-    axios.post("http://localhost:8080/api/sales", saleData)
+    axios.post("/api/sales", saleData)
       .then(() => {
-        axios.get('http://localhost:8080/api/sales')
+        axios.get('/api/sales')
           .then(response => {
             setSales(response.data);
             setSnackbar({ open: true, message: 'Order added successfully!', severity: 'success' });
-            axios.get('http://localhost:8080/api/sales') // Fetch orders again
+            axios.get('/api/sales') // Fetch orders again
               .then(response => {
                 setSales(response.data);
                 setSortedSales(response.data); // Update sortedSales
@@ -510,7 +510,7 @@ const Sales = ({ userDetails }) => {
 
   // Handle status updates for delivered orders
   const handleStatusUpdate = (saleId, newStatus) => {
-    axios.put(`http://localhost:8080/api/sales/${saleId}/status?status=${newStatus}`)
+    axios.put(`/api/sales/${saleId}/status?status=${newStatus}`)
       .then(() => {
         // Refresh sales or update UI accordingly
       })
@@ -851,6 +851,7 @@ const Sales = ({ userDetails }) => {
                         variant="outlined"
                         color="error"
                         onClick={() => handleDelete(sale.saleId)}
+                        disabled={sale.orderDecision.toLowerCase() ==="confirmed" }
                         startIcon={<Delete />}
                         sx={{ width: '10%', padding: '6px 6px' }}  // Reduced width and padding for smaller size
                       >
