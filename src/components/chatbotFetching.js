@@ -8,6 +8,7 @@ import axios from 'axios';
 
 // Function to fetch chatbot response or raw materials
 export const fetchChatbotResponse = async (userMessage) => {
+  //check for testing commit
   const apiKey = process.env.REACT_APP_OPENAI_API_KEY;
 
   console.log(apiKey)
