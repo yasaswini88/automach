@@ -40,6 +40,8 @@ import FloatingChatButton from './components/FloatingChatButton';
 import DeliveredOrders from './components/DeliveredOrders';
 import RequiredProductsStockAlerts from './components/RequiredProductsStockAlerts';
 
+axios.defaults.baseURL=`http://98.82.11.0:8080`;
+
 const App = () => {
   
   const authState = useSelector((state) => state.auth);
