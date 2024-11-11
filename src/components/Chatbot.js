@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Box, Button, TextField, Typography, Paper, CircularProgress } from '@mui/material';
-import { fetchChatbotResponse } from './chatbotFetching'; // Import the fetching function
+import { fetchChatbotResponse } from './chatbotFetching'; 
 import axios from 'axios';
 import SmartToyIcon from '@mui/icons-material/SmartToy';
 import Person4Icon from '@mui/icons-material/Person4';
