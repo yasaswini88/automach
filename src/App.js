@@ -42,7 +42,7 @@ import RequiredProductsStockAlerts from './components/RequiredProductsStockAlert
 import Customers from './components/Customers';
 
 
-axios.defaults.baseURL=`http://localhost:8080`;
+axios.defaults.baseURL=`http://98.82.11.0:8080`;
 
 console.log(process.env)
 
