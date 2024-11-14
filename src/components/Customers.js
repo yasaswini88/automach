@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, IconButton, Button, Snackbar, Alert, TablePagination } from '@mui/material';
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, IconButton, Button, Snackbar, Alert, TablePagination, useTheme, useMediaQuery } from '@mui/material';
 import { Edit, Delete } from '@mui/icons-material';
 import axios from 'axios';
 import CustomersDialog from './CustomersDialog';
@@ -17,6 +17,10 @@ const Customers = () => {
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [sortColumn, setSortColumn] = useState('');
   const [sortDirection, setSortDirection] = useState('asc');
+
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const isTablet = useMediaQuery(theme.breakpoints.down('md'));
 
   const fetchCustomers = async () => {
     try {
@@ -111,46 +115,53 @@ const Customers = () => {
   }, []);
 
   return (
-    <Paper>
-      <Button variant="outlined" color="secondary" onClick={() => handleDialogOpen()} style={{ margin: '16px' }}>
+    <Paper sx={{ width: '100%', overflow: 'hidden' }}>
+      <Button variant="outlined" color="secondary" onClick={() => handleDialogOpen()} style={{ margin: isMobile ? '8px' : '16px' }}>
         Add New Customer
       </Button>
-      <TableContainer style={{ border: '1px solid #ccc', marginLeft: '20px', marginRight: '20px' }}>
+      <TableContainer style={{ 
+        border: '1px solid #ccc', 
+        marginLeft: isMobile ? '8px' : '20px', 
+        marginRight: isMobile ? '8px' : '20px',
+        overflowX: 'auto'
+      }}>
 
-
-        <Table sx={{ border: `1px solid`}}>
+        <Table sx={{ 
+          border: `1px solid`,
+          minWidth: isMobile ? 300 : 650 
+        }}>
         
         <TableHead style={{ backgroundColor: '#f5f5f5' }}>
-
             <TableRow>
-              <TableCell>
-              <Button
+              <TableCell sx={{ display: { xs: 'table-cell', sm: 'table-cell' } }}>
+                <Button
                   variant="outlined"
                   onClick={handleSort.bind(null, 'customerName')}
-                  endIcon={<SwapVertIcon />} // Adds the sorting icon at the end of the text
+                  endIcon={<SwapVertIcon />}
+                  sx={{ fontSize: isMobile ? '12px' : '14px' }}
                 >
-                 Customer Name
+                  Customer Name
                 </Button>
               </TableCell>
-              <TableCell>Email</TableCell>
-              <TableCell>Phone Number</TableCell>
-              <TableCell>Address</TableCell>
-              <TableCell>City</TableCell>
-              <TableCell>State</TableCell>
-              <TableCell>Postal Code</TableCell>
+              <TableCell sx={{ display: { xs: 'none', sm: 'table-cell' } }}>Email</TableCell>
+              <TableCell sx={{ display: { xs: 'none', md: 'table-cell' } }}>Phone Number</TableCell>
+              <TableCell sx={{ display: { xs: 'none', lg: 'table-cell' } }}>Address</TableCell>
+              <TableCell sx={{ display: { xs: 'none', lg: 'table-cell' } }}>City</TableCell>
+              <TableCell sx={{ display: { xs: 'none', lg: 'table-cell' } }}>State</TableCell>
+              <TableCell sx={{ display: { xs: 'none', lg: 'table-cell' } }}>Postal Code</TableCell>
               <TableCell>Actions</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {customers.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((customer) => (
               <TableRow key={customer.id}>
-                <TableCell>{customer.customerName}</TableCell>
-                <TableCell>{customer.email}</TableCell>
-                <TableCell>{customer.phoneNumber}</TableCell>
-                <TableCell>{customer.addressLine1} {customer.addressLine2}</TableCell>
-                <TableCell>{customer.city}</TableCell>
-                <TableCell>{customer.state}</TableCell>
-                <TableCell>{customer.postalCode}</TableCell>
+                <TableCell sx={{ display: { xs: 'table-cell', sm: 'table-cell' } }}>{customer.customerName}</TableCell>
+                <TableCell sx={{ display: { xs: 'none', sm: 'table-cell' } }}>{customer.email}</TableCell>
+                <TableCell sx={{ display: { xs: 'none', md: 'table-cell' } }}>{customer.phoneNumber}</TableCell>
+                <TableCell sx={{ display: { xs: 'none', lg: 'table-cell' } }}>{customer.addressLine1} {customer.addressLine2}</TableCell>
+                <TableCell sx={{ display: { xs: 'none', lg: 'table-cell' } }}>{customer.city}</TableCell>
+                <TableCell sx={{ display: { xs: 'none', lg: 'table-cell' } }}>{customer.state}</TableCell>
+                <TableCell sx={{ display: { xs: 'none', lg: 'table-cell' } }}>{customer.postalCode}</TableCell>
                 <TableCell>
                   <IconButton color="primary" onClick={() => handleDialogOpen(customer)}>
                     <Edit />
@@ -171,6 +182,11 @@ const Customers = () => {
         onPageChange={handleChangePage}
         rowsPerPage={rowsPerPage}
         onRowsPerPageChange={handleChangeRowsPerPage}
+        sx={{
+          '.MuiTablePagination-selectLabel, .MuiTablePagination-displayedRows': {
+            fontSize: isMobile ? '12px' : '14px'
+          }
+        }}
       />
       <CustomersDialog
         open={dialogOpen}
@@ -179,22 +195,23 @@ const Customers = () => {
         customerData={selectedCustomer}
       />
       <Dialog
-  open={confirmDelete}
-  onClose={() => setConfirmDelete(false)}
->
-  <DialogTitle>Confirm Deletion</DialogTitle>
-  <DialogContent>
-    Are you sure you want to delete this customer?
-  </DialogContent>
-  <DialogActions>
-    <Button onClick={() => setConfirmDelete(false)} color="primary">
-      Cancel
-    </Button>
-    <Button onClick={confirmDeleteCustomer} color="secondary">
-      Confirm
-    </Button>
-  </DialogActions>
-</Dialog>
+        open={confirmDelete}
+        onClose={() => setConfirmDelete(false)}
+        fullScreen={isMobile}
+      >
+        <DialogTitle>Confirm Deletion</DialogTitle>
+        <DialogContent>
+          Are you sure you want to delete this customer?
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setConfirmDelete(false)} color="primary">
+            Cancel
+          </Button>
+          <Button onClick={confirmDeleteCustomer} color="secondary">
+            Confirm
+          </Button>
+        </DialogActions>
+      </Dialog>
 
       <Snackbar
         open={snackbar.open}
