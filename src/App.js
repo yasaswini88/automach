@@ -404,29 +404,6 @@ const App = () => {
         <FloatingChatButton userDetails={authState.userDetails} />
       )}
 
-<Fab
-    color="primary"
-    aria-label="chat"
-    onClick={handleChatOpen}
-    sx={{ 
-      position: 'fixed', 
-      bottom: isMobile ? 8 : 16, 
-      right: isMobile ? 8 : 16,
-      display: isMobile ? 'none' : 'flex'
-    }}
-  >
-    <ChatIcon />
-  </Fab>
-
-  <Dialog 
-    open={chatOpen} 
-    onClose={handleChatClose}
-    fullScreen={isMobile}
-  >
-    <DialogContent>
-      <Chatbot userDetails={authState.userDetails} />
-    </DialogContent>
-  </Dialog>
 
     </ThemeProvider>
     
