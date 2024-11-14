@@ -30,7 +30,7 @@ const authSlice = createSlice({
     loadAuth: (state) => {
       const storedUser = localStorage.getItem('userDetails') || sessionStorage.getItem('userDetails');
       if (storedUser) {
-        state.isLoggedIn = false;
+        state.isLoggedIn = true;
         state.userDetails = JSON.parse(storedUser);
       }
     }
