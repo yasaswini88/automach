@@ -82,16 +82,7 @@ const Stocks = ({ userDetails }) => {
               return aName > bName ? 1 : -1;
             });
         });
-        // Sort the alerts alphabetically by the raw material name
-        // Object.keys(categorizedAlerts).forEach(category => {
-        //   categorizedAlerts[category].sort((a, b) => {
-        //     // Extract the material name part from the alert string for comparison
-        //     const aName = a.match(/: (.*?) is/)[1].toLowerCase();
-        //     const bName = b.match(/: (.*?) is/)[1].toLowerCase();
-        //     return aName.localeCompare(bName);
-        //   });
-        // });
-
+     
 
         setAlerts(categorizedAlerts);
       })

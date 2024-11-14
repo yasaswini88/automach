@@ -15,8 +15,8 @@ import "./Login.css";
 const NewLogin = () => {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
-    const [keepMeSignedIn, setKeepMeSignedIn] = useState(false); // Added state for "Keep Me Signed In"
-    const [showPassword, setShowPassword] = useState(false); // State to toggle password visibility
+    const [keepMeSignedIn, setKeepMeSignedIn] = useState(false);
+    const [showPassword, setShowPassword] = useState(false);
     const [open, setOpen] = useState(false);
     const [message, setMessage] = useState("");
 
@@ -25,9 +25,9 @@ const NewLogin = () => {
     const authState = useSelector((state) => state.auth);
 
     useEffect(() => {
-        dispatch(loadAuth()); // Load authentication state on mount
+        dispatch(loadAuth());
         if (authState.isLoggedIn) {
-            navigate("/"); // Navigate if already logged in
+            navigate("/");
         }
     }, [authState.isLoggedIn, dispatch, navigate]);
 
@@ -56,13 +56,10 @@ const NewLogin = () => {
     
             if (response.status === 200) {
                 const userDetails = response.data;
-
-                // Dispatch Redux action with the userDetails and keepMeSignedIn flag
                 dispatch(loginSuccess({ userDetails, keepMeSignedIn }));
-
                 setMessage("Successfully Logged in 😀");
                 setOpen(true);
-                navigate("/");  // Navigate after successful login
+                navigate("/");
             } else {
                 setMessage("Login Failed !!! 😡");
                 setOpen(true);
@@ -78,114 +75,116 @@ const NewLogin = () => {
     };
 
     const handleForgotPassword = () => {
-        navigate("/forgot-password"); // Navigate to ForgotPassword page
+        navigate("/forgot-password");
     };
-    
 
     const handleClose = () => {
         setOpen(false);
     };
 
     return (
-        <div className="login-container">
-        <div className="form-container">
-            <div>
-            <div className="header">
-                <h2>Welcome Back <span>👋</span></h2>
-                <p>Let’s explore the app again with us.</p>
-            </div>
-            <h2>Login</h2>
-            <form onSubmit={handleSubmit}>
-                <div className="form-group">
-                    <label>Username:</label>
-                    <TextField
-                        fullWidth
-                        type="text"
-                        name="username"
-                        value={username}
-                        onChange={handleChange}
-                        variant="outlined"
-                    />
-                </div>
-                <div className="form-group">
-                    <label>Password:</label>
-                    <TextField
-                        fullWidth
-                        type={showPassword ? "text" : "password"}
-                        name="password"
-                        value={password}
-                        onChange={handleChange}
-                        variant="outlined"
-                        InputProps={{
-                            endAdornment: (
-                                <InputAdornment position="end">
-                                    <IconButton
-                                        aria-label="toggle password visibility"
-                                        onClick={handleClickShowPassword}
-                                        edge="end"
-                                    >
-                                        {showPassword ? <VisibilityOff /> : <Visibility />}
-                                    </IconButton>
-                                </InputAdornment>
-                            ),
-                        }}
-                    />
-                </div>
-                <div className="form-group">
-                    <label>
-                        <input
-                            type="checkbox"
-                            name="keepMeSignedIn"
-                            checked={keepMeSignedIn}
-                            onChange={handleCheckboxChange}
+        <div className="login-page">
+            <div className="login-container">
+                <div className="form-container">
+                    <div className="login-content">
+                        <div className="header">
+                            <h1>Welcome Back <span>👋</span></h1>
+                            <p className="subtitle">Let's explore the app again with us.</p>
+                        </div>
+                        
+                        <form onSubmit={handleSubmit} className="login-form">
+                            <div className="form-group">
+                                <label className="form-label">Username</label>
+                                <TextField
+                                    fullWidth
+                                    type="text"
+                                    name="username"
+                                    value={username}
+                                    onChange={handleChange}
+                                    variant="outlined"
+                                    placeholder="Enter your username"
+                                    className="form-input"
+                                />
+                            </div>
+                            
+                            <div className="form-group">
+                                <label className="form-label">Password</label>
+                                <TextField
+                                    fullWidth
+                                    type={showPassword ? "text" : "password"}
+                                    name="password"
+                                    value={password}
+                                    onChange={handleChange}
+                                    variant="outlined"
+                                    placeholder="Enter your password"
+                                    className="form-input"
+                                    InputProps={{
+                                        endAdornment: (
+                                            <InputAdornment position="end">
+                                                <IconButton
+                                                    aria-label="toggle password visibility"
+                                                    onClick={handleClickShowPassword}
+                                                    edge="end"
+                                                >
+                                                    {showPassword ? <VisibilityOff /> : <Visibility />}
+                                                </IconButton>
+                                            </InputAdornment>
+                                        ),
+                                    }}
+                                />
+                            </div>
+
+                            <div className="form-group checkbox-group">
+                                <label className="checkbox-label">
+                                    <input
+                                        type="checkbox"
+                                        name="keepMeSignedIn"
+                                        checked={keepMeSignedIn}
+                                        onChange={handleCheckboxChange}
+                                        className="checkbox-input"
+                                    />
+                                    <span>Keep Me Signed In</span>
+                                </label>
+                            </div>
+
+                            <Button
+                                type="submit"
+                                fullWidth
+                                variant="contained"
+                                color="primary"
+                                className="login-button"
+                            >
+                                Login
+                            </Button>
+
+                            <Button
+                                type="button"
+                                onClick={handleForgotPassword}
+                                color="secondary"
+                                className="forgot-password-button"
+                            >
+                                Forgot Password?
+                            </Button>
+                        </form>
+
+                        <Snackbar
+                            open={open}
+                            autoHideDuration={6000}
+                            onClose={handleClose}
+                            message={message}
+                            action={
+                                <Button color="inherit" size="small" onClick={handleClose}>
+                                    Close
+                                </Button>
+                            }
                         />
-                        Keep Me Signed In
-                    </label>
+                    </div>
                 </div>
-                <Button
-                    type="submit"
-                    fullWidth
-                    variant="contained"
-                    color="primary"
-                    className="login-button"
-                >
-                    Login
-                </Button>
-                <br />
-                <Button
-                    type="button"
-                    onClick={handleForgotPassword}
-                    color="secondary"
-                    className="forgot-password-button"
-                >
-                    Forgot Password?
-                </Button>
-            </form>
-            {/* <Button
-                onClick={handleRegister}
-                color="primary"
-                className="register-button"
-            >
-                Register
-            </Button> */}
-
-            <Snackbar
-                open={open}
-                autoHideDuration={6000}
-                onClose={handleClose}
-                message={message}
-                action={
-                    <Button color="inherit" size="small" onClick={handleClose}>
-                        Close
-                    </Button>
-                }
-            />
+                <div className="image-container">
+                    {/* You can add an illustration or image here */}
+                </div>
             </div>
         </div>
-        <div className="image-container">
-
-        </div>
-    </div>
     );
 };
 
