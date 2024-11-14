@@ -11,7 +11,7 @@ const authSlice = createSlice({
   reducers: {
     loginSuccess: (state, action) => {
       const { userDetails, keepMeSignedIn } = action.payload;
-      state.isLoggedIn = true;
+      state.isLoggedIn = false;
       state.userDetails = userDetails;
 
       if (keepMeSignedIn) {
@@ -30,7 +30,7 @@ const authSlice = createSlice({
     loadAuth: (state) => {
       const storedUser = localStorage.getItem('userDetails') || sessionStorage.getItem('userDetails');
       if (storedUser) {
-        state.isLoggedIn = true;
+        state.isLoggedIn = false;
         state.userDetails = JSON.parse(storedUser);
       }
     }
