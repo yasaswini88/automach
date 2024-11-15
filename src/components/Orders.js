@@ -25,6 +25,7 @@ import useMediaQuery from '@mui/material/useMediaQuery';
 const Orders = ({ userDetails }) => {
 
   const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   
 
   const navigate = useNavigate();
@@ -358,7 +359,7 @@ const confirmDeleteOrder = async () => {
             <MenuItem value="Shipped">Shipped</MenuItem>
           </Select>
 
-          <Autocomplete
+          <Autocomplete display={isMobile ? 'none' : 'flex'}
             options={rawMaterials}
             getOptionLabel={(option) => option.materialName}
             value={rawMaterials.find(material => material.id === newOrder.rawMaterialId) || null}
@@ -373,7 +374,7 @@ const confirmDeleteOrder = async () => {
         </Box>
 
         {/* Right Side: View Delivered Orders Button */}
-        <Button
+        <Button display={isMobile ? 'none' : 'flex'}
           variant="outlined"
           color="secondary"
           onClick={() => navigate('/delivered-orders')}
@@ -387,21 +388,20 @@ const confirmDeleteOrder = async () => {
 
 
       {/* Column Visibility Control */}
-      <Box display="flex" gap={2} mb={2}>
-        {Object.keys(visibleColumns).map((column) => (
-          <FormControlLabel
-            key={column}
-            control={
-              <Checkbox
-                checked={visibleColumns[column]}
-                onChange={() => handleColumnVisibilityChange(column)}
-              />
-            }
-            label={column.charAt(0).toUpperCase() + column.slice(1)} // Capitalize first letter of column names
-          />
-        ))}
-      </Box>
-
+      <Box display={isMobile ? 'none' : 'flex'} gap={2} mb={2}>
+  {Object.keys(visibleColumns).map((column) => (
+    <FormControlLabel
+      key={column}
+      control={
+        <Checkbox
+          checked={visibleColumns[column]}
+          onChange={() => handleColumnVisibilityChange(column)}
+        />
+      }
+      label={column.charAt(0).toUpperCase() + column.slice(1)} // Capitalize first letter of column names
+    />
+  ))}
+</Box>
       <Button variant="outlined" color="secondary" onClick={handleOpen}>
         Add Order
       </Button>
@@ -418,21 +418,21 @@ const confirmDeleteOrder = async () => {
               )}
               {visibleColumns.status && <TableCell>Status</TableCell>}
               {/* {visibleColumns.trackingInfo && <TableCell>Tracking Info</TableCell>} */}
-              {visibleColumns.notes && <TableCell>Notes</TableCell>}
+              {visibleColumns.notes && !isMobile &&<TableCell>Notes</TableCell>}
               {visibleColumns.rawMaterialName && (
                 <TableCell onClick={() => handleSort('rawMaterialName')} style={{ cursor: 'pointer' }}>
                   Raw Material {sortColumn === 'rawMaterialName' ? (sortDirection === 'asc' ? '↑' : '↓') : ''}
                 </TableCell>
               )}
               {visibleColumns.rawMaterialQuantity && <TableCell>Quantity</TableCell>}
-              {visibleColumns.createdBy && <TableCell>Created By</TableCell>}
-              {visibleColumns.createdDate && (
+              {visibleColumns.createdBy && !isMobile &&<TableCell>Created By</TableCell>}
+              {visibleColumns.createdDate && !isMobile && (
       <TableCell onClick={() => handleSort('createdDate')} style={{ cursor: 'pointer' }}>
         Created Date {sortColumn === 'createdDate' ? (sortDirection === 'asc' ? '↑' : '↓') : ''}
       </TableCell>
     )}
-              {visibleColumns.updatedBy && <TableCell>Updated By</TableCell>}
-              {visibleColumns.updatedDate && <TableCell>Updated Date</TableCell>}
+              {visibleColumns.updatedBy && !isMobile &&<TableCell>Updated By</TableCell>}
+              {visibleColumns.updatedDate && !isMobile &&<TableCell>Updated Date</TableCell>}
               <TableCell>Actions</TableCell> {/* Actions column always visible */}
             </TableRow>
           </TableHead>
@@ -444,17 +444,17 @@ const confirmDeleteOrder = async () => {
                   {visibleColumns.supplierName && <TableCell>{order.supplierName}</TableCell>}
                   {visibleColumns.status && <TableCell>{order.status}</TableCell>}
                   {/* {visibleColumns.trackingInfo && <TableCell>{order.trackingInfo}</TableCell>} */}
-                  {visibleColumns.notes && <TableCell>{order.notes}</TableCell>}
+                  {visibleColumns.notes && !isMobile && <TableCell>{order.notes}</TableCell>}
                   {visibleColumns.rawMaterialName && <TableCell>{order.rawMaterialName}</TableCell>}
                   {visibleColumns.rawMaterialQuantity && <TableCell>{order.rawMaterialQuantity}</TableCell>}
-                  {visibleColumns.createdBy && (
+                  {visibleColumns.createdBy && !isMobile && (
                     <TableCell>{getUserNameById(order.createdBy)}</TableCell> // Replace user ID with name
                   )}
-                  {visibleColumns.createdDate && <TableCell>{formatDate(order.createdDate)}</TableCell>}
-                  {visibleColumns.updatedBy && (
+                  {visibleColumns.createdDate && !isMobile && <TableCell>{formatDate(order.createdDate)}</TableCell>}
+                  {visibleColumns.updatedBy && !isMobile &&(
                     <TableCell>{getUserNameById(order.updatedBy)}</TableCell> // Replace user ID with name
                   )}
-       {visibleColumns.updatedDate && (
+       {visibleColumns.updatedDate && !isMobile && (
   <TableCell>{order.updatedDate ? formatDate(order.updatedDate) : formatDate(order.createdDate)}</TableCell>
 )}
 
@@ -484,7 +484,7 @@ const confirmDeleteOrder = async () => {
         </Table>
       </TableContainer>
 
-      <Dialog open={open} onClose={handleClose} >
+      <Dialog open={open} onClose={handleClose} fullWidth={isMobile} maxWidth="sm">
         <DialogTitle style={tableRowStyles}>{editMode ? 'Edit Order' : 'Add New Order'}</DialogTitle>
         <DialogContent>
           {/* Autocomplete for raw material */}
@@ -494,25 +494,12 @@ const confirmDeleteOrder = async () => {
             value={rawMaterials.find(material => material.id === newOrder.rawMaterialId) || null}
             onChange={handleRawMaterialChange}
             renderInput={(params) => (
-              <TextField {...params} label="Select Raw Material" variant="outlined" />
+              <TextField {...params} label="Select Raw Material" variant="outlined" required helperText="Required"/>
             )}
             fullWidth
             sx={{ mt: 2 }}
           />
-          {/* 
-        Autocomplete for supplier - filtered by raw material */}
-          {/* <Autocomplete
-          options={filteredSuppliers}
-          getOptionLabel={(option) => option.name}
-          value={filteredSuppliers.find(supplier => supplier.id === newOrder.supplierId) || null}
-          onChange={(event, newValue) => {
-            setNewOrder({ ...newOrder, supplierId: newValue ? newValue.id : '' });
-          }}
-          renderInput={(params) => (
-            <TextField {...params} label="Select Supplier" variant="outlined" />
-          )}
-          fullWidth
-        /> */}
+        
           <Autocomplete
             options={filteredSuppliers}
             getOptionLabel={(option) => option.name}
@@ -525,7 +512,7 @@ const confirmDeleteOrder = async () => {
               });
             }}
             renderInput={(params) => (
-              <TextField {...params} label="Select Supplier" variant="outlined" />
+              <TextField {...params} label="Select Supplier" variant="outlined" required helperText="Required" />
             )}
             fullWidth
           />
@@ -553,12 +540,14 @@ const confirmDeleteOrder = async () => {
             onChange={(e) => setNewOrder({ ...newOrder, trackingInfo: e.target.value })}
           /> */}
           <TextField
-            margin="normal"
+            required
             label="Notes"
             fullWidth
             variant="outlined"
             value={newOrder.notes}
             onChange={(e) => setNewOrder({ ...newOrder, notes: e.target.value })}
+            margin={isMobile ? 'dense' : 'normal'}
+            sx={{ mt: isMobile ? 1 : 2 }}
           />
           {/* <Autocomplete
             options={rawMaterials}
@@ -574,13 +563,16 @@ const confirmDeleteOrder = async () => {
             sx={{ mt: 2 }}
           /> */}
           <TextField
-            margin="normal"
+            required
             label="Raw Material Quantity"
             type="number"
             fullWidth
+            
+    helperText="Required"
             variant="outlined"
             value={newOrder.rawMaterialQuantity}
             onChange={(e) => setNewOrder({ ...newOrder, rawMaterialQuantity: e.target.value })}
+            
           />
         </DialogContent>
         <DialogActions>
