@@ -4,6 +4,7 @@ import {
   Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper,
   TablePagination, IconButton, Dialog, DialogActions, DialogContent, DialogContentText, Select, MenuItem, Box,
   DialogTitle, Button, TextField, useTheme, Chip, Grid, Autocomplete, InputLabel, FormControl, OutlinedInput, Typography, Link,
+  FormHelperText
 } from '@mui/material';
 import { Edit, Delete, KeyboardArrowDown, KeyboardArrowUp } from '@mui/icons-material';
 import dayjs from "dayjs";
@@ -401,6 +402,7 @@ const Sales = ({ userDetails }) => {
     if (!newSale.products.length || newSale.products.some((prod) => !prod.prodId)) errors.products = 'At least one product is required.';
     if (newSale.products.some((prod) => !prod.quantity || prod.quantity <= 0)) errors.quantities = 'Each product must have a valid quantity.';
     if (!newSale.orderDeliveryDate) errors.orderDeliveryDate = 'Delivery date is required.';
+    if (newSale.discountPercent && isNaN(newSale.discountPercent)) errors.discountPercent = 'Discount Percent must be a valid number.'; // Added error check
 
     if (Object.keys(errors).length > 0) {
         setFormErrors(errors);
@@ -530,14 +532,7 @@ const Sales = ({ userDetails }) => {
       <Dialog open={openAdd} onClose={handleCloseAdd}>
         <DialogTitle>Add New Order</DialogTitle>
         <DialogContent>
-          {/* <TextField
-            margin="dense"
-            label="Customer Name"
-            name="customerName"
-            fullWidth
-            onChange={handleInputChange}
-            sx={{ mb: 1 }}
-          /> */}
+         
 
           <Autocomplete
             options={customers}
@@ -576,10 +571,12 @@ const Sales = ({ userDetails }) => {
               value={newSale.orderDecision}
               label="Order Decision"
               onChange={(e) => setNewSale({ ...newSale, orderDecision: e.target.value })}
+              error={Boolean(formErrors.orderDecision)}
             >
               <MenuItem value="Quoted">Quoted</MenuItem>
               <MenuItem value="Confirmed">Confirmed</MenuItem>
             </Select>
+            {formErrors.orderDecision && <FormHelperText error>{formErrors.orderDecision}</FormHelperText>}  
           </FormControl>
 
 
@@ -599,7 +596,9 @@ const Sales = ({ userDetails }) => {
 
                     console.log(newSale)
                   }}
-                  renderInput={(params) => <TextField {...params} label="Product Names" margin="normal" />}
+                  renderInput={(params) => <TextField {...params} label="Product Names" margin="normal" 
+                  error={Boolean(formErrors.products)}
+                  />}
                 />
               </Grid>
               <Grid item xs={4}>
@@ -632,6 +631,8 @@ const Sales = ({ userDetails }) => {
             name="discountPercent"
             fullWidth
             onChange={handleInputChange}
+            error={Boolean(formErrors.discountPercent)}  // Error condition
+  helperText={formErrors.discountPercent}  // Show helper text for error
           />
 
           
