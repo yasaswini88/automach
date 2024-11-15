@@ -504,7 +504,8 @@ const Supplier = () => {
           )}
 
 <Stack spacing={isMobile ? 1 : 2} sx={{ width: isMobile ? '100%' : '95%' }}>
-          <TextField label="Name" fullWidth required value={selectedSupplier?.name || ''} onChange={(e) => handleSupplierChange('name', e.target.value)} />
+          <TextField label="Name" fullWidth required helperText="Required   Name" 
+          value={selectedSupplier?.name || ''} onChange={(e) => handleSupplierChange('name', e.target.value)} />
           <Autocomplete
             multiple
             options={rawMaterials}
@@ -542,6 +543,7 @@ const Supplier = () => {
                 label="Address Line 1"
                 fullWidth
                 required
+                helperText="Required"
                 value={selectedSupplier?.addressLine1 || ''}
                 onChange={(e) => handleSupplierChange('addressLine1', e.target.value)}
               />
