@@ -5,8 +5,14 @@ import axios from 'axios';
 import CustomersDialog from './CustomersDialog';
 import SwapVertIcon from '@mui/icons-material/SwapVert';
 import { Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material';
+import useMediaQuery from '@mui/material/useMediaQuery';
+import { useTheme } from '@mui/material/styles';
 
 const Customers = () => {
+
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+
   const [customers, setCustomers] = useState([]);
   const [selectedCustomer, setSelectedCustomer] = useState(null);
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -112,7 +118,8 @@ const Customers = () => {
 
   return (
     <Paper>
-      <Button variant="outlined" color="secondary" onClick={() => handleDialogOpen()} style={{ margin: '16px' }}>
+      <Button variant="outlined" color="secondary" onClick={() => handleDialogOpen()} 
+         style={{ margin: isMobile ? '8px' : '16px' }}>
         Add New Customer
       </Button>
       <TableContainer style={{ border: '1px solid #ccc', marginLeft: '20px', marginRight: '20px' }}>
@@ -181,6 +188,7 @@ const Customers = () => {
       <Dialog
   open={confirmDelete}
   onClose={() => setConfirmDelete(false)}
+  fullWidth={isMobile} maxWidth={isMobile ? 'xs' : 'sm'}
 >
   <DialogTitle>Confirm Deletion</DialogTitle>
   <DialogContent>
