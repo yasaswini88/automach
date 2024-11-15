@@ -14,12 +14,15 @@ import ExpandMore from '@mui/icons-material/ExpandMore';
 import { TableSortLabel } from '@mui/material';
 import { Snackbar, Alert } from '@mui/material';
 import CustomersDialog from './CustomersDialog';
+import useMediaQuery from '@mui/material/useMediaQuery';
 
 
 
 const Sales = ({ userDetails }) => {
 
   const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+
   const [sales, setSales] = useState([]);
   const [orderStatus, setOrderStatus] = useState('');
 
@@ -49,6 +52,8 @@ const Sales = ({ userDetails }) => {
   const [customers, setCustomers] = useState([]);
 
 
+
+  const [formErrors, setFormErrors] = useState({});
 
 
   // Separate state for Edit dialog
@@ -388,6 +393,23 @@ const Sales = ({ userDetails }) => {
 
 
   const handleAddOrder = () => {
+
+    const errors = {};
+
+    if (!newSale.customerName) errors.customerName = 'Customer Name is required.';
+    if (!newSale.orderDecision) errors.orderDecision = 'Order Decision is required.';
+    if (!newSale.products.length || newSale.products.some((prod) => !prod.prodId)) errors.products = 'At least one product is required.';
+    if (newSale.products.some((prod) => !prod.quantity || prod.quantity <= 0)) errors.quantities = 'Each product must have a valid quantity.';
+    if (!newSale.orderDeliveryDate) errors.orderDeliveryDate = 'Delivery date is required.';
+
+    if (Object.keys(errors).length > 0) {
+        setFormErrors(errors);
+        setSnackbar({ open: true, message: 'Please fix errors before adding the order.', severity: 'error' });
+        return;
+    }
+
+    setFormErrors({}); 
+
     const saleData = {
       customerName: newSale.customerName,
       orderDecision: newSale.orderDecision,
@@ -458,45 +480,48 @@ const Sales = ({ userDetails }) => {
     <Paper>
       <h1 sx={{ ml: 3 }}>Sales Orders</h1>
       <Box display="flex" justifyContent="space-between" alignItems="center" sx={{ ml: 3, mt: 2 }}>
-        {/* Add New Order Button */}
-        <Button variant="contained" color="primary" onClick={handleClickOpenAdd}>
-          Add New Order
-        </Button>
+  {/* Add New Order Button */}
+  <Button variant="contained" color="primary" onClick={handleClickOpenAdd}>
+    Add New Order
+  </Button>
 
-        {/* Filters */}
-        <Box display="flex" gap={2} alignItems="center">
-          {/* Filter by Order Status */}
-          <FormControl sx={{ minWidth: 200 }}>
-            <InputLabel id="order-status-filter-label">Filter by Order Status</InputLabel>
-            <Select
-              labelId="order-status-filter-label"
-              value={orderStatusFilter}
-              onChange={handleOrderStatusFilterChange}
-              label="Filter by Order Status"
-            >
-              <MenuItem value="">All</MenuItem>
-              <MenuItem value="Pending">Pending</MenuItem>
-              <MenuItem value="Shipped">Shipped</MenuItem>
-              <MenuItem value="Delivered">Delivered</MenuItem>
-            </Select>
-          </FormControl>
+  {/* Filters */}
+  {!isMobile && (
+    <Box display="flex" gap={2} alignItems="center">
+      {/* Filter by Order Status */}
+      <FormControl sx={{ minWidth: 200 }}>
+        <InputLabel id="order-status-filter-label">Filter by Order Status</InputLabel>
+        <Select
+          labelId="order-status-filter-label"
+          value={orderStatusFilter}
+          onChange={handleOrderStatusFilterChange}
+          label="Filter by Order Status"
+        >
+          <MenuItem value="">All</MenuItem>
+          <MenuItem value="Pending">Pending</MenuItem>
+          <MenuItem value="Shipped">Shipped</MenuItem>
+          <MenuItem value="Delivered">Delivered</MenuItem>
+        </Select>
+      </FormControl>
 
-          {/* Filter by Order Decision */}
-          <FormControl sx={{ minWidth: 200, mr: 3 }}> {/* Added margin-right to space it out */}
-            <InputLabel id="order-decision-filter-label">Filter by Order Decision</InputLabel>
-            <Select
-              labelId="order-decision-filter-label"
-              value={orderDecisionFilter}
-              onChange={handleOrderDecisionFilterChange}
-              label="Filter by Order Decision"
-            >
-              <MenuItem value="">All</MenuItem>
-              <MenuItem value="Quoted">Quoted</MenuItem>
-              <MenuItem value="Confirmed">Confirmed</MenuItem>
-            </Select>
-          </FormControl>
-        </Box>
-      </Box>
+      {/* Filter by Order Decision */}
+      <FormControl sx={{ minWidth: 200, mr: 3 }}> {/* Added margin-right to space it out */}
+        <InputLabel id="order-decision-filter-label">Filter by Order Decision</InputLabel>
+        <Select
+          labelId="order-decision-filter-label"
+          value={orderDecisionFilter}
+          onChange={handleOrderDecisionFilterChange}
+          label="Filter by Order Decision"
+        >
+          <MenuItem value="">All</MenuItem>
+          <MenuItem value="Quoted">Quoted</MenuItem>
+          <MenuItem value="Confirmed">Confirmed</MenuItem>
+        </Select>
+      </FormControl>
+    </Box>
+  )}
+</Box>
+
 
 
       
@@ -521,7 +546,10 @@ const Sales = ({ userDetails }) => {
               setNewSale({ ...newSale, customerName: newValue ? newValue.customerName : '' });
             }}
             renderInput={(params) => (
-              <TextField {...params} label="Customer Name" margin="dense" fullWidth />
+              <TextField {...params} label="Customer Name" margin="dense" fullWidth 
+              error={Boolean(formErrors.customerName)}
+            helperText={formErrors.customerName}
+            />
             )}
             sx={{ mb: 1 }}
           />
@@ -582,6 +610,8 @@ const Sales = ({ userDetails }) => {
                   value={product.quantity}
                   onChange={(e) => handleQuantityInput(index, e)}
                   margin="normal"
+                   error={Boolean(formErrors.quantities)}
+    helperText={index === 0 && formErrors.quantities}
                 />
               </Grid>
               <Grid item xs={2}>
