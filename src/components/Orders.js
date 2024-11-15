@@ -332,13 +332,13 @@ const confirmDeleteOrder = async () => {
 
   return (
 
-    <Box p={3}>
+    <Box display="flex" flexDirection={isMobile ? 'column' : 'row'} gap={2} mb={3} alignItems="center" justifyContent="space-between">
       <Typography variant="h4" component="h1" gutterBottom>
         Supplier Orders
       </Typography>
 
       {/* Filter Inputs */}
-      <Box display="flex" gap={2} mb={3} alignItems="center" justifyContent="space-between">
+      <Box display="flex" flexDirection={isMobile ? 'column' : 'row'} gap={2} width="100%">
         {/* Left Side: Select and Autocomplete */}
         <Box display="flex" gap={2}>
           <Select
@@ -349,7 +349,7 @@ const confirmDeleteOrder = async () => {
             sx={{
               color: theme.palette.text.primary, // Adjust text color for dark mode
               backgroundColor: theme.palette.background.paper,
-              width: '240px', // Set custom width
+              width: isMobile ? '100%' : '240px',// Set custom width
               height: '50px' // Set custom height
             }}
           >
@@ -367,7 +367,7 @@ const confirmDeleteOrder = async () => {
               setMaterialFilter(newValue ? newValue.materialName : ''); // Update filter as well
             }}
             renderInput={(params) => (
-              <TextField {...params} label="Filter by Raw Material" variant="outlined" sx={{ width: '240px', height: '50px' }} />
+              <TextField {...params} label="Filter by Raw Material" variant="outlined" sx={{ width: isMobile ? '100%' : '240px', height: '50px' }}/>
             )}
           />
         </Box>
@@ -378,7 +378,7 @@ const confirmDeleteOrder = async () => {
           color="secondary"
           onClick={() => navigate('/delivered-orders')}
           size="large"
-          sx={{ width: '240px', height: '50px' }} // Custom width and height
+          sx={{ width: isMobile ? '100%' : '240px', height: '50px' }}
         >
           View Delivered Orders
         </Button>
@@ -387,7 +387,7 @@ const confirmDeleteOrder = async () => {
 
 
       {/* Column Visibility Control */}
-      <Box display="flex" gap={2} mb={2}>
+      <Box display="flex" flexDirection={isMobile ? 'column' : 'row'} gap={2} mb={2}>
         {Object.keys(visibleColumns).map((column) => (
           <FormControlLabel
             key={column}
@@ -402,7 +402,10 @@ const confirmDeleteOrder = async () => {
         ))}
       </Box>
 
-      <Button variant="outlined" color="secondary" onClick={handleOpen}>
+      <Button variant="outlined" color="secondary" onClick={handleOpen} sx={{
+        width: isMobile ? '100%' : 'auto',
+        mt: isMobile ? 2 : 0 
+    }}>
         Add Order
       </Button>
 
