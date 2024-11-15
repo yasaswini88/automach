@@ -16,10 +16,13 @@ import { Chip } from '@mui/material';
 import { Snackbar, Alert } from '@mui/material';
 
 import { Stack } from '@mui/material';
+import useMediaQuery from '@mui/material/useMediaQuery';
 
 
 const Supplier = () => {
   const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+
   const [rawMaterials, setRawMaterials] = useState([]); // Raw materials state
   const [selectedRawMaterials, setSelectedRawMaterials] = useState([]); // Selected raw materials
   //to expnd details 
@@ -126,33 +129,40 @@ const Supplier = () => {
   const [formErrors, setFormErrors] = useState({}); // State to store form validation errors
 
   const handleAddOrEdit = async () => {
-
     // Define regular expressions for validation
     const emailRegex = /^[a-zA-Z0-9._%+-]+@gmail\.com$/; // Validates Gmail addresses
     const phoneRegex = /^\d{10}$/; // Validates 10-digit phone numbers
-
+  
     // Initialize an empty errors object
     let errors = {};
-
-    // Validate email
-    if (!emailRegex.test(selectedSupplier?.email)) {
+  
+    // Check for empty required fields and validate them
+    if (!selectedSupplier?.name) errors.name = "Name is required.";
+    if (!selectedSupplier?.email) errors.email = "Email is required.";
+    else if (!emailRegex.test(selectedSupplier.email)) {
       errors.email = "Please enter a valid Gmail address.";
     }
-
-    // Validate phone number
-    if (!phoneRegex.test(selectedSupplier?.phone)) {
+    
+    if (!selectedSupplier?.phone) errors.phone = "Phone number is required.";
+    else if (!phoneRegex.test(selectedSupplier.phone)) {
       errors.phone = "Please enter a valid 10-digit phone number.";
     }
-
-    // If there are errors, set them in the formErrors state and return early
+  
+    if (!selectedSupplier?.addressLine1) errors.addressLine1 = "Address Line 1 is required.";
+    if (!selectedSupplier?.city) errors.city = "City is required.";
+    if (!selectedSupplier?.state) errors.state = "State is required.";
+    if (!selectedSupplier?.postalCode) errors.postalCode = "Postal Code is required.";
+  
+    
     if (Object.keys(errors).length > 0) {
       setFormErrors(errors);
       return;
     }
-
-    // Clear any previous errors if validation passes
+  
+  
     setFormErrors({});
-
+  
+    
     const supplierData = {
       ...selectedSupplier,
       rawMaterialIds: selectedRawMaterials.map(material => material.id), // Add raw materials as an array of IDs
@@ -320,7 +330,7 @@ const Supplier = () => {
   if (loadError) return <div>Error loading maps</div>;
   return (
     <Paper style={{
-      padding: '16px', backgroundColor: theme.palette.background.paper,  // Use theme-based background color
+      padding: isMobile ? '8px' : '16px', backgroundColor: theme.palette.background.paper,  // Use theme-based background color
       color: theme.palette.text.primary
     }}>
       <Button variant="outlined" color="secondary"
@@ -345,23 +355,25 @@ const Supplier = () => {
         />
 
         {/* Sort by Name Button */}
+        {!isMobile && (
         <Button
           variant="outlined"
           onClick={handleSortByName}
           sx={{
             color: theme.palette.text.primary, // Adjust text color for dark mode
-            backgroundColor: theme.palette.background.paper,// Adjust background color
+            backgroundColor: theme.palette.background.paper,
             display: 'flex', alignItems: 'center'
           }}
         >
           Sort by Name <SwapVertIcon style={{ marginLeft: '8px' }} />
         </Button>
+        )}
       </div>
 
 
 
       <TableContainer component={Paper}>
-        <Table sx={{ border: `1px solid ${theme.palette.divider}` }}> {/* Use dynamic border color */}
+        <Table sx={{ border: `1px solid ${theme.palette.divider}` }}> 
           <TableHead sx={{ backgroundColor: theme.palette.background.default }}>
             <TableRow>
               <TableCell sx={{ color: theme.palette.text.primary }}>
@@ -430,8 +442,8 @@ const Supplier = () => {
                         backgroundColor: theme.palette.mode === 'light' ? '#f9f9f9' : theme.palette.background.paper,
                         borderRadius: '8px',
                         border: '1px solid #ccc',
-                        width: '50%', // Adjusted width to make it smaller
-                        maxWidth: '300px', // Set a maximum width for consistency
+                        width: isMobile ? '100%' : '50%', 
+    maxWidth: isMobile ? '100%' : '300px',
                       }}
                     >
                       <Typography variant="h6" sx={{ mb: 1 }}>Raw Materials Supplied:</Typography>
@@ -469,10 +481,10 @@ const Supplier = () => {
           sx: {
             padding: '16px',
             borderRadius: '8px',
-            border: `1px solid ${theme.palette.divider}`,  // Use theme-based border color
-            backgroundColor: theme.palette.background.paper, // Use theme-based background color
-            color: theme.palette.text.primary, // Use theme-based text color
-            boxShadow: '0px 4px 20px rgba(0, 0, 0, 0.1)', // Adds a shadow for depth
+            border: `1px solid ${theme.palette.divider}`,  
+            backgroundColor: theme.palette.background.paper, 
+            color: theme.palette.text.primary, 
+            boxShadow: '0px 4px 20px rgba(0, 0, 0, 0.1)', 
             width:"75%"
           }
         }}
@@ -491,8 +503,8 @@ const Supplier = () => {
             </div>
           )}
 
-<Stack spacing={2} sx={{ width: '95%' }}>
-          <TextField label="Name" fullWidth value={selectedSupplier?.name || ''} onChange={(e) => handleSupplierChange('name', e.target.value)} />
+<Stack spacing={isMobile ? 1 : 2} sx={{ width: isMobile ? '100%' : '95%' }}>
+          <TextField label="Name" fullWidth required value={selectedSupplier?.name || ''} onChange={(e) => handleSupplierChange('name', e.target.value)} />
           <Autocomplete
             multiple
             options={rawMaterials}
@@ -505,11 +517,11 @@ const Supplier = () => {
               ))
             }
             renderInput={(params) => (
-              <TextField {...params} label="Raw Materials" variant="outlined" fullWidth />
+              <TextField {...params} label="Raw Materials" variant="outlined" fullWidth required/>
             )}
           />
-          <TextField label="Email" fullWidth value={selectedSupplier?.email || ''} onChange={(e) => handleSupplierChange('email', e.target.value)} />
-          <TextField label="Phone" fullWidth value={selectedSupplier?.phone || ''} onChange={(e) => handleSupplierChange('phone', e.target.value)} />
+          <TextField label="Email" fullWidth required value={selectedSupplier?.email || ''} onChange={(e) => handleSupplierChange('email', e.target.value)} />
+          <TextField label="Phone" fullWidth required value={selectedSupplier?.phone || ''} onChange={(e) => handleSupplierChange('phone', e.target.value)} />
 
           <Autocomplete
             options={addressSuggestions.map((suggestion) => suggestion.description)}
@@ -529,6 +541,7 @@ const Supplier = () => {
                 {...params}
                 label="Address Line 1"
                 fullWidth
+                required
                 value={selectedSupplier?.addressLine1 || ''}
                 onChange={(e) => handleSupplierChange('addressLine1', e.target.value)}
               />
