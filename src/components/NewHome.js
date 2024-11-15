@@ -61,12 +61,12 @@ const NewHome = ({ userDetails }) => {
                     }
                 }
             },
-        
+
             responsive: [{
                 breakpoint: 600,
                 options: {
                     chart: {
-                        width: isMobile ?'100%': '100%', 
+                        width: isMobile ? '100%' : '100%',
                     },
                     legend: {
                         position: isMobile ? 'bottom' : 'top',
@@ -121,7 +121,7 @@ const NewHome = ({ userDetails }) => {
                     }
                 }
             },
-           
+
             responsive: [{
                 breakpoint: 600,
                 options: {
@@ -129,7 +129,7 @@ const NewHome = ({ userDetails }) => {
                         width: isMobile ? '100%' : '100%',
                     },
                     legend: {
-                        position: isMobile ? 'bottom':'top',
+                        position: isMobile ? 'bottom' : 'top',
                     }
                 }
             }],
@@ -366,39 +366,43 @@ const NewHome = ({ userDetails }) => {
         <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', ml: 5, mr: 5, bgcolor: theme.palette.background.default }}>
             <CssBaseline />
             <Grid container spacing={3}>
-           
-                <Grid item xs={12} md={12}  sx={{ mt: isMobile ? 1 : 3 }}>
-            
+
+                <Grid item xs={12} md={12} sx={{ mt: isMobile ? 1 : 3 }}>
+
                     <Card
                         sx={{
-                            mb: isMobile ? 2: 3,
-                            mt: isMobile ?2 :3,
+                            mb: isMobile ? 2 : 3,
+                            mt: isMobile ? 2 : 3,
                             borderRadius: '12px',
                             border: '2px solid #D3D3D3',
-                            height: isMobile ? 'auto':300,
+                            height: isMobile ? 'auto' : 300,
                             background: '#e1f5fe',
-                            padding : isMobile ? '10px' : '16px',
+                            padding: isMobile ? '10px' : '16px',
                         }}>
                         <CardContent>
                             <Typography variant="h6" sx={{ fontSize: isMobile ? '1rem' : '1.25rem' }}><b>Raw Material Stock</b></Typography>
-                            <ApexCharts options={rawMaterialData.options} series={rawMaterialData.series} type="bar" height={300} />
+
+                            {!isMobile && (
+                                <ApexCharts options={rawMaterialData.options} series={rawMaterialData.series} type="bar" height={300} />
+                            )}
+
                         </CardContent>
                     </Card>
                 </Grid>
                 <Grid item xs={12} md={6} sx={{ mt: isMobile ? 1 : 3 }}>
                     <Card
                         sx={{
-                            mb: isMobile? 2: 3,
-                            mt :isMobile?2:3,
-                            height:isMobile ? 'auto' : 300,
+                            mb: isMobile ? 2 : 3,
+                            mt: isMobile ? 2 : 3,
+                            height: isMobile ? 'auto' : 300,
                             borderRadius: '12px',
                             border: '2px solid #D3D3D3',
                             background: '#e1f5fe',
-                            padding : isMobile ? '10px' : '16px' , 
+                            padding: isMobile ? '10px' : '16px',
                         }}>
                         <CardContent>
-                        
-                            <Typography variant="h6" sx={{ fontSize : isMobile ? '1rem' : '1.25 rem'}}><b>Raw Material Order Status from Last 2 Weeks</b></Typography>
+
+                            <Typography variant="h6" sx={{ fontSize: isMobile ? '1rem' : '1.25 rem' }}><b>Raw Material Order Status from Last 2 Weeks</b></Typography>
                             <ApexCharts options={last2WeeksOrderStatusData.options} series={last2WeeksOrderStatusData.series} type="donut" height={300} />
                         </CardContent>
                     </Card>
@@ -406,53 +410,53 @@ const NewHome = ({ userDetails }) => {
                 <Grid item xs={12} sm={6} md={6} sx={{ mt: isMobile ? 1 : 3 }}>
                     <Card
                         sx={{
-                            mb: isMobile ? 2: 3 ,
-                            mt:isMobile?2:3,
-                            height: isMobile ? 'auto':300,
+                            mb: isMobile ? 2 : 3,
+                            mt: isMobile ? 2 : 3,
+                            height: isMobile ? 'auto' : 300,
                             border: '2px solid #D3D3D3',
                             borderRadius: '12px',
                             height: 380,
                             background: '#e1f5fe',
-                            padding : isMobile ? '10px' : '16px' , 
+                            padding: isMobile ? '10px' : '16px',
                         }}>
                         <CardContent sx={{ padding: '16px' }}>
                             <Typography variant="h6" sx={{ fontSize: isMobile ? '1rem' : '1.25rem' }}><b>Orders to be Delivered in Next 7 Days: {deliveryOrders.length}</b></Typography>
                             <Box sx={{ overflowX: isMobile ? 'auto' : 'visible' }}>
- 
-                            <TableContainer component={Paper} sx={{ mt: 2, background: '#e1f5fe', }}>
-                                <Table>
-                                    <TableHead>
-                                        <TableRow>
-                                            <TableCell><strong>Customer Name</strong></TableCell>
-                                            <TableCell><b>Status</b></TableCell>
-                                            <TableCell><b>Delivery Date</b></TableCell>
-                                            <TableCell><b>Product Name</b></TableCell>
-                                            <TableCell><b>Quantity</b></TableCell>
-                                        </TableRow>
-                                    </TableHead>
-                                    <TableBody>
-                                        {deliveryOrders.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((order) => (
-                                            <TableRow key={order.saleId}>
-                                                <TableCell>{order.customerName}</TableCell>
-                                                <TableCell>{order.orderStatus}</TableCell>
-                                                <TableCell>{dayjs(order.orderDeliveryDate).format('YYYY-MM-DD')}</TableCell>
-                                                <TableCell>{order.products.map(product => product.prodName).join(", ")}</TableCell>
-                                                <TableCell>{order.quantities.join(", ")}</TableCell>
-                                            </TableRow>
-                                        ))}
-                                    </TableBody>
-                                </Table>
-                                <TablePagination
-                                    rowsPerPageOptions={[3]}
-                                    component="div"
-                                    count={deliveryOrders.length} // For Delivery Orders Table
-                                    rowsPerPage={rowsPerPage}
-                                    page={page}
-                                    onPageChange={handleChangePage}
-                                    onRowsPerPageChange={handleChangeRowsPerPage}
-                                />
 
-                            </TableContainer>
+                                <TableContainer component={Paper} sx={{ mt: 2, background: '#e1f5fe', }}>
+                                    <Table>
+                                        <TableHead>
+                                            <TableRow>
+                                                <TableCell><strong>Customer Name</strong></TableCell>
+                                                <TableCell><b>Status</b></TableCell>
+                                                <TableCell><b>Delivery Date</b></TableCell>
+                                                <TableCell><b>Product Name</b></TableCell>
+                                                <TableCell><b>Quantity</b></TableCell>
+                                            </TableRow>
+                                        </TableHead>
+                                        <TableBody>
+                                            {deliveryOrders.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((order) => (
+                                                <TableRow key={order.saleId}>
+                                                    <TableCell>{order.customerName}</TableCell>
+                                                    <TableCell>{order.orderStatus}</TableCell>
+                                                    <TableCell>{dayjs(order.orderDeliveryDate).format('YYYY-MM-DD')}</TableCell>
+                                                    <TableCell>{order.products.map(product => product.prodName).join(", ")}</TableCell>
+                                                    <TableCell>{order.quantities.join(", ")}</TableCell>
+                                                </TableRow>
+                                            ))}
+                                        </TableBody>
+                                    </Table>
+                                    <TablePagination
+                                        rowsPerPageOptions={[3]}
+                                        component="div"
+                                        count={deliveryOrders.length} // For Delivery Orders Table
+                                        rowsPerPage={rowsPerPage}
+                                        page={page}
+                                        onPageChange={handleChangePage}
+                                        onRowsPerPageChange={handleChangeRowsPerPage}
+                                    />
+
+                                </TableContainer>
                             </Box>
                         </CardContent>
                     </Card>
@@ -461,66 +465,66 @@ const NewHome = ({ userDetails }) => {
                 <Grid item xs={12} sm={6} md={6} sx={{ mt: isMobile ? 1 : 3 }}>
                     <Card
                         sx={{
-                            mb:isMobile ? 2: 3,
-                            mt:isMobile ?2 : 3,
+                            mb: isMobile ? 2 : 3,
+                            mt: isMobile ? 2 : 3,
                             border: '2px solid #D3D3D3',
                             borderRadius: '12px',
-                            height: isMobile? 'auto' : 380,
+                            height: isMobile ? 'auto' : 380,
                             background: '#e1f5fe',
-                            padding : isMobile ? '10px' : '16px' , 
+                            padding: isMobile ? '10px' : '16px',
 
                         }}>
                         <CardContent sx={{ padding: '16px' }}>
                             {console.log({ next14DaysOrderStatusData })}
-                           
-                            <Typography variant="h6" sx={{ fontSize:isMobile ? '1rem' : '1.25rem'}}><b>Order Status for Deliveries in Next 14 Days</b></Typography>
+
+                            <Typography variant="h6" sx={{ fontSize: isMobile ? '1rem' : '1.25rem' }}><b>Order Status for Deliveries in Next 14 Days</b></Typography>
                             <ApexCharts options={next14DaysOrderStatusData.options} series={next14DaysOrderStatusData.series} type="donut" height={300} />
                         </CardContent>
                     </Card>
                 </Grid>
-               
+
                 <Grid item xs={12} sm={6} md={6} sx={{ mt: isMobile ? 1 : 3 }}>
                     <Card
                         sx={{
-                            mb: isMobile?2:3,
-                            mt: isMobile?2:3,
+                            mb: isMobile ? 2 : 3,
+                            mt: isMobile ? 2 : 3,
                             border: '2px solid #D3D3D3',
                             borderRadius: '12px',
-                            height: isMobile?'auto':380,
+                            height: isMobile ? 'auto' : 380,
                             background: '#FF5733',
-                            padding : isMobile ? '10px':'16px'
+                            padding: isMobile ? '10px' : '16px'
                         }}>
                         <CardContent sx={{ padding: '16px' }}>
-                     
-                        <Typography variant="h6" sx={{ fontSize: isMobile ? '1rem' : '1.25rem' }} color="white">
-  <b>Overdue Orders: {overdueOrders.length}</b>
-</Typography>
-<Box sx={{ overflowX: isMobile ? 'auto' : 'visible' }}>
-  
-                            <TableContainer component={Paper} sx={{ mt: 2, background: '#FFCCCB' }}>
-                                <Table>
-                                    <TableHead>
-                                        <TableRow>
-                                            <TableCell><strong>Customer Name</strong></TableCell>
-                                            <TableCell><strong>Status</strong></TableCell>
-                                            <TableCell><strong>Delivery Date</strong></TableCell>
-                                            <TableCell><strong>Product Name</strong></TableCell>
-                                            <TableCell><strong>Quantity</strong></TableCell>
-                                        </TableRow>
-                                    </TableHead>
-                                    <TableBody>
-                                        {overdueOrders.map((order) => (
-                                            <TableRow key={order.saleId}>
-                                                <TableCell>{order.customerName}</TableCell>
-                                                <TableCell>{order.orderStatus}</TableCell>
-                                                <TableCell>{dayjs(order.orderDeliveryDate).format('YYYY-MM-DD')}</TableCell>
-                                                <TableCell>{order.products.map(product => product.prodName).join(", ")}</TableCell>
-                                                <TableCell>{order.quantities.join(", ")}</TableCell>
+
+                            <Typography variant="h6" sx={{ fontSize: isMobile ? '1rem' : '1.25rem' }} color="white">
+                                <b>Overdue Orders: {overdueOrders.length}</b>
+                            </Typography>
+                            <Box sx={{ overflowX: isMobile ? 'auto' : 'visible' }}>
+
+                                <TableContainer component={Paper} sx={{ mt: 2, background: '#FFCCCB' }}>
+                                    <Table>
+                                        <TableHead>
+                                            <TableRow>
+                                                <TableCell><strong>Customer Name</strong></TableCell>
+                                                <TableCell><strong>Status</strong></TableCell>
+                                                <TableCell><strong>Delivery Date</strong></TableCell>
+                                                <TableCell><strong>Product Name</strong></TableCell>
+                                                <TableCell><strong>Quantity</strong></TableCell>
                                             </TableRow>
-                                        ))}
-                                    </TableBody>
-                                </Table>
-                            </TableContainer>
+                                        </TableHead>
+                                        <TableBody>
+                                            {overdueOrders.map((order) => (
+                                                <TableRow key={order.saleId}>
+                                                    <TableCell>{order.customerName}</TableCell>
+                                                    <TableCell>{order.orderStatus}</TableCell>
+                                                    <TableCell>{dayjs(order.orderDeliveryDate).format('YYYY-MM-DD')}</TableCell>
+                                                    <TableCell>{order.products.map(product => product.prodName).join(", ")}</TableCell>
+                                                    <TableCell>{order.quantities.join(", ")}</TableCell>
+                                                </TableRow>
+                                            ))}
+                                        </TableBody>
+                                    </Table>
+                                </TableContainer>
                             </Box>
                         </CardContent>
                     </Card>
