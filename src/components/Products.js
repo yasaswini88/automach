@@ -16,6 +16,8 @@ import ListItem from '@mui/material/ListItem';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import { Snackbar, Alert } from '@mui/material';
+import useMediaQuery from '@mui/material/useMediaQuery';
+
 
 
 const getTagColor = (tag) => {
@@ -32,6 +34,9 @@ const getTagColor = (tag) => {
 
 const Products = () => {
   const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+
+
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -318,33 +323,18 @@ const Products = () => {
             Product List
           </Typography>
           <TextField
-            fullWidth
+            
+            sx={{ mb: 3, width: isMobile ? '100%' : '50%' }}
             label="Search Products"
             variant="outlined"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            sx={{ mb: 3 }}
+          
           />
-          {/* <Autocomplete
-            options={categories}
-            getOptionLabel={(option) => option.name}
-            value={filteredCategory}
-            onChange={(event, newValue) => setFilteredCategory(newValue)}
-            renderInput={(params) => <TextField {...params} label="Filter by Category" />}
-            sx={{ mb: 2 }}
-          />
-          <Autocomplete
-            multiple
-            options={tags}
-            getOptionLabel={(option) => option.name}
-            value={filteredTags}
-            onChange={(event, newValue) => setFilteredTags(newValue)}
-            renderInput={(params) => <TextField {...params} label="Filter by Tags" />}
-            sx={{ mb: 2 }}
-          /> */}
-          <Grid item xs={4} style={{ marginBottom: '16px' }}>
+         
+          <Grid item xs={4} sm={6} md={4} style={{ marginBottom: '16px' }}>
             <Select
-              fullWidth
+              sx={{ mb: 3, width: isMobile ? '100%' : '50%' }}
               value={categoryFilter || ''}
               onChange={handleCategoryFilterChange}
               displayEmpty
@@ -359,7 +349,7 @@ const Products = () => {
               ))}
             </Select>
           </Grid>
-          <Grid item xs={4} style={{ marginBottom: '16px' }}>
+          <Grid item xs={4} sm={6} md={4} style={{ marginBottom: '16px' }}>
             <Autocomplete
               multiple
               options={tags}
@@ -386,21 +376,13 @@ const Products = () => {
               <DialogContentText>
                 To add a new product, please enter the product name, select a category, assign tags, and specify the raw materials with their quantities.
               </DialogContentText>
-              {/* <TextField
-                autoFocus
-                margin="dense"
-                label="Product Name"
-                type="text"
-                fullWidth
-                value={newProduct.prodName}
-                onChange={(e) => setNewProduct({ ...newProduct, prodName: e.target.value })}
-              /> */}
+              
               <TextField
                 autoFocus
                 margin="dense"
                 label="Product Name"
                 type="text"
-                fullWidth
+                sx={{ mb: 3, width: isMobile ? '100%' : '50%' }}
                 value={newProduct.prodName}
                 onChange={(e) => {
                   setNewProduct({ ...newProduct, prodName: e.target.value });
@@ -415,38 +397,12 @@ const Products = () => {
                 helperText={productError}
               />
 
-              {/* <TextField
-                margin="dense"
-                label="Price"
-                type="number"
-                fullWidth
-                value={newProduct.price}
-                onChange={(e) => setNewProduct({ ...newProduct, price: e.target.value })}
-              /> */}
-
-              {/* <TextField
-                margin="dense"
-                label="Price"
-                type="number"
-                fullWidth
-                value={newProduct.price}
-                onChange={(e) => {
-                  const value = e.target.value;
-                  if (!isNaN(value) && Number(value) >= 0) {
-                    setNewProduct({ ...newProduct, price: value });
-                    setPriceError(''); // Clear error if input is valid
-                  } else {
-                    setPriceError('Price must be a valid number');
-                  }
-                }}
-                error={Boolean(priceError)}
-                helperText={priceError}
-              /> */}
+             
 
               <TextField
                 margin="dense"
                 label="Price"
-                type="text"  // Change to text to allow custom validation
+                type="text"  
                 fullWidth
                 value={newProduct.price}
                 onChange={(e) => {
