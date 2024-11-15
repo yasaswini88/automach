@@ -359,30 +359,34 @@ const confirmDeleteOrder = async () => {
             <MenuItem value="Shipped">Shipped</MenuItem>
           </Select>
 
-          <Autocomplete display={isMobile ? 'none' : 'flex'}
-            options={rawMaterials}
-            getOptionLabel={(option) => option.materialName}
-            value={rawMaterials.find(material => material.id === newOrder.rawMaterialId) || null}
-            onChange={(event, newValue) => {
-              setNewOrder({ ...newOrder, rawMaterialId: newValue ? newValue.id : '' });
-              setMaterialFilter(newValue ? newValue.materialName : ''); // Update filter as well
-            }}
-            renderInput={(params) => (
-              <TextField {...params} label="Filter by Raw Material" variant="outlined" sx={{ width: '240px', height: '50px' }} />
-            )}
-          />
+          {!isMobile && (
+      <Autocomplete
+        options={rawMaterials}
+        getOptionLabel={(option) => option.materialName}
+        value={rawMaterials.find(material => material.id === newOrder.rawMaterialId) || null}
+        onChange={(event, newValue) => {
+          setNewOrder({ ...newOrder, rawMaterialId: newValue ? newValue.id : '' });
+          setMaterialFilter(newValue ? newValue.materialName : ''); // Update filter as well
+        }}
+        renderInput={(params) => (
+          <TextField {...params} label="Filter by Raw Material" variant="outlined" sx={{ width: '240px', height: '50px' }} />
+        )}
+      />
+    )}
         </Box>
 
         {/* Right Side: View Delivered Orders Button */}
-        <Button display={isMobile ? 'none' : 'flex'}
-          variant="outlined"
-          color="secondary"
-          onClick={() => navigate('/delivered-orders')}
-          size="large"
-          sx={{ width: '240px', height: '50px' }} // Custom width and height
-        >
-          View Delivered Orders
-        </Button>
+        {!isMobile && (
+    <Button
+      variant="outlined"
+      color="secondary"
+      onClick={() => navigate('/delivered-orders')}
+      size="large"
+      sx={{ width: '240px', height: '50px' }} // Custom width and height
+    >
+      View Delivered Orders
+    </Button>
+  )}
       </Box>
 
 
