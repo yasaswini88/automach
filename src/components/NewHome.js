@@ -337,11 +337,12 @@ const NewHome = ({ userDetails }) => {
                         data: minQuantities,
                     }
                 ],
+                
                 options: {
                     ...prevData.options,
                     xaxis: {
                         ...prevData.options.xaxis,
-                        categories: materialNames,
+                        categories: materialNames, 
                     }
                 }
             }));
