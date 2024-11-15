@@ -158,6 +158,7 @@ const NewHome = ({ userDetails }) => {
                     autoScaleYaxis: true
                 },
                 toolbar: {
+                    show: !isMobile,
                     autoSelected: 'zoom',
                     tools: {
                         zoomin: true,
@@ -382,9 +383,9 @@ const NewHome = ({ userDetails }) => {
                         <CardContent>
                             <Typography variant="h6" sx={{ fontSize: isMobile ? '1rem' : '1.25rem' }}><b>Raw Material Stock</b></Typography>
 
-                            {!isMobile && (
+                            
                                 <ApexCharts options={rawMaterialData.options} series={rawMaterialData.series} type="bar" height={300} />
-                            )}
+                            
 
                         </CardContent>
                     </Card>
