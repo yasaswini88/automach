@@ -65,7 +65,8 @@ const Supplier = () => {
 
 
   const { isLoaded, loadError } = useLoadScript({
-    googleMapsApiKey: process.env.REACT_APP_GOOGLE_API_KEY,
+    
+    googleMapsApiKey: 'AIzaSyDGHTc6OClMANPGNji-8fwLoxvNkwqdhF0',
     libraries: ['places'], // Loading the "places" tool from Google.
     onLoad: () => setPlacesLoaded(true), // This means once loaded, it sets a value to let the rest of your code know it's ready.
   });
@@ -317,17 +318,19 @@ const Supplier = () => {
     }));
   };
 
-  //to add expanded details 
+ 
   const toggleDetails = (supplierId) => {
     setExpandedDetails((prevState) => ({
       ...prevState,
-      [supplierId]: !prevState[supplierId], // Toggle the visibility for the selected supplier
+      [supplierId]: !prevState[supplierId], 
     }));
   };
 
 
-  if (!isLoaded) return <div>Loading...</div>;
-  if (loadError) return <div>Error loading maps</div>;
+  if (loadError) {
+    console.error("Error loading Google Maps script:", loadError);
+    return <div>Error loading maps</div>;
+  }
   return (
     <Paper style={{
       padding: isMobile ? '8px' : '16px', backgroundColor: theme.palette.background.paper,  // Use theme-based background color

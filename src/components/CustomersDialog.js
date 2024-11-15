@@ -75,7 +75,7 @@ const CustomersDialog = ({ open, onClose, onSave, customerData }) => {
   }, [customerData, open]);
 
   const { isLoaded, loadError } = useLoadScript({
-    googleMapsApiKey: 'AIzaSyDGHTc6OClMANPGNji-8fwLoxvNkwqdhF0', // Replace with your actual API key
+    googleMapsApiKey: 'AIzaSyDGHTc6OClMANPGNji-8fwLoxvNkwqdhF0', 
     libraries
   });
 
