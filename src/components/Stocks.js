@@ -256,9 +256,14 @@ const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
             variant="contained"
             color="info"
             onClick={() => handleAlertClick('medium')}
+            sx={{
+              marginRight: 2,
+              padding: isMobile ? '4px 8px' : '6px 16px',
+              fontSize: isMobile ? '0.75rem' : '1rem',
+            }}
           >
             Medium Alerts ({alerts.medium.length})
-            sx={{ marginRight: 2 ,padding:isMobile ?'4px 8px':'6px 16px' , fontSize : isMobile ? '0.75rem' : '1rem' }}
+            
           </Button>
         </Box>
 
