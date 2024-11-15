@@ -25,10 +25,13 @@ import { useTheme } from '@mui/material/styles';
 import { useNavigate } from 'react-router-dom'; 
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
+import useMediaQuery from '@mui/material/useMediaQuery';
 
 const Inventory = ({ userDetails }) => {
 
     const theme = useTheme();
+    const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+
     const navigate = useNavigate();
     const [inventory, setInventory] = useState([]);
     const [filteredInventory, setFilteredInventory] = useState([]);
@@ -187,9 +190,9 @@ const Inventory = ({ userDetails }) => {
     };
 
     return (
-        <Box sx={{ display: 'flex' }}>
+        <Box sx={{ display: 'flex', padding: isMobile ? 0 : 3 }}>
             <Toolbar />
-            <Box component="main" sx={{ flexGrow: 1, bgcolor: 'background.default', p: 3 }}>
+            <Box component="main" sx={{ flexGrow: 1, bgcolor: 'background.default', p: isMobile ? 2 : 3 }}>
                 <Typography variant="h4" component="h2" gutterBottom>
                     Product Inventory
                 </Typography>
@@ -204,7 +207,7 @@ const Inventory = ({ userDetails }) => {
                     </Box>
                 )}
 
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+                <div style={{ display: 'flex', justifyContent: isMobile ? 'center' : 'space-between', alignItems: 'center', marginBottom: '16px' }}>
                     <Autocomplete
                         options={inventory.map(item => item.productName)}
                         value={searchValue}
