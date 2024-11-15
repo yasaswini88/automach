@@ -385,7 +385,7 @@ const Products = () => {
                 margin="dense"
                 label="Product Name"
                 type="text"
-                sx={{ mb: 3, width: isMobile ? '100%' : '50%' }}
+                fullWidth
                 value={newProduct.prodName}
                 onChange={(e) => {
                   setNewProduct({ ...newProduct, prodName: e.target.value });
