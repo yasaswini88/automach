@@ -226,7 +226,7 @@ const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   return (
     <Box sx={{ display: 'flex' }}>
       <Toolbar />
-      <Box component="main" sx={{ flexGrow: 1, bgcolor: 'background.default', p: 3 }}>
+      <Box component="main" sx={{ flexGrow: 1, bgcolor: 'background.default', p: isMobile ? 0 : 3 }}>
     
         <Typography variant="h4" component="h2" gutterBottom sx={{ fontSize : isMobile ? '1.5rem' : '2.125rem'}}>
           Raw Material Stocks
