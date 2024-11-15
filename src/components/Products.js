@@ -324,7 +324,7 @@ const Products = () => {
           </Typography>
           <TextField
             
-            sx={{ mb: 3, width: isMobile ? '100%' : '50%' }}
+            sx={{ mb: 3, width: isMobile ? '30%' : '50%' }}
             label="Search Products"
             variant="outlined"
             value={searchQuery}
@@ -334,7 +334,7 @@ const Products = () => {
          
           <Grid item xs={4} sm={6} md={4} style={{ marginBottom: '16px' }}>
             <Select
-              sx={{ mb: 3, width: isMobile ? '100%' : '50%' }}
+              sx={{ mb: 3, width: isMobile ? '30%' : '50%' }}
               value={categoryFilter || ''}
               onChange={handleCategoryFilterChange}
               displayEmpty
