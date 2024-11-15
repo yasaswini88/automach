@@ -400,9 +400,10 @@ const NewHome = ({ userDetails }) => {
                 <Grid item xs={12} md={6} sx={{ mt: isMobile ? 1 : 3 }}>
                     <Card
                         sx={{
+                            // width:'100%',
                             mb: isMobile ? 2 : 3,
                             mt: isMobile ? 2 : 3,
-                            height: isMobile ? 'auto' : 300,
+                            height: isMobile ? 'auto' : 380,
                             borderRadius: '12px',
                             border: '2px solid #D3D3D3',
                             background: '#e1f5fe',
