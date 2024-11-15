@@ -6,7 +6,7 @@ import {
   OutlinedInput,
   InputLabel,
   SelectChangeEvent,
-  ListItemText,Grid,
+  ListItemText,
   DialogContent, DialogActions, Autocomplete, Select, MenuItem, IconButton, Checkbox, FormControlLabel, TablePagination
 } from '@mui/material';
 import { useSelector, useDispatch } from 'react-redux';
@@ -25,7 +25,7 @@ import useMediaQuery from '@mui/material/useMediaQuery';
 const Orders = ({ userDetails }) => {
 
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  
 
   const navigate = useNavigate();
 
@@ -50,7 +50,7 @@ const Orders = ({ userDetails }) => {
   // New states for filters
   const [statusFilter, setStatusFilter] = useState('');
   const [materialFilter, setMaterialFilter] = useState('');
-
+  
 
   const [newOrder, setNewOrder] = useState({
     orderId: '', // Added orderId to the state
@@ -71,7 +71,7 @@ const Orders = ({ userDetails }) => {
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
   const handleSnackbarClose = () => {
     setSnackbar({ ...snackbar, open: false });
-  };
+};
 
 
   const dispatch = useDispatch();
@@ -235,7 +235,7 @@ const Orders = ({ userDetails }) => {
     } catch (error) {
       setSnackbar({ open: true, message: `Failed to ${editMode ? 'update' : 'add'} order. Please try again.`, severity: 'error' });
       console.error(`Error ${editMode ? 'updating' : 'adding'} order:`, error);
-    }
+  }
   };
 
   const handleEditOrder = (order) => {
@@ -262,19 +262,19 @@ const Orders = ({ userDetails }) => {
     setDeleteDialogOpen(true); // Open the confirmation dialog
   };
 
-
-  const confirmDeleteOrder = async () => {
-    try {
+ 
+const confirmDeleteOrder = async () => {
+  try {
       await axios.delete(`/api/orders/${orderToDelete}`);
       setOrders(orders.filter((order) => order.orderId !== orderToDelete));
       filterOrders(statusFilter, materialFilter); // Filter orders after deletion
       setSnackbar({ open: true, message: 'Order deleted successfully!', severity: 'success' });
       setDeleteDialogOpen(false); // Close the confirmation dialog
-    } catch (error) {
+  } catch (error) {
       setSnackbar({ open: true, message: 'Failed to delete order. Please try again.', severity: 'error' });
       console.error('Error deleting order:', error);
-    }
-  };
+  }
+};
 
   const filterOrders = (status, material) => {
     let filtered = orders;
@@ -332,181 +332,159 @@ const Orders = ({ userDetails }) => {
 
   return (
 
-    <Box display="flex" flexDirection="column" gap={2} mb={3} alignItems="center" width="100%">
-  <Typography variant="h4" component="h1" gutterBottom>
-    Supplier Orders
-  </Typography>
+    <Box p={3}>
+      <Typography variant="h4" component="h1" gutterBottom>
+        Supplier Orders
+      </Typography>
 
-  {/* Filter Inputs and Buttons Layout */}
-  <Box width="100%">
-    <Grid container spacing={2}>
-      {/* Status Filter */}
-      <Grid item xs={12} sm={6} md={3}>
-        <Select
-          value={statusFilter}
-          onChange={(e) => setStatusFilter(e.target.value)}
-          displayEmpty
-          variant="outlined"
-          fullWidth
-          sx={{
-            color: theme.palette.text.primary,
-            backgroundColor: theme.palette.background.paper,
-            height: '50px'
-          }}
-        >
-          <MenuItem value="">All Statuses</MenuItem>
-          <MenuItem value="Pending">Pending</MenuItem>
-          <MenuItem value="Shipped">Shipped</MenuItem>
-        </Select>
-      </Grid>
+      {/* Filter Inputs */}
+      <Box display="flex" gap={2} mb={3} alignItems="center" justifyContent="space-between">
+        {/* Left Side: Select and Autocomplete */}
+        <Box display="flex" gap={2}>
+          <Select
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
+            displayEmpty
+            variant="outlined"
+            sx={{
+              color: theme.palette.text.primary, // Adjust text color for dark mode
+              backgroundColor: theme.palette.background.paper,
+              width: '240px', // Set custom width
+              height: '50px' // Set custom height
+            }}
+          >
+            <MenuItem value="">All Statuses</MenuItem>
+            <MenuItem value="Pending">Pending</MenuItem>
+            <MenuItem value="Shipped">Shipped</MenuItem>
+          </Select>
 
-      {/* Raw Material Filter */}
-      <Grid item xs={12} sm={6} md={3}>
-        <Autocomplete
-          options={rawMaterials}
-          getOptionLabel={(option) => option.materialName}
-          value={rawMaterials.find(material => material.id === newOrder.rawMaterialId) || null}
-          onChange={(event, newValue) => {
-            setNewOrder({ ...newOrder, rawMaterialId: newValue ? newValue.id : '' });
-            setMaterialFilter(newValue ? newValue.materialName : '');
-          }}
-          renderInput={(params) => (
-            <TextField {...params} label="Filter by Raw Material" variant="outlined" fullWidth />
-          )}
-        />
-      </Grid>
+          <Autocomplete
+            options={rawMaterials}
+            getOptionLabel={(option) => option.materialName}
+            value={rawMaterials.find(material => material.id === newOrder.rawMaterialId) || null}
+            onChange={(event, newValue) => {
+              setNewOrder({ ...newOrder, rawMaterialId: newValue ? newValue.id : '' });
+              setMaterialFilter(newValue ? newValue.materialName : ''); // Update filter as well
+            }}
+            renderInput={(params) => (
+              <TextField {...params} label="Filter by Raw Material" variant="outlined" sx={{ width: '240px', height: '50px' }} />
+            )}
+          />
+        </Box>
 
-      {/* View Delivered Orders Button */}
-      <Grid item xs={12} sm={6} md={3}>
+        {/* Right Side: View Delivered Orders Button */}
         <Button
           variant="outlined"
           color="secondary"
           onClick={() => navigate('/delivered-orders')}
-          fullWidth
-          sx={{ height: '50px' }}
+          size="large"
+          sx={{ width: '240px', height: '50px' }} // Custom width and height
         >
           View Delivered Orders
         </Button>
-      </Grid>
+      </Box>
 
-      {/* Add Order Button */}
-      <Grid item xs={12} sm={6} md={3}>
-        <Button
-          variant="outlined"
-          color="secondary"
-          onClick={handleOpen}
-          fullWidth
-          sx={{ height: '50px' }}
-        >
-          Add Order
-        </Button>
-      </Grid>
-    </Grid>
-  </Box>
 
-  {/* Column Visibility Control */}
-  {!isMobile && (
-    <Box display="flex" flexWrap="wrap" gap={2} mb={2} mt={3}>
-      {Object.keys(visibleColumns).map((column) => (
-        <FormControlLabel
-          key={column}
-          control={
-            <Checkbox
-              checked={visibleColumns[column]}
-              onChange={() => handleColumnVisibilityChange(column)}
-            />
-          }
-          label={column.charAt(0).toUpperCase() + column.slice(1)}
-        />
-      ))}
-    </Box>
-  )}
 
-      <Button variant="outlined" color="secondary" onClick={handleOpen} sx={{
-        width: isMobile ? '100%' : 'auto',
-        mt: isMobile ? 2 : 0
-      }}>
+      {/* Column Visibility Control */}
+      <Box display="flex" gap={2} mb={2}>
+        {Object.keys(visibleColumns).map((column) => (
+          <FormControlLabel
+            key={column}
+            control={
+              <Checkbox
+                checked={visibleColumns[column]}
+                onChange={() => handleColumnVisibilityChange(column)}
+              />
+            }
+            label={column.charAt(0).toUpperCase() + column.slice(1)} // Capitalize first letter of column names
+          />
+        ))}
+      </Box>
+
+      <Button variant="outlined" color="secondary" onClick={handleOpen}>
         Add Order
       </Button>
 
-      <Box sx={{ overflowX: isMobile ? 'auto' : 'visible' }}>
-  <TableContainer component={Paper} sx={{ mt: 3, border: '1px solid grey' }}>
-    <Table sx={{ border: '1px solid grey', minWidth: isMobile ? '500px' : 'auto' }}>
-      <TableHead>
-        <TableRow style={tableRowStyles}>
-          {visibleColumns.supplierName && (
-            <TableCell onClick={() => handleSort('supplierName')} style={{ cursor: 'pointer', color: theme.palette.text.primary }}>
-              Supplier Name {sortColumn === 'supplierName' ? (sortDirection === 'asc' ? '↑' : '↓') : ''}
-            </TableCell>
-          )}
-          {visibleColumns.status && <TableCell>Status</TableCell>}
-          {visibleColumns.notes && !isMobile && <TableCell>Notes</TableCell>}
-          {visibleColumns.rawMaterialName && (
-            <TableCell onClick={() => handleSort('rawMaterialName')} style={{ cursor: 'pointer' }}>
-              Raw Material {sortColumn === 'rawMaterialName' ? (sortDirection === 'asc' ? '↑' : '↓') : ''}
-            </TableCell>
-          )}
-          {visibleColumns.rawMaterialQuantity && <TableCell>Quantity</TableCell>}
-          {visibleColumns.createdBy && !isMobile && <TableCell>Created By</TableCell>}
-          {visibleColumns.createdDate && !isMobile && (
-            <TableCell onClick={() => handleSort('createdDate')} style={{ cursor: 'pointer' }}>
-              Created Date {sortColumn === 'createdDate' ? (sortDirection === 'asc' ? '↑' : '↓') : ''}
-            </TableCell>
-          )}
-          {visibleColumns.updatedBy && !isMobile && <TableCell>Updated By</TableCell>}
-          {visibleColumns.updatedDate && !isMobile && <TableCell>Updated Date</TableCell>}
-          <TableCell>Actions</TableCell>
-        </TableRow>
-      </TableHead>
-      <TableBody>
-        {filteredOrders
-          .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-          .map((order) => (
-            <TableRow key={order.orderId}>
-              {visibleColumns.supplierName && <TableCell>{order.supplierName}</TableCell>}
-              {visibleColumns.status && <TableCell>{order.status}</TableCell>}
-              {visibleColumns.notes && !isMobile && <TableCell>{order.notes}</TableCell>}
-              {visibleColumns.rawMaterialName && <TableCell>{order.rawMaterialName}</TableCell>}
-              {visibleColumns.rawMaterialQuantity && <TableCell>{order.rawMaterialQuantity}</TableCell>}
-              {visibleColumns.createdBy && !isMobile && (
-                <TableCell>{getUserNameById(order.createdBy)}</TableCell>
+      <TableContainer component={Paper} sx={{ mt: 3, border: '1px solid grey' }}>
+        <Table sx={{ border: '1px solid grey' }}>
+          <TableHead>
+            <TableRow style={tableRowStyles}>
+              {/* {visibleColumns.supplierName && <TableCell>Supplier Name</TableCell>} */}
+              {visibleColumns.supplierName && (
+                <TableCell onClick={() => handleSort('supplierName')} style={{ cursor: 'pointer', color: theme.palette.text.primary }}>
+                  Supplier Name {sortColumn === 'supplierName' ? (sortDirection === 'asc' ? '↑' : '↓') : ''}
+                </TableCell>
               )}
-              {visibleColumns.createdDate && !isMobile && <TableCell>{formatDate(order.createdDate)}</TableCell>}
-              {visibleColumns.updatedBy && !isMobile && (
-                <TableCell>{getUserNameById(order.updatedBy)}</TableCell>
+              {visibleColumns.status && <TableCell>Status</TableCell>}
+              {/* {visibleColumns.trackingInfo && <TableCell>Tracking Info</TableCell>} */}
+              {visibleColumns.notes && <TableCell>Notes</TableCell>}
+              {visibleColumns.rawMaterialName && (
+                <TableCell onClick={() => handleSort('rawMaterialName')} style={{ cursor: 'pointer' }}>
+                  Raw Material {sortColumn === 'rawMaterialName' ? (sortDirection === 'asc' ? '↑' : '↓') : ''}
+                </TableCell>
               )}
-              {visibleColumns.updatedDate && !isMobile && (
-                <TableCell>{order.updatedDate ? formatDate(order.updatedDate) : formatDate(order.createdDate)}</TableCell>
-              )}
-              <TableCell>
-                <IconButton color="primary" onClick={() => handleEditOrder(order)}>
-                  <Edit />
-                </IconButton>
-                <IconButton color="error" onClick={() => handleDeleteOrder(order.orderId)}>
-                  <Delete />
-                </IconButton>
-              </TableCell>
+              {visibleColumns.rawMaterialQuantity && <TableCell>Quantity</TableCell>}
+              {visibleColumns.createdBy && <TableCell>Created By</TableCell>}
+              {visibleColumns.createdDate && (
+      <TableCell onClick={() => handleSort('createdDate')} style={{ cursor: 'pointer' }}>
+        Created Date {sortColumn === 'createdDate' ? (sortDirection === 'asc' ? '↑' : '↓') : ''}
+      </TableCell>
+    )}
+              {visibleColumns.updatedBy && <TableCell>Updated By</TableCell>}
+              {visibleColumns.updatedDate && <TableCell>Updated Date</TableCell>}
+              <TableCell>Actions</TableCell> {/* Actions column always visible */}
             </TableRow>
-          ))}
-      </TableBody>
-      <TablePagination
-        component="div"
-        count={filteredOrders.length}
-        page={page}
-        onPageChange={(event, newPage) => setPage(newPage)}
-        rowsPerPage={rowsPerPage}
-        onRowsPerPageChange={(event) => {
-          setRowsPerPage(parseInt(event.target.value, 10));
-          setPage(0);
-        }}
-        rowsPerPageOptions={[5, 10, 25]}
-      />
-    </Table>
-  </TableContainer>
-</Box>
+          </TableHead>
+          <TableBody>
+            {filteredOrders
+              .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+              .map((order) => (
+                <TableRow key={order.orderId}>
+                  {visibleColumns.supplierName && <TableCell>{order.supplierName}</TableCell>}
+                  {visibleColumns.status && <TableCell>{order.status}</TableCell>}
+                  {/* {visibleColumns.trackingInfo && <TableCell>{order.trackingInfo}</TableCell>} */}
+                  {visibleColumns.notes && <TableCell>{order.notes}</TableCell>}
+                  {visibleColumns.rawMaterialName && <TableCell>{order.rawMaterialName}</TableCell>}
+                  {visibleColumns.rawMaterialQuantity && <TableCell>{order.rawMaterialQuantity}</TableCell>}
+                  {visibleColumns.createdBy && (
+                    <TableCell>{getUserNameById(order.createdBy)}</TableCell> // Replace user ID with name
+                  )}
+                  {visibleColumns.createdDate && <TableCell>{formatDate(order.createdDate)}</TableCell>}
+                  {visibleColumns.updatedBy && (
+                    <TableCell>{getUserNameById(order.updatedBy)}</TableCell> // Replace user ID with name
+                  )}
+       {visibleColumns.updatedDate && (
+  <TableCell>{order.updatedDate ? formatDate(order.updatedDate) : formatDate(order.createdDate)}</TableCell>
+)}
 
+                  <TableCell>
+                    <IconButton color="primary" onClick={() => handleEditOrder(order)}>
+                      <Edit />
+                    </IconButton>
+                    <IconButton color="error" onClick={() => handleDeleteOrder(order.orderId)}>
+                      <Delete />
+                    </IconButton>
+                  </TableCell>
+                </TableRow>
+              ))}
+          </TableBody>
+          <TablePagination
+            component="div"
+            count={filteredOrders.length} // Total number of rows
+            page={page}
+            onPageChange={(event, newPage) => setPage(newPage)}
+            rowsPerPage={rowsPerPage}
+            onRowsPerPageChange={(event) => {
+              setRowsPerPage(parseInt(event.target.value, 10));
+              setPage(0); // Reset to the first page
+            }}
+            rowsPerPageOptions={[5, 10, 25]} // Allow selection of rows per page
+          />
+        </Table>
+      </TableContainer>
 
-      <Dialog open={open} onClose={handleClose} fullWidth={isMobile} maxWidth="sm">
+      <Dialog open={open} onClose={handleClose} >
         <DialogTitle style={tableRowStyles}>{editMode ? 'Edit Order' : 'Add New Order'}</DialogTitle>
         <DialogContent>
           {/* Autocomplete for raw material */}
@@ -516,12 +494,25 @@ const Orders = ({ userDetails }) => {
             value={rawMaterials.find(material => material.id === newOrder.rawMaterialId) || null}
             onChange={handleRawMaterialChange}
             renderInput={(params) => (
-              <TextField {...params} label="Select Raw Material" variant="outlined" required helperText="Required" />
+              <TextField {...params} label="Select Raw Material" variant="outlined" />
             )}
             fullWidth
             sx={{ mt: 2 }}
           />
-
+          {/* 
+        Autocomplete for supplier - filtered by raw material */}
+          {/* <Autocomplete
+          options={filteredSuppliers}
+          getOptionLabel={(option) => option.name}
+          value={filteredSuppliers.find(supplier => supplier.id === newOrder.supplierId) || null}
+          onChange={(event, newValue) => {
+            setNewOrder({ ...newOrder, supplierId: newValue ? newValue.id : '' });
+          }}
+          renderInput={(params) => (
+            <TextField {...params} label="Select Supplier" variant="outlined" />
+          )}
+          fullWidth
+        /> */}
           <Autocomplete
             options={filteredSuppliers}
             getOptionLabel={(option) => option.name}
@@ -534,7 +525,7 @@ const Orders = ({ userDetails }) => {
               });
             }}
             renderInput={(params) => (
-              <TextField {...params} label="Select Supplier" variant="outlined" required helperText="Required" />
+              <TextField {...params} label="Select Supplier" variant="outlined" />
             )}
             fullWidth
           />
@@ -553,19 +544,22 @@ const Orders = ({ userDetails }) => {
             <MenuItem value="Shipped">Shipped</MenuItem>
             <MenuItem value="Delivered">Delivered</MenuItem>
           </Select>
-
+          {/* <TextField
+            margin="normal"
+            label="Tracking Info"
+            fullWidth
+            variant="outlined"
+            value={newOrder.trackingInfo}
+            onChange={(e) => setNewOrder({ ...newOrder, trackingInfo: e.target.value })}
+          /> */}
           <TextField
+            margin="normal"
             label="Notes"
             fullWidth
-            required
             variant="outlined"
             value={newOrder.notes}
             onChange={(e) => setNewOrder({ ...newOrder, notes: e.target.value })}
-            margin={isMobile ? 'dense' : 'normal'}
-            sx={{ mt: isMobile ? 1 : 2 }}
           />
-
-
           {/* <Autocomplete
             options={rawMaterials}
             getOptionLabel={(option) => option.materialName}
@@ -580,18 +574,13 @@ const Orders = ({ userDetails }) => {
             sx={{ mt: 2 }}
           /> */}
           <TextField
-
+            margin="normal"
             label="Raw Material Quantity"
             type="number"
             fullWidth
-            required
-
-            helperText="Required"
             variant="outlined"
             value={newOrder.rawMaterialQuantity}
             onChange={(e) => setNewOrder({ ...newOrder, rawMaterialQuantity: e.target.value })}
-            margin={isMobile ? 'dense' : 'normal'}
-            sx={{ mt: isMobile ? 1 : 2 }}
           />
         </DialogContent>
         <DialogActions>
@@ -621,15 +610,15 @@ const Orders = ({ userDetails }) => {
 
       {/* Snackbar for notifications */}
       <Snackbar
-        open={snackbar.open}
-        autoHideDuration={6000}
-        onClose={handleSnackbarClose}
-        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
-      >
-        <Alert onClose={handleSnackbarClose} severity={snackbar.severity} sx={{ width: '100%' }}>
-          {snackbar.message}
-        </Alert>
-      </Snackbar>
+            open={snackbar.open}
+            autoHideDuration={6000}
+            onClose={handleSnackbarClose}
+            anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+        >
+            <Alert onClose={handleSnackbarClose} severity={snackbar.severity} sx={{ width: '100%' }}>
+                {snackbar.message}
+            </Alert>
+        </Snackbar>
 
     </Box>
   );
