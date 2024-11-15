@@ -225,6 +225,22 @@ const Products = () => {
     if (!newProduct.prodName) errors.prodName = 'Product name is required.';
     if (!newProduct.price) errors.price = 'Price is required.';
     if (!newProduct.category) errors.category = 'Category is required.';
+    if (newProduct.tags.length === 0) {
+      errors.tags = 'At least one tag is required.';
+    }
+
+    // Check for raw materials and quantities
+    newProduct.rawMaterials.forEach((material, index) => {
+      if (!material.materialId) {
+        errors[`rawMaterial_${index}`] = 'Raw Material is required.';
+      }
+      if (!material.rawMaterialQuantity) {
+        errors[`rawMaterialQuantity_${index}`] = 'Quantity is required.';
+      } else if (isNaN(material.rawMaterialQuantity) || material.rawMaterialQuantity <= 0) {
+        errors[`rawMaterialQuantity_${index}`] = 'Quantity must be a positive number.';
+      }
+    });
+
 
     // Check if product name is duplicate
     if (checkDuplicateProductName(newProduct.prodName)) {
@@ -250,12 +266,12 @@ const Products = () => {
     // Filter valid tags
     const validTags = newProduct.tags.filter(tag => tag && tag.id != null);
 
-    // Prepare payload
+
     const payload = {
       product: {
         prodName: newProduct.prodName,
         category: newProduct.category,
-        price: newProduct.price, // Include price in payload
+        price: newProduct.price,
         tags: validTags.map(tag => ({ id: tag.id }))
       },
       rawMaterialQuantities: rawMaterialQuantities
@@ -463,7 +479,9 @@ const Products = () => {
                         newRawMaterials[index].materialId = newValue ? newValue.id : '';
                         setNewProduct({ ...newProduct, rawMaterials: newRawMaterials });
                       }}
-                      renderInput={(params) => <TextField {...params} label="Raw Material" margin="normal" />}
+                      renderInput={(params) => <TextField {...params} label="Raw Material" margin="normal"
+                        error={Boolean(formErrors[`rawMaterial_${index}`])}
+                        helperText={formErrors[`rawMaterial_${index}`]} />}
                     />
                   </Grid>
                   <Grid item xs={4}>
@@ -474,6 +492,8 @@ const Products = () => {
                       value={material.rawMaterialQuantity}
                       onChange={(e) => handleInputChange(index, e)}
                       margin="normal"
+                      error={Boolean(formErrors[`rawMaterialQuantity_${index}`])}
+                      helperText={formErrors[`rawMaterialQuantity_${index}`]}
                     />
                   </Grid>
                   <Grid item xs={2}>
