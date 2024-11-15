@@ -22,7 +22,7 @@ import {
 } from '@mui/material';
 import SwapVertIcon from '@mui/icons-material/SwapVert';
 import { useTheme } from '@mui/material/styles';
-import { useNavigate } from 'react-router-dom'; 
+import { useNavigate } from 'react-router-dom';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import useMediaQuery from '@mui/material/useMediaQuery';
@@ -58,8 +58,8 @@ const Inventory = ({ userDetails }) => {
         });
     };
 
-    
-    
+
+
 
 
     useEffect(() => {
@@ -77,34 +77,34 @@ const Inventory = ({ userDetails }) => {
             })
             .catch(error => console.error('Error fetching inventory:', error));
     }, []);
-    
+
 
 
     const handleSnackbarClose = () => {
         setSnackbar({ ...snackbar, open: false });
     };
 
-   
 
 
-    
+
+
 
     const handleUpdate = (index) => {
         const actualIndex = page * rowsPerPage + index;
         const updatedItem = filteredInventory[actualIndex];
-    
+
         if (!updatedItem.inventoryId) {
             console.error('Error: updatedItem.inventoryId is undefined');
             return;
         }
-    
+
         setLoading(true);
 
-        const oldQuantity = inventory[actualIndex].quantity; 
+        const oldQuantity = inventory[actualIndex].quantity;
         const payload = {
             quantity: updatedItem.quantity,
         };
-    
+
         axios.put(`/api/inventory/${updatedItem.inventoryId}/quantity`, payload)
             .then(response => {
                 const updatedInventory = [...inventory];
@@ -112,7 +112,7 @@ const Inventory = ({ userDetails }) => {
 
                 // Reapply product names using the helper function
                 const mappedInventory = mapInventoryWithProductNames(updatedInventory, products);
-    
+
                 setInventory(mappedInventory);
                 setFilteredInventory(mappedInventory);
                 setSnackbar({ open: true, message: 'Stock updated successfully!', severity: 'success' });
@@ -125,7 +125,7 @@ const Inventory = ({ userDetails }) => {
                 setLoading(false);
             });
     };
-    
+
 
     const handleQuantityChange = (index, event) => {
         const newInventory = [...filteredInventory];
@@ -177,7 +177,7 @@ const Inventory = ({ userDetails }) => {
         setRowsPerPage(parseInt(event.target.value, 10));
         setPage(0);
     };
-    
+
     const handleProductCheckAlerts = (item) => {
         console.log(item);
         navigate(`/required-products-stock-alerts?productName=${item.productName}&requiredQuantity=${item.requiredQuantity}`)
@@ -217,17 +217,19 @@ const Inventory = ({ userDetails }) => {
                         )}
                     />
 
+                    {!isMobile && (
+                        <Button
+                            variant="outlined"
+                            onClick={() => handleSort('productName')}
+                            sx={{
+                                color: theme.palette.text.primary, // Adjust text color for dark mode
+                                backgroundColor: theme.palette.background.paper // Adjust background color
+                            }}
+                        >
+                            Sort by Product <SwapVertIcon style={{ marginLeft: '8px' }} />
+                        </Button>
+                    )}
 
-                    <Button
-                        variant="outlined"
-                        onClick={() => handleSort('productName')}
-                        sx={{
-                            color: theme.palette.text.primary, // Adjust text color for dark mode
-                            backgroundColor: theme.palette.background.paper // Adjust background color
-                        }}
-                    >
-                        Sort by Product <SwapVertIcon style={{ marginLeft: '8px' }} />
-                    </Button>
 
 
                 </div>
@@ -241,7 +243,7 @@ const Inventory = ({ userDetails }) => {
                                 <TableCell>Required Quanity</TableCell>
                                 {/* <TableCell>Modified By</TableCell> */}
                                 <TableCell>Last Modified</TableCell>
-                                <TableCell style={{textAlign: 'center'}}>Alerts</TableCell>
+                                <TableCell style={{ textAlign: 'center' }}>Alerts</TableCell>
                             </TableRow>
                         </TableHead>
 
@@ -267,15 +269,15 @@ const Inventory = ({ userDetails }) => {
                                     </TableCell>
                                     {/* <TableCell>{userDetails?.firstName} {userDetails?.lastName}</TableCell> */}
                                     <TableCell>{new Date(item.modifiedDate).toLocaleString()}</TableCell>
-                                    <TableCell style={{textAlign: 'center'}}>
+                                    <TableCell style={{ textAlign: 'center' }}>
                                         {item.requiredQuantity > 0 ? (<Button
-                                        variant="text"
-                                        color="warning"
-                                        onClick={() => handleProductCheckAlerts(item)}
-                                    >
-                                        <NotificationsIcon />
-                                    </Button>) : (<CheckCircleOutlineIcon sx={{ color: 'green' }} />)}
-                                    
+                                            variant="text"
+                                            color="warning"
+                                            onClick={() => handleProductCheckAlerts(item)}
+                                        >
+                                            <NotificationsIcon />
+                                        </Button>) : (<CheckCircleOutlineIcon sx={{ color: 'green' }} />)}
+
                                     </TableCell>
                                 </TableRow>
                             ))}
