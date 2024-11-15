@@ -1,4 +1,4 @@
-/* Login.css */
+
 
 body, html {
     margin: 0;
@@ -18,7 +18,7 @@ body, html {
     grid-template-columns: 1fr 1fr;
 }
 
-/* Adjust form container to be centered */
+
 .form-container {
     display: flex;
     align-items: center;
@@ -42,35 +42,34 @@ body, html {
     height: 100%;
 }
 
-/* Responsive adjustments for smaller screens */
+
 @media (max-width: 768px) {
-    /* Hide image container on mobile */
+    
     .image-container {
         display: none;
     }
 
-    /* Make login container full-width and centered */
     .login-container {
         display: flex;
         flex-direction: column;
         align-items: center;
     }
 
-    /* Set form container to be smaller and centered */
+    
     .form-container {
         width: 100%;
         max-width: 400px;
         padding: 20px;
     }
 
-    /* Adjust inner form width */
+   
     .form-container > div {
         width: 100%;
         padding: 20px;
     }
 }
 
-/* Other styling */
+
 .header h2 {
     margin-bottom: 10px;
     color: #333;
