@@ -58,6 +58,8 @@ const Products = () => {
 
   const [priceError, setPriceError] = useState('');
 
+  const [formErrors, setFormErrors] = useState({});
+
 
   const [newProduct, setNewProduct] = useState({
     prodName: '',
@@ -130,18 +132,7 @@ const Products = () => {
     setSortedProducts(filteredProductsList);
   }, [searchQuery, categoryFilter, tagFilter]);
 
-  // useEffect(() => {
-  //   axios.get('/api/products')
-  //     .then(response => {
-  //       setProducts(response.data);
-  //       setLoading(false);
-  //     })
-  //     .catch(error => {
-  //       console.error('There was an error fetching the products!', error);
-  //       setError('Error fetching products');
-  //       setLoading(false);
-  //     });
-  // }, []);
+
 
   useEffect(() => {
     axios.get('/api/products')
@@ -227,12 +218,27 @@ const Products = () => {
     newRawMaterials[index][name] = value;
     setNewProduct({ ...newProduct, rawMaterials: newRawMaterials });
   };
-
   const handleAddProduct = () => {
-    if (productError || priceError || checkDuplicateProductName(newProduct.prodName)) {
+    const errors = {};
+
+    // Check for required fields
+    if (!newProduct.prodName) errors.prodName = 'Product name is required.';
+    if (!newProduct.price) errors.price = 'Price is required.';
+    if (!newProduct.category) errors.category = 'Category is required.';
+
+    // Check if product name is duplicate
+    if (checkDuplicateProductName(newProduct.prodName)) {
+      errors.prodName = 'Product name already exists.';
+    }
+
+    // Update formErrors state and show an error message if there are validation issues
+    if (Object.keys(errors).length > 0 || productError || priceError) {
+      setFormErrors(errors);
       setSnackbar({ open: true, message: 'Please fix errors before adding the product', severity: 'error' });
       return;
     }
+
+    // Prepare raw material quantities
     const rawMaterialQuantities = {};
     newProduct.rawMaterials.forEach((material) => {
       const rawMaterialId = material.materialId;
@@ -241,14 +247,15 @@ const Products = () => {
       }
     });
 
+    // Filter valid tags
     const validTags = newProduct.tags.filter(tag => tag && tag.id != null);
 
+    // Prepare payload
     const payload = {
       product: {
         prodName: newProduct.prodName,
         category: newProduct.category,
         price: newProduct.price, // Include price in payload
-        // tags: newProduct.tags.map(tag => ({ id: tag.id }))
         tags: validTags.map(tag => ({ id: tag.id }))
       },
       rawMaterialQuantities: rawMaterialQuantities
@@ -256,6 +263,7 @@ const Products = () => {
 
     console.log('Payload being sent:', payload);
 
+    // API call to add product
     axios.post('/api/products', payload)
       .then(response => {
         setProducts([...products, response.data]);
@@ -281,14 +289,7 @@ const Products = () => {
     return <Typography>{error}</Typography>;
   }
 
-  // const filteredProducts = products.filter(product =>
-  //   product.prodName.toLowerCase().includes(searchQuery.toLowerCase())
-  // );
-  // const filteredProducts = products.filter(product => {
-  //   const categoryMatch = filteredCategory ? product.category?.id === filteredCategory.id : true;
-  //   const tagsMatch = filteredTags.length > 0 ? filteredTags.every(tag => product.tags.some(pTag => pTag.id === tag.id)) : true;
-  //   return product.prodName.toLowerCase().includes(searchQuery.toLowerCase()) && categoryMatch && tagsMatch;
-  // });
+
   const handleCategoryFilterChange = (event) => {
     setCategoryFilter(event.target.value);
   };
@@ -323,15 +324,16 @@ const Products = () => {
             Product List
           </Typography>
           <TextField
-            
+
             sx={{ mb: 3, width: isMobile ? '30%' : '50%' }}
+
             label="Search Products"
             variant="outlined"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-          
+
           />
-         
+
           <Grid item xs={4} sm={6} md={4} style={{ marginBottom: '16px' }}>
             <Select
               sx={{ mb: 3, width: isMobile ? '30%' : '50%' }}
@@ -351,12 +353,14 @@ const Products = () => {
           </Grid>
           <Grid item xs={4} sm={6} md={4} style={{ marginBottom: '16px' }}>
             <Autocomplete
+              sx={{ mb: 3, width: isMobile ? '30%' : '50%' }}
               multiple
               options={tags}
               getOptionLabel={(option) => option.name}
               value={tagFilter}
               onChange={handleTagFilterChange}
               renderInput={(params) => <TextField {...params} label="Filter by Tags" />}
+
             />
           </Grid>
           <Grid item style={{ marginBottom: '16px' }}>
@@ -376,7 +380,6 @@ const Products = () => {
               <DialogContentText>
                 To add a new product, please enter the product name, select a category, assign tags, and specify the raw materials with their quantities.
               </DialogContentText>
-              
               <TextField
                 autoFocus
                 margin="dense"
@@ -393,16 +396,17 @@ const Products = () => {
                     setProductError('Product name already exists');
                   }
                 }}
-                error={Boolean(productError)}
-                helperText={productError}
+                error={Boolean(formErrors.prodName)}
+                helperText={formErrors.prodName}
               />
 
-             
+
+
 
               <TextField
                 margin="dense"
                 label="Price"
-                type="text"  
+                type="text"
                 fullWidth
                 value={newProduct.price}
                 onChange={(e) => {
@@ -429,7 +433,9 @@ const Products = () => {
                 onChange={(event, newValue) => {
                   setNewProduct({ ...newProduct, category: newValue });
                 }}
-                renderInput={(params) => <TextField {...params} label="Category" />}
+                renderInput={(params) => <TextField {...params} label="Category"
+                  error={Boolean(formErrors.category)}
+                  helperText={formErrors.category || 'Required'} />}
                 sx={{ mt: 2 }}
               />
               <Autocomplete
@@ -440,7 +446,9 @@ const Products = () => {
                 onChange={(event, newValue) => {
                   setNewProduct({ ...newProduct, tags: newValue });
                 }}
-                renderInput={(params) => <TextField {...params} label="Tags" />}
+                renderInput={(params) => <TextField {...params} label="Tags"
+                  error={Boolean(formErrors.tags)}
+                  helperText={formErrors.tags || 'Required'} />}
                 sx={{ mt: 2 }}
               />
               {newProduct.rawMaterials.map((material, index) => (
@@ -484,59 +492,61 @@ const Products = () => {
               <Button onClick={handleAddProduct} color="primary">Add Product</Button>
             </DialogActions>
           </Dialog>
-          <TableContainer component={Paper} sx={{ mt: 3, border: '1px solid #ccc' }}>
-            <Table>
-              <TableHead
-                sx={{
-                  backgroundColor: theme.palette.mode === 'light' ? '#f0f0f0' : theme.palette.background.default,
-                  fontWeight: 'bold',
-                }}>
-                <TableRow sx={{ bgcolor: theme.palette.background.main, fontWeight: 'bold' }}>
-                  <TableCell onClick={() => handleSort('prodName')} sx={{ cursor: 'pointer' }}>Product Name</TableCell>
-                  <TableCell onClick={() => handleSort('price')} sx={{ cursor: 'pointer' }}>Price</TableCell>
-                  <TableCell>Tags</TableCell>
-                  <TableCell>Category</TableCell>
-                  <TableCell>Actions</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {sortedProducts.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((product) => (
-                  <TableRow key={product.prodId} hover sx={{ borderBottom: '1px solid #ddd' }}>
-                    <TableCell>{product.prodName}</TableCell>
-                    <TableCell>${product.price}</TableCell>
-                    <TableCell>
-                      {product.tags.map((tag) => {
-                        const randomColor = getTagColor(tag);
-                        return <Chip key={tag.id} label={tag.name} sx={{ mr: 1, backgroundColor: randomColor, textTransform: 'capitalize' }} />;
-                      })}
-                    </TableCell>
-                    <TableCell>{product.category?.name || 'N/A'}</TableCell>
-                    <TableCell>
-                      <Button variant="outlined" color="secondary" onClick={() => fetchRawMaterials(product.prodId)}>
-                        View Raw Materials
-                      </Button>
-                    </TableCell>
+          <Box sx={{ overflowX: isMobile ? 'auto' : 'visible' }}>
+            <TableContainer component={Paper} sx={{ mt: 3, border: '1px solid #ccc' }}>
+              <Table>
+                <TableHead
+                  sx={{
+                    backgroundColor: theme.palette.mode === 'light' ? '#f0f0f0' : theme.palette.background.default,
+                    fontWeight: 'bold',
+                  }}>
+                  <TableRow sx={{ bgcolor: theme.palette.background.main, fontWeight: 'bold' }}>
+                    <TableCell onClick={() => handleSort('prodName')} sx={{ cursor: 'pointer' }}>Product Name</TableCell>
+                    <TableCell onClick={() => handleSort('price')} sx={{ cursor: 'pointer' }}>Price</TableCell>
+                    <TableCell>Tags</TableCell>
+                    <TableCell>Category</TableCell>
+                    <TableCell>Actions</TableCell>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-            <TablePagination
-              sx={{
-                '& .MuiPaginationItem-root': {
-                  fontSize: '1.2rem', // Increases font size
-                  color: '#1976d2', // Changes color to blue
-                }
-              }}
+                </TableHead>
+                <TableBody>
+                  {sortedProducts.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((product) => (
+                    <TableRow key={product.prodId} hover sx={{ borderBottom: '1px solid #ddd' }}>
+                      <TableCell>{product.prodName}</TableCell>
+                      <TableCell>${product.price}</TableCell>
+                      <TableCell>
+                        {product.tags.map((tag) => {
+                          const randomColor = getTagColor(tag);
+                          return <Chip key={tag.id} label={tag.name} sx={{ mr: 1, backgroundColor: randomColor, textTransform: 'capitalize' }} />;
+                        })}
+                      </TableCell>
+                      <TableCell>{product.category?.name || 'N/A'}</TableCell>
+                      <TableCell>
+                        <Button variant="outlined" color="secondary" onClick={() => fetchRawMaterials(product.prodId)}>
+                          View Raw Materials
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+              <TablePagination
+                sx={{
+                  '& .MuiPaginationItem-root': {
+                    fontSize: '1.2rem', // Increases font size
+                    color: '#1976d2', // Changes color to blue
+                  }
+                }}
 
-              rowsPerPageOptions={[5, 10, 25]}
-              component="div"
-              count={sortedProducts.length}
-              rowsPerPage={rowsPerPage}
-              page={page}
-              onPageChange={handleChangePage}
-              onRowsPerPageChange={handleChangeRowsPerPage}
-            />
-          </TableContainer>
+                rowsPerPageOptions={[5, 10, 25]}
+                component="div"
+                count={sortedProducts.length}
+                rowsPerPage={rowsPerPage}
+                page={page}
+                onPageChange={handleChangePage}
+                onRowsPerPageChange={handleChangeRowsPerPage}
+              />
+            </TableContainer>
+          </Box>
           {selectedProduct && (
             <>
               <Typography variant="h6" component="h4" mt={4} gutterBottom>
