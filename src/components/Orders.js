@@ -50,7 +50,7 @@ const Orders = ({ userDetails }) => {
   // New states for filters
   const [statusFilter, setStatusFilter] = useState('');
   const [materialFilter, setMaterialFilter] = useState('');
-  
+
 
   const [newOrder, setNewOrder] = useState({
     orderId: '', // Added orderId to the state
@@ -71,7 +71,7 @@ const Orders = ({ userDetails }) => {
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
   const handleSnackbarClose = () => {
     setSnackbar({ ...snackbar, open: false });
-};
+  };
 
 
   const dispatch = useDispatch();
@@ -235,7 +235,7 @@ const Orders = ({ userDetails }) => {
     } catch (error) {
       setSnackbar({ open: true, message: `Failed to ${editMode ? 'update' : 'add'} order. Please try again.`, severity: 'error' });
       console.error(`Error ${editMode ? 'updating' : 'adding'} order:`, error);
-  }
+    }
   };
 
   const handleEditOrder = (order) => {
@@ -262,19 +262,19 @@ const Orders = ({ userDetails }) => {
     setDeleteDialogOpen(true); // Open the confirmation dialog
   };
 
- 
-const confirmDeleteOrder = async () => {
-  try {
+
+  const confirmDeleteOrder = async () => {
+    try {
       await axios.delete(`/api/orders/${orderToDelete}`);
       setOrders(orders.filter((order) => order.orderId !== orderToDelete));
       filterOrders(statusFilter, materialFilter); // Filter orders after deletion
       setSnackbar({ open: true, message: 'Order deleted successfully!', severity: 'success' });
       setDeleteDialogOpen(false); // Close the confirmation dialog
-  } catch (error) {
+    } catch (error) {
       setSnackbar({ open: true, message: 'Failed to delete order. Please try again.', severity: 'error' });
       console.error('Error deleting order:', error);
-  }
-};
+    }
+  };
 
   const filterOrders = (status, material) => {
     let filtered = orders;
@@ -367,7 +367,7 @@ const confirmDeleteOrder = async () => {
               setMaterialFilter(newValue ? newValue.materialName : ''); // Update filter as well
             }}
             renderInput={(params) => (
-              <TextField {...params} label="Filter by Raw Material" variant="outlined" sx={{ width: isMobile ? '100%' : '240px', height: '50px' }}/>
+              <TextField {...params} label="Filter by Raw Material" variant="outlined" sx={{ width: isMobile ? '100%' : '240px', height: '50px' }} />
             )}
           />
         </Box>
@@ -387,7 +387,7 @@ const confirmDeleteOrder = async () => {
 
 
       {/* Column Visibility Control */}
-      <Box display="flex" flexDirection={isMobile ? 'column' : 'row'} gap={2} mb={2}>
+      <Box display={isMobile ? 'none' : 'flex'} gap={2} mb={2}>
         {Object.keys(visibleColumns).map((column) => (
           <FormControlLabel
             key={column}
@@ -404,90 +404,87 @@ const confirmDeleteOrder = async () => {
 
       <Button variant="outlined" color="secondary" onClick={handleOpen} sx={{
         width: isMobile ? '100%' : 'auto',
-        mt: isMobile ? 2 : 0 
-    }}>
+        mt: isMobile ? 2 : 0
+      }}>
         Add Order
       </Button>
 
       <Box sx={{ overflowX: isMobile ? 'auto' : 'visible' }}>
-      <TableContainer component={Paper} sx={{ mt: 3, border: '1px solid grey' }}>
-        <Table sx={{ border: '1px solid grey' }}>
-          <TableHead>
-            <TableRow style={tableRowStyles}>
-              {/* {visibleColumns.supplierName && <TableCell>Supplier Name</TableCell>} */}
-              {visibleColumns.supplierName && (
-                <TableCell onClick={() => handleSort('supplierName')} style={{ cursor: 'pointer', color: theme.palette.text.primary }}>
-                  Supplier Name {sortColumn === 'supplierName' ? (sortDirection === 'asc' ? '↑' : '↓') : ''}
-                </TableCell>
+  <TableContainer component={Paper} sx={{ mt: 3, border: '1px solid grey' }}>
+    <Table sx={{ border: '1px solid grey', minWidth: isMobile ? '500px' : 'auto' }}>
+      <TableHead>
+        <TableRow style={tableRowStyles}>
+          {visibleColumns.supplierName && (
+            <TableCell onClick={() => handleSort('supplierName')} style={{ cursor: 'pointer', color: theme.palette.text.primary }}>
+              Supplier Name {sortColumn === 'supplierName' ? (sortDirection === 'asc' ? '↑' : '↓') : ''}
+            </TableCell>
+          )}
+          {visibleColumns.status && <TableCell>Status</TableCell>}
+          {visibleColumns.notes && !isMobile && <TableCell>Notes</TableCell>}
+          {visibleColumns.rawMaterialName && (
+            <TableCell onClick={() => handleSort('rawMaterialName')} style={{ cursor: 'pointer' }}>
+              Raw Material {sortColumn === 'rawMaterialName' ? (sortDirection === 'asc' ? '↑' : '↓') : ''}
+            </TableCell>
+          )}
+          {visibleColumns.rawMaterialQuantity && <TableCell>Quantity</TableCell>}
+          {visibleColumns.createdBy && !isMobile && <TableCell>Created By</TableCell>}
+          {visibleColumns.createdDate && !isMobile && (
+            <TableCell onClick={() => handleSort('createdDate')} style={{ cursor: 'pointer' }}>
+              Created Date {sortColumn === 'createdDate' ? (sortDirection === 'asc' ? '↑' : '↓') : ''}
+            </TableCell>
+          )}
+          {visibleColumns.updatedBy && !isMobile && <TableCell>Updated By</TableCell>}
+          {visibleColumns.updatedDate && !isMobile && <TableCell>Updated Date</TableCell>}
+          <TableCell>Actions</TableCell>
+        </TableRow>
+      </TableHead>
+      <TableBody>
+        {filteredOrders
+          .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+          .map((order) => (
+            <TableRow key={order.orderId}>
+              {visibleColumns.supplierName && <TableCell>{order.supplierName}</TableCell>}
+              {visibleColumns.status && <TableCell>{order.status}</TableCell>}
+              {visibleColumns.notes && !isMobile && <TableCell>{order.notes}</TableCell>}
+              {visibleColumns.rawMaterialName && <TableCell>{order.rawMaterialName}</TableCell>}
+              {visibleColumns.rawMaterialQuantity && <TableCell>{order.rawMaterialQuantity}</TableCell>}
+              {visibleColumns.createdBy && !isMobile && (
+                <TableCell>{getUserNameById(order.createdBy)}</TableCell>
               )}
-              {visibleColumns.status && <TableCell>Status</TableCell>}
-              {/* {visibleColumns.trackingInfo && <TableCell>Tracking Info</TableCell>} */}
-              {visibleColumns.notes &&  !isMobile && <TableCell>Notes</TableCell>}
-              {visibleColumns.rawMaterialName && (
-                <TableCell onClick={() => handleSort('rawMaterialName')} style={{ cursor: 'pointer' }}>
-                  Raw Material {sortColumn === 'rawMaterialName' ? (sortDirection === 'asc' ? '↑' : '↓') : ''}
-                </TableCell>
+              {visibleColumns.createdDate && !isMobile && <TableCell>{formatDate(order.createdDate)}</TableCell>}
+              {visibleColumns.updatedBy && !isMobile && (
+                <TableCell>{getUserNameById(order.updatedBy)}</TableCell>
               )}
-              {visibleColumns.rawMaterialQuantity && <TableCell>Quantity</TableCell>}
-              {visibleColumns.createdBy &&  !isMobile && <TableCell>Created By</TableCell>}
-              {visibleColumns.createdDate &&  !isMobile && (
-      <TableCell onClick={() => handleSort('createdDate')} style={{ cursor: 'pointer' }}>
-        Created Date {sortColumn === 'createdDate' ? (sortDirection === 'asc' ? '↑' : '↓') : ''}
-      </TableCell>
-    )}
-              {visibleColumns.updatedBy &&  !isMobile && <TableCell>Updated By</TableCell>}
-              {visibleColumns.updatedDate &&  !isMobile && <TableCell>Updated Date</TableCell>}
-              <TableCell>Actions</TableCell> {/* Actions column always visible */}
+              {visibleColumns.updatedDate && !isMobile && (
+                <TableCell>{order.updatedDate ? formatDate(order.updatedDate) : formatDate(order.createdDate)}</TableCell>
+              )}
+              <TableCell>
+                <IconButton color="primary" onClick={() => handleEditOrder(order)}>
+                  <Edit />
+                </IconButton>
+                <IconButton color="error" onClick={() => handleDeleteOrder(order.orderId)}>
+                  <Delete />
+                </IconButton>
+              </TableCell>
             </TableRow>
-          </TableHead>
-          <TableBody>
-            {filteredOrders
-              .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-              .map((order) => (
-                <TableRow key={order.orderId}>
-                  {visibleColumns.supplierName && <TableCell>{order.supplierName}</TableCell>}
-                  {visibleColumns.status && <TableCell>{order.status}</TableCell>}
-                  {/* {visibleColumns.trackingInfo && <TableCell>{order.trackingInfo}</TableCell>} */}
-                  {visibleColumns.notes &&  !isMobile && <TableCell>{order.notes}</TableCell>}
-                  {visibleColumns.rawMaterialName && <TableCell>{order.rawMaterialName}</TableCell>}
-                  {visibleColumns.rawMaterialQuantity && <TableCell>{order.rawMaterialQuantity}</TableCell>}
-                  {visibleColumns.createdBy &&  !isMobile && (
-                    <TableCell>{getUserNameById(order.createdBy)}</TableCell> // Replace user ID with name
-                  )}
-                  {visibleColumns.createdDate &&  !isMobile && <TableCell>{formatDate(order.createdDate)}</TableCell>}
-                  {visibleColumns.updatedBy &&  !isMobile && (
-                    <TableCell>{getUserNameById(order.updatedBy)}</TableCell> // Replace user ID with name
-                  )}
-       {visibleColumns.updatedDate &&  !isMobile && (
-  <TableCell>{order.updatedDate ? formatDate(order.updatedDate) : formatDate(order.createdDate)}</TableCell>
-)}
+          ))}
+      </TableBody>
+      <TablePagination
+        component="div"
+        count={filteredOrders.length}
+        page={page}
+        onPageChange={(event, newPage) => setPage(newPage)}
+        rowsPerPage={rowsPerPage}
+        onRowsPerPageChange={(event) => {
+          setRowsPerPage(parseInt(event.target.value, 10));
+          setPage(0);
+        }}
+        rowsPerPageOptions={[5, 10, 25]}
+      />
+    </Table>
+  </TableContainer>
+</Box>
 
-                  <TableCell>
-                    <IconButton color="primary" onClick={() => handleEditOrder(order)}>
-                      <Edit />
-                    </IconButton>
-                    <IconButton color="error" onClick={() => handleDeleteOrder(order.orderId)}>
-                      <Delete />
-                    </IconButton>
-                  </TableCell>
-                </TableRow>
-              ))}
-          </TableBody>
-          <TablePagination
-            component="div"
-            count={filteredOrders.length} // Total number of rows
-            page={page}
-            onPageChange={(event, newPage) => setPage(newPage)}
-            rowsPerPage={rowsPerPage}
-            onRowsPerPageChange={(event) => {
-              setRowsPerPage(parseInt(event.target.value, 10));
-              setPage(0); // Reset to the first page
-            }}
-            rowsPerPageOptions={[5, 10, 25]} // Allow selection of rows per page
-          />
-        </Table>
-      </TableContainer>
-      </Box>
 
       <Dialog open={open} onClose={handleClose} fullWidth={isMobile} maxWidth="sm">
         <DialogTitle style={tableRowStyles}>{editMode ? 'Edit Order' : 'Add New Order'}</DialogTitle>
@@ -504,7 +501,7 @@ const confirmDeleteOrder = async () => {
             fullWidth
             sx={{ mt: 2 }}
           />
-          
+
           <Autocomplete
             options={filteredSuppliers}
             getOptionLabel={(option) => option.name}
@@ -517,7 +514,7 @@ const confirmDeleteOrder = async () => {
               });
             }}
             renderInput={(params) => (
-              <TextField {...params} label="Select Supplier" variant="outlined" required helperText="Required"/>
+              <TextField {...params} label="Select Supplier" variant="outlined" required helperText="Required" />
             )}
             fullWidth
           />
@@ -536,19 +533,19 @@ const confirmDeleteOrder = async () => {
             <MenuItem value="Shipped">Shipped</MenuItem>
             <MenuItem value="Delivered">Delivered</MenuItem>
           </Select>
-        
-          <TextField
-    label="Notes"
-    fullWidth
-    required
-    variant="outlined"
-    value={newOrder.notes}
-    onChange={(e) => setNewOrder({ ...newOrder, notes: e.target.value })}
-    margin={isMobile ? 'dense' : 'normal'}
-    sx={{ mt: isMobile ? 1 : 2 }}
-/>
 
-          
+          <TextField
+            label="Notes"
+            fullWidth
+            required
+            variant="outlined"
+            value={newOrder.notes}
+            onChange={(e) => setNewOrder({ ...newOrder, notes: e.target.value })}
+            margin={isMobile ? 'dense' : 'normal'}
+            sx={{ mt: isMobile ? 1 : 2 }}
+          />
+
+
           {/* <Autocomplete
             options={rawMaterials}
             getOptionLabel={(option) => option.materialName}
@@ -563,18 +560,18 @@ const confirmDeleteOrder = async () => {
             sx={{ mt: 2 }}
           /> */}
           <TextField
-          
+
             label="Raw Material Quantity"
             type="number"
             fullWidth
             required
-          
-    helperText="Required"
+
+            helperText="Required"
             variant="outlined"
             value={newOrder.rawMaterialQuantity}
             onChange={(e) => setNewOrder({ ...newOrder, rawMaterialQuantity: e.target.value })}
             margin={isMobile ? 'dense' : 'normal'}
-    sx={{ mt: isMobile ? 1 : 2 }}
+            sx={{ mt: isMobile ? 1 : 2 }}
           />
         </DialogContent>
         <DialogActions>
@@ -604,15 +601,15 @@ const confirmDeleteOrder = async () => {
 
       {/* Snackbar for notifications */}
       <Snackbar
-            open={snackbar.open}
-            autoHideDuration={6000}
-            onClose={handleSnackbarClose}
-            anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
-        >
-            <Alert onClose={handleSnackbarClose} severity={snackbar.severity} sx={{ width: '100%' }}>
-                {snackbar.message}
-            </Alert>
-        </Snackbar>
+        open={snackbar.open}
+        autoHideDuration={6000}
+        onClose={handleSnackbarClose}
+        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+      >
+        <Alert onClose={handleSnackbarClose} severity={snackbar.severity} sx={{ width: '100%' }}>
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
 
     </Box>
   );
