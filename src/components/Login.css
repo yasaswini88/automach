@@ -7,41 +7,32 @@ body, html {
     height: 100%;
 }
 
-/* .login-container{
-    width: 100%;
-    display:grid;
-    grid-template-columns: 1fr 1fr;
-    
-} */
-
-
 .login-container {
-	padding: 0px;
+    padding: 0px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     border: 1px solid #ccc;
     border-radius: 5px;
-    background-color:#e8dede ;
+    background-color: #e8dede;
     width: 100%;
-    display:grid;
+    display: grid;
     grid-template-columns: 1fr 1fr;
 }
 
+/* Adjust form container to be centered */
 .form-container {
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	padding: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
 }
 
 .form-container > div {
-	width: 70%;
-	padding: 40px;
-	display: flex;
-	flex-direction: column;
-	justify-content: center;
-	align-items: center;
-	/* border-radius: 8px;
-	border: 1px solid lightgray; */
+    width: 70%;
+    padding: 40px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
 }
 
 .image-container {
@@ -51,8 +42,35 @@ body, html {
     height: 100%;
 }
 
+/* Responsive adjustments for smaller screens */
+@media (max-width: 768px) {
+    /* Hide image container on mobile */
+    .image-container {
+        display: none;
+    }
 
+    /* Make login container full-width and centered */
+    .login-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
 
+    /* Set form container to be smaller and centered */
+    .form-container {
+        width: 100%;
+        max-width: 400px;
+        padding: 20px;
+    }
+
+    /* Adjust inner form width */
+    .form-container > div {
+        width: 100%;
+        padding: 20px;
+    }
+}
+
+/* Other styling */
 .header h2 {
     margin-bottom: 10px;
     color: #333;
