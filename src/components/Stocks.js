@@ -20,9 +20,14 @@ import {
 } from '@mui/material';
 import SwapVertIcon from '@mui/icons-material/SwapVert';
 import { Snackbar } from '@mui/material';
+import useMediaQuery from '@mui/material/useMediaQuery';
+import { useTheme } from '@mui/material/styles';
 
 
 const Stocks = ({ userDetails }) => {
+  const theme = useTheme();
+const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+
   const [stocks, setStocks] = useState([]);
   const [filteredStocks, setFilteredStocks] = useState([]);
   const [alerts, setAlerts] = useState({ critical: [], low: [], medium: [] });
@@ -222,7 +227,8 @@ const Stocks = ({ userDetails }) => {
     <Box sx={{ display: 'flex' }}>
       <Toolbar />
       <Box component="main" sx={{ flexGrow: 1, bgcolor: 'background.default', p: 3 }}>
-        <Typography variant="h4" component="h2" gutterBottom>
+    
+        <Typography variant="h4" component="h2" gutterBottom sx={{ fontSize : isMobile ? '1.5rem' : '2.125rem'}}>
           Raw Material Stocks
         </Typography>
 
@@ -232,7 +238,8 @@ const Stocks = ({ userDetails }) => {
             variant="contained"
             color="error"
             onClick={() => handleAlertClick('critical')}
-            sx={{ marginRight: 2 }}
+            sx={{ marginRight: 2 ,padding:isMobile ?'4px 8px':'6px 16px' , fontSize : isMobile ? '0.75rem' : '1rem' }}
+           
           >
             Critical Alerts ({alerts.critical.length})
           </Button>
@@ -240,7 +247,8 @@ const Stocks = ({ userDetails }) => {
             variant="contained"
             color="warning"
             onClick={() => handleAlertClick('low')}
-            sx={{ marginRight: 2 }}
+          
+              sx={{ marginRight: 2 ,padding:isMobile ?'4px 8px' :'6px 16px' , fontSize : isMobile ? '0.75rem' : '1rem' }}
           >
             Low Alerts ({alerts.low.length})
           </Button>
@@ -250,6 +258,7 @@ const Stocks = ({ userDetails }) => {
             onClick={() => handleAlertClick('medium')}
           >
             Medium Alerts ({alerts.medium.length})
+            sx={{ marginRight: 2 ,padding:isMobile ?'4px 8px':'6px 16px' , fontSize : isMobile ? '0.75rem' : '1rem' }}
           </Button>
         </Box>
 
@@ -270,6 +279,7 @@ const Stocks = ({ userDetails }) => {
               onPageChange={handleAlertPageChange}
               rowsPerPage={alertsPerPage}
               rowsPerPageOptions={[]}
+              sx={{ fontSize: isMobile ? '0.75rem' : '1rem' }}
             />
           </Box>
         )}
@@ -297,7 +307,8 @@ const Stocks = ({ userDetails }) => {
             )}
           />
         </div>
-
+        
+          <Box sx ={{ overflowX:isMobile ? 'auto' : 'visible'}}>
         <TableContainer component={Paper} sx={{ border: '1px solid lightgray' }}>
           <Table>
             <TableHead>
@@ -315,14 +326,15 @@ const Stocks = ({ userDetails }) => {
                 <TableCell>Raw Material Quantity</TableCell>
                 <TableCell>Min Quantity</TableCell>
                 <TableCell>Update Quantity</TableCell>
-                <TableCell>Modified By</TableCell>
-                <TableCell>Time Modified</TableCell>
+                {!isMobile && <TableCell>Modified By</TableCell>}
+        {!isMobile && <TableCell>Time Modified</TableCell>}
+                
               </TableRow>
             </TableHead>
             <TableBody>
               {filteredStocks.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((stock, index) => (
                 <TableRow key={stock.raw_material_stock_id} sx={{ borderBottom: '1px solid lightgray' }}>
-                  {/* <TableCell>{stock.rawMaterial.materialName}</TableCell> */}
+                 
                   <TableCell>
                     {stock.rawMaterial.materialName.charAt(0).toUpperCase() + stock.rawMaterial.materialName.slice(1).toLowerCase()}
                   </TableCell>
@@ -341,13 +353,15 @@ const Stocks = ({ userDetails }) => {
                       Update
                     </Button>
                   </TableCell>
-                  <TableCell>{`${stock.modifiedBy?.firstName || userDetails?.firstName} ${stock.modifiedBy?.lastName || userDetails?.lastName}`}</TableCell>
-                  <TableCell>{new Date(stock.dateModified).toLocaleString()}</TableCell>
+               
+                  {!isMobile && <TableCell>{`${stock.modifiedBy?.firstName || userDetails?.firstName} ${stock.modifiedBy?.lastName || userDetails?.lastName}`}</TableCell>}
+            {!isMobile && <TableCell>{new Date(stock.dateModified).toLocaleString()}</TableCell>}
                 </TableRow>
               ))}
             </TableBody>
           </Table>
         </TableContainer>
+        </Box>
         <TablePagination
           rowsPerPageOptions={[5, 10, 25]}
           component="div"
@@ -356,6 +370,7 @@ const Stocks = ({ userDetails }) => {
           page={page}
           onPageChange={handleChangePage}
           onRowsPerPageChange={handleChangeRowsPerPage}
+          sx={{ fontSize: isMobile ? '0.75rem' : '1rem' }}
         />
       </Box>
     </Box>

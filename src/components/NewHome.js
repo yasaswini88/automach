@@ -383,9 +383,16 @@ const NewHome = ({ userDetails }) => {
                         <CardContent>
                             <Typography variant="h6" sx={{ fontSize: isMobile ? '1rem' : '1.25rem' }}><b>Raw Material Stock</b></Typography>
 
-                            
+
+                            <Box
+                                sx={{
+                                    overflowX: isMobile ? 'auto' : 'visible',
+                                    whiteSpace: 'nowrap'
+                                }}
+                            >
                                 <ApexCharts options={rawMaterialData.options} series={rawMaterialData.series} type="bar" height={300} />
-                            
+                            </Box>
+
 
                         </CardContent>
                     </Card>

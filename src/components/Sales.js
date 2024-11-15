@@ -88,18 +88,7 @@ const Sales = ({ userDetails }) => {
   };
 
 
-  // const handleSaveCustomer = (customerData) => {
-  //   axios.post('/api/customers', customerData)
-  //     .then(() => {
-  //       setSnackbar({ open: true, message: 'Customer added successfully!', severity: 'success' });
-  //       handleCloseCustomerDialog();
-  //     })
-  //     .catch((error) => {
-  //       setSnackbar({ open: true, message: 'Error adding customer.', severity: 'error' });
-  //       console.error('Error adding customer:', error);
-  //     });
-  // };
-
+  
 
   const handleSaveCustomer = (customerData) => {
   axios.post('/api/customers', customerData)
@@ -146,40 +135,6 @@ const Sales = ({ userDetails }) => {
   }, []);
 
 
-  //   const handleSort = (column) => {
-  //     const isAsc = sortColumn === column && sortDirection === 'asc';
-  //     const newDirection = isAsc ? 'desc' : 'asc';
-  //     setSortColumn(column);
-  //     setSortDirection(newDirection);
-
-  //     const sorted = [...sales].sort((a, b) => {
-  //         let aValue, bValue;
-  //         switch (column) {
-  //             case 'orderDecision':
-  //                 aValue = a.orderDecision.toLowerCase();
-  //                 bValue = b.orderDecision.toLowerCase();
-  //                 break;
-  //             case 'orderStatus':
-  //                 aValue = a.orderStatus.toLowerCase();
-  //                 bValue = b.orderStatus.toLowerCase();
-  //                 break;
-  //             case 'finalPrice':
-  //                 aValue = a.finalPrice;
-  //                 bValue = b.finalPrice;
-  //                 break;
-  //             default:
-  //                 return 0;
-  //         }
-
-  //         if (newDirection === 'asc') {
-  //             return aValue > bValue ? 1 : -1;
-  //         } else {
-  //             return aValue < bValue ? 1 : -1;
-  //         }
-  //     });
-
-  //     setSortedSales(sorted);
-  // };
 
   const filteredSales = sortedSales
     .filter((sale) => !orderStatusFilter || sale.orderStatus.toLowerCase() === orderStatusFilter.toLowerCase())
@@ -250,15 +205,7 @@ const Sales = ({ userDetails }) => {
     setOpenDeleteDialog(true); // Open confirmation dialog
   };
 
-  // Handle delete button click
-  // const handleDelete = (sale) => {
-  //   if (sale.orderDecision.toLowerCase() === "confirmed") {
-  //     setSnackbar({ open: true, message: 'Order cannot be deleted', severity: 'error' });
-  //   } else {
-  //     setSaleToDelete(sale.saleId);       // Set sale ID
-  //     setOpenDeleteDialog(true); // Open confirmation dialog
-  //   }
-  // };
+  
 
   // Confirm delete method
   const confirmDelete = () => {
@@ -274,20 +221,7 @@ const Sales = ({ userDetails }) => {
       });
   };
 
-  // useEffect(() => {
-  //   if (editSale) {
-  //     axios.get(`/api/sales/${editSale?.saleId}/ready-to-ship`).then(resp => {
-  //       if (resp) {
-  //         setShippingOptions(['Pending', 'Shipped', 'Delivered']);
-  //       } else {
-  //         setShippingOptions(['Pending']);
-  //       }
-  //       setOpenEdit(true);
-  //     });
-
-  //     console.log(shippingOptions)
-  //   }
-  // }, [editSale])
+ 
 
   useEffect(() => {
     if (editSale) {
@@ -348,25 +282,6 @@ const Sales = ({ userDetails }) => {
 
 
 
-  // Handle save (PUT request)
-  // const handleSave = () => {
-  //   const updatedSale = {
-  //     ...formData,
-  //     updatedUserId: userDetails.userId,
-  //     updatedDate: new Date().toISOString(),
-  //     quantities: Array.isArray(formData.quantities) ? formData.quantities : formData.quantities.split(',').map(Number), // Ensure quantities is an array before saving
-  //   };
-
-  //   axios.put(`/api/sales/${editSale.saleId}`, updatedSale)
-  //     .then(response => {
-  //       setSales(sales.map(sale => (sale.saleId === editSale.saleId ? response.data : sale)));
-  //       setOpenEdit(false);
-  //     })
-  //     .catch(error => console.error("Error updating sale:", error));
-  // };
-
-  // Handle save (PUT request)
-  // Handle save (PUT request)
   const handleSave = () => {
 
     // Extract the old quantities and product IDs from the sale being edited
@@ -584,17 +499,7 @@ const Sales = ({ userDetails }) => {
       </Box>
 
 
-      {/* <FormControl sx={{ ml: 3, minWidth: 200 }}>
-        <InputLabel>Sort By</InputLabel>
-        <Select
-            value={sortColumn}
-            onChange={(e) => handleSort(e.target.value)}
-        >
-            <MenuItem value="orderDecision">Order Decision</MenuItem>
-            <MenuItem value="orderStatus">Order Status</MenuItem>
-            <MenuItem value="finalPrice">Final Price</MenuItem>
-        </Select>
-    </FormControl> */}
+      
 
       {/* Dialog for adding new order */}
       <Dialog open={openAdd} onClose={handleCloseAdd}>
@@ -699,19 +604,7 @@ const Sales = ({ userDetails }) => {
             onChange={handleInputChange}
           />
 
-          {/* <FormControl fullWidth>
-            <InputLabel id="order-status-label">Order Status</InputLabel>
-            <Select
-              labelId="order-status-label"
-              id="order-status-select"
-              value={newSale.orderStatus}
-              label="Order Status"
-              onChange={(e) => setNewSale({ ...newSale, orderStatus: e.target.value })}
-            >
-              <MenuItem value="Pending">Pending</MenuItem>
           
-            </Select>
-          </FormControl> */}
 
 
 
@@ -789,11 +682,7 @@ const Sales = ({ userDetails }) => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {/* {sortedSales
-              .filter((sale) => !orderStatusFilter || sale.orderStatus.toLowerCase() === orderStatusFilter.toLowerCase())
-              .filter((sale) => !orderDecisionFilter || sale.orderDecision.toLowerCase() === orderDecisionFilter.toLowerCase())
-              .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-              .map((sale) => ( */}
+        
             {sortedSales
               .filter((sale) => !orderStatusFilter || sale.orderStatus.toLowerCase() === orderStatusFilter.toLowerCase())
               .filter((sale) => !orderDecisionFilter || sale.orderDecision.toLowerCase() === orderDecisionFilter.toLowerCase())
@@ -858,15 +747,7 @@ const Sales = ({ userDetails }) => {
 
                       </Button>
 
-                      {/* <Button
-                        variant="outlined"
-                        color="error"
-                        onClick={() => handleDelete(sale)}
-                        startIcon={<Delete />}
-                        sx={{ width: '10%', padding: '6px 6px' }}
-                        disabled={sale.orderDecision.toLowerCase() === "confirmed"} // Disable if orderDecision is "confirmed"
-                      /> */}
-
+                    
                       {/* New View Details Dropdown */}
                       <Button
                         variant="outlined"
@@ -880,7 +761,7 @@ const Sales = ({ userDetails }) => {
                     </Box>
 
                     {/* View Details Box */}
-                    {/* View Details Box */}
+                  
                     {expandedDetails[sale.saleId] && (
                       <Paper
                         elevation={3}
@@ -929,14 +810,7 @@ const Sales = ({ userDetails }) => {
       </TableContainer>
 
 
-      {/* <TablePagination
-        component="div"
-        count={sales.length}
-        page={page}
-        onPageChange={handleChangePage}
-        rowsPerPage={rowsPerPage}
-        onRowsPerPageChange={handleChangeRowsPerPage}
-      /> */}
+    
 
       <TablePagination
         component="div"
