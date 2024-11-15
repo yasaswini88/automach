@@ -118,25 +118,25 @@ const Customers = () => {
 
   return (
     <Paper>
-      <Button variant="outlined" color="secondary" onClick={() => handleDialogOpen()} 
-         style={{ margin: isMobile ? '8px' : '16px' }}>
+      <Button variant="outlined" color="secondary" onClick={() => handleDialogOpen()}
+        style={{ margin: isMobile ? '8px' : '16px' }}>
         Add New Customer
       </Button>
       <TableContainer style={{ border: '1px solid #ccc', marginLeft: '20px', marginRight: '20px' }}>
 
 
-        <Table sx={{ border: `1px solid`}}>
-        
-        <TableHead style={{ backgroundColor: '#f5f5f5' }}>
+        <Table sx={{ border: `1px solid` }}>
+
+          <TableHead style={{ backgroundColor: '#f5f5f5' }}>
 
             <TableRow>
               <TableCell>
-              <Button
+                <Button
                   variant="outlined"
                   onClick={handleSort.bind(null, 'customerName')}
                   endIcon={<SwapVertIcon />} // Adds the sorting icon at the end of the text
                 >
-                 Customer Name
+                  Customer Name
                 </Button>
               </TableCell>
               <TableCell>Email</TableCell>
@@ -186,23 +186,23 @@ const Customers = () => {
         customerData={selectedCustomer}
       />
       <Dialog
-  open={confirmDelete}
-  onClose={() => setConfirmDelete(false)}
-  fullWidth={isMobile} maxWidth={isMobile ? 'xs' : 'sm'}
->
-  <DialogTitle>Confirm Deletion</DialogTitle>
-  <DialogContent>
-    Are you sure you want to delete this customer?
-  </DialogContent>
-  <DialogActions>
-    <Button onClick={() => setConfirmDelete(false)} color="primary">
-      Cancel
-    </Button>
-    <Button onClick={confirmDeleteCustomer} color="secondary">
-      Confirm
-    </Button>
-  </DialogActions>
-</Dialog>
+        open={confirmDelete}
+        onClose={() => setConfirmDelete(false)}
+        fullWidth={isMobile} maxWidth={isMobile ? 'xs' : 'sm'}
+      >
+        <DialogTitle>Confirm Deletion</DialogTitle>
+        <DialogContent>
+          Are you sure you want to delete this customer?
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setConfirmDelete(false)} color="primary">
+            Cancel
+          </Button>
+          <Button onClick={confirmDeleteCustomer} color="secondary">
+            Confirm
+          </Button>
+        </DialogActions>
+      </Dialog>
 
       <Snackbar
         open={snackbar.open}

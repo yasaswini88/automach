@@ -152,6 +152,8 @@ const CustomersDialog = ({ open, onClose, onSave, customerData }) => {
           value={customer.customerName}
           onChange={handleChange}
           fullWidth
+          required 
+          helperText="Required"
           margin="normal"
         />
         <TextField
@@ -185,7 +187,7 @@ const CustomersDialog = ({ open, onClose, onSave, customerData }) => {
             }
           }}
           renderInput={(params) => (
-            <TextField {...params} label="Address Line 1" fullWidth margin="normal" />
+            <TextField {...params} label="Address Line 1" fullWidth required margin="normal" />
           )}
         />
         <TextField
