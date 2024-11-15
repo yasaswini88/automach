@@ -332,14 +332,14 @@ const Orders = ({ userDetails }) => {
 
   return (
 
-    <Box display="flex"  gap={2} mb={3} alignItems="center" justifyContent="space-between">
+    <Box display="flex" flexDirection="column" gap={2} mb={3} alignItems="center" width="100%">
       <Typography variant="h4" component="h1" gutterBottom>
         Supplier Orders
       </Typography>
 
       {/* Filter Inputs */}
       <Box display="flex"  gap={2} width="100%">
-        {/* Left Side: Select and Autocomplete */}
+       
         <Box display="flex" gap={2}>
           <Select
             value={statusFilter}
