@@ -32,6 +32,16 @@ const CustomersDialog = ({ open, onClose, onSave, customerData }) => {
   const handleSave = () => {
     const errors = {};
 
+    // Customer name validation
+    if (!customer.customerName) {
+      errors.customerName = 'Customer name is required.';
+    }
+
+    // Address Line 1 validation
+    if (!customer.addressLine1) {
+      errors.addressLine1 = 'Address Line 1 is required.';
+    }
+
     // Email validation
     if (!/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(customer.email)) {
       errors.email = 'Please enter a valid email address.';
@@ -42,19 +52,33 @@ const CustomersDialog = ({ open, onClose, onSave, customerData }) => {
       errors.phoneNumber = 'Please enter a valid 10-digit phone number.';
     }
 
+    // Add more required field validations as needed (e.g., city, state, postal code)
+    if (!customer.city) {
+      errors.city = 'City is required.';
+    }
+    if (!customer.state) {
+      errors.state = 'State is required.';
+    }
+    if (!customer.postalCode) {
+      errors.postalCode = 'Postal Code is required.';
+    }
+
+    // Check if there are any errors
     if (Object.keys(errors).length > 0) {
       setFormErrors(errors);
       return;
     }
 
+    setFormErrors({}); // Clear errors if validation passes
     setLoading(true);
+
     onSave(customer)
-    .then(() => {
-      setLoading(false);
-    })
-    .catch(() => {
-      setLoading(false);
-    });
+      .then(() => {
+        setLoading(false);
+      })
+      .catch(() => {
+        setLoading(false);
+      });
   };
 
   useEffect(() => {
@@ -75,7 +99,7 @@ const CustomersDialog = ({ open, onClose, onSave, customerData }) => {
   }, [customerData, open]);
 
   const { isLoaded, loadError } = useLoadScript({
-    googleMapsApiKey: 'AIzaSyDGHTc6OClMANPGNji-8fwLoxvNkwqdhF0', 
+    googleMapsApiKey: 'AIzaSyDGHTc6OClMANPGNji-8fwLoxvNkwqdhF0',
     libraries
   });
 
@@ -152,8 +176,8 @@ const CustomersDialog = ({ open, onClose, onSave, customerData }) => {
           value={customer.customerName}
           onChange={handleChange}
           fullWidth
-          required 
-          helperText="Required"
+          required
+
           margin="normal"
         />
         <TextField
@@ -187,7 +211,15 @@ const CustomersDialog = ({ open, onClose, onSave, customerData }) => {
             }
           }}
           renderInput={(params) => (
-            <TextField {...params} label="Address Line 1" fullWidth required margin="normal" />
+            <TextField
+              {...params}
+              label="Address Line 1"
+              fullWidth
+              required
+              margin="normal"
+              error={!!formErrors.addressLine1} // Show error if there's a validation message
+              helperText={formErrors.addressLine1} // Show the error message
+            />
           )}
         />
         <TextField
