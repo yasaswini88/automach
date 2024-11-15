@@ -6,7 +6,7 @@ import {
   OutlinedInput,
   InputLabel,
   SelectChangeEvent,
-  ListItemText,
+  ListItemText,Grid,
   DialogContent, DialogActions, Autocomplete, Select, MenuItem, IconButton, Checkbox, FormControlLabel, TablePagination
 } from '@mui/material';
 import { useSelector, useDispatch } from 'react-redux';
@@ -333,74 +333,94 @@ const Orders = ({ userDetails }) => {
   return (
 
     <Box display="flex" flexDirection="column" gap={2} mb={3} alignItems="center" width="100%">
-      <Typography variant="h4" component="h1" gutterBottom>
-        Supplier Orders
-      </Typography>
+  <Typography variant="h4" component="h1" gutterBottom>
+    Supplier Orders
+  </Typography>
 
-      {/* Filter Inputs */}
-      <Box display="flex"  gap={2} width="100%">
-       
-        <Box display="flex" gap={2}>
-          <Select
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
-            displayEmpty
-            variant="outlined"
-            sx={{
-              color: theme.palette.text.primary, // Adjust text color for dark mode
-              backgroundColor: theme.palette.background.paper,
-              width: isMobile ? '100%' : '240px',// Set custom width
-              height: '50px' // Set custom height
-            }}
-          >
-            <MenuItem value="">All Statuses</MenuItem>
-            <MenuItem value="Pending">Pending</MenuItem>
-            <MenuItem value="Shipped">Shipped</MenuItem>
-          </Select>
+  {/* Filter Inputs and Buttons Layout */}
+  <Box width="100%">
+    <Grid container spacing={2}>
+      {/* Status Filter */}
+      <Grid item xs={12} sm={6} md={3}>
+        <Select
+          value={statusFilter}
+          onChange={(e) => setStatusFilter(e.target.value)}
+          displayEmpty
+          variant="outlined"
+          fullWidth
+          sx={{
+            color: theme.palette.text.primary,
+            backgroundColor: theme.palette.background.paper,
+            height: '50px'
+          }}
+        >
+          <MenuItem value="">All Statuses</MenuItem>
+          <MenuItem value="Pending">Pending</MenuItem>
+          <MenuItem value="Shipped">Shipped</MenuItem>
+        </Select>
+      </Grid>
 
-          <Autocomplete
-            options={rawMaterials}
-            getOptionLabel={(option) => option.materialName}
-            value={rawMaterials.find(material => material.id === newOrder.rawMaterialId) || null}
-            onChange={(event, newValue) => {
-              setNewOrder({ ...newOrder, rawMaterialId: newValue ? newValue.id : '' });
-              setMaterialFilter(newValue ? newValue.materialName : ''); // Update filter as well
-            }}
-            renderInput={(params) => (
-              <TextField {...params} label="Filter by Raw Material" variant="outlined" sx={{ width: isMobile ? '100%' : '240px', height: '50px' }} />
-            )}
-          />
-        </Box>
+      {/* Raw Material Filter */}
+      <Grid item xs={12} sm={6} md={3}>
+        <Autocomplete
+          options={rawMaterials}
+          getOptionLabel={(option) => option.materialName}
+          value={rawMaterials.find(material => material.id === newOrder.rawMaterialId) || null}
+          onChange={(event, newValue) => {
+            setNewOrder({ ...newOrder, rawMaterialId: newValue ? newValue.id : '' });
+            setMaterialFilter(newValue ? newValue.materialName : '');
+          }}
+          renderInput={(params) => (
+            <TextField {...params} label="Filter by Raw Material" variant="outlined" fullWidth />
+          )}
+        />
+      </Grid>
 
-        {/* Right Side: View Delivered Orders Button */}
+      {/* View Delivered Orders Button */}
+      <Grid item xs={12} sm={6} md={3}>
         <Button
           variant="outlined"
           color="secondary"
           onClick={() => navigate('/delivered-orders')}
-          size="large"
-          sx={{ width: isMobile ? '100%' : '240px', height: '50px' }}
+          fullWidth
+          sx={{ height: '50px' }}
         >
           View Delivered Orders
         </Button>
-      </Box>
+      </Grid>
 
+      {/* Add Order Button */}
+      <Grid item xs={12} sm={6} md={3}>
+        <Button
+          variant="outlined"
+          color="secondary"
+          onClick={handleOpen}
+          fullWidth
+          sx={{ height: '50px' }}
+        >
+          Add Order
+        </Button>
+      </Grid>
+    </Grid>
+  </Box>
 
-
-      {/* Column Visibility Control */}
-      <Box display={isMobile ? 'none' : 'flex'} gap={2} mb={2}>
-        {Object.keys(visibleColumns).map((column) => (
-          <FormControlLabel
-            key={column}
-            control={
-              <Checkbox
-                checked={visibleColumns[column]}
-                onChange={() => handleColumnVisibilityChange(column)}
-              />
-            }
-            label={column.charAt(0).toUpperCase() + column.slice(1)} // Capitalize first letter of column names
-          />
-        ))}
-      </Box>
+  {/* Column Visibility Control */}
+  {!isMobile && (
+    <Box display="flex" flexWrap="wrap" gap={2} mb={2} mt={3}>
+      {Object.keys(visibleColumns).map((column) => (
+        <FormControlLabel
+          key={column}
+          control={
+            <Checkbox
+              checked={visibleColumns[column]}
+              onChange={() => handleColumnVisibilityChange(column)}
+            />
+          }
+          label={column.charAt(0).toUpperCase() + column.slice(1)}
+        />
+      ))}
+    </Box>
+  )}
 
       <Button variant="outlined" color="secondary" onClick={handleOpen} sx={{
         width: isMobile ? '100%' : 'auto',
