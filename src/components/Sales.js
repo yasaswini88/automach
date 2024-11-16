@@ -401,8 +401,15 @@ const Sales = ({ userDetails }) => {
     if (!newSale.orderDecision) errors.orderDecision = 'Order Decision is required.';
     if (!newSale.products.length || newSale.products.some((prod) => !prod.prodId)) errors.products = 'At least one product is required.';
     if (newSale.products.some((prod) => !prod.quantity || prod.quantity <= 0)) errors.quantities = 'Each product must have a valid quantity.';
-    if (!newSale.orderDeliveryDate) errors.orderDeliveryDate = 'Delivery date is required.';
-    if (newSale.discountPercent && isNaN(newSale.discountPercent)) errors.discountPercent = 'Discount Percent must be a valid number.'; // Added error check
+    if (!newSale.discountPercent || isNaN(newSale.discountPercent)) {
+      errors.discountPercent = 'Discount Percent must be a valid number.';
+  }
+
+  // Validate Promised Delivery Date
+  if (!newSale.orderDeliveryDate) {
+      errors.orderDeliveryDate = 'Promised Delivery Date is required.';
+  }
+
 
     if (Object.keys(errors).length > 0) {
         setFormErrors(errors);
@@ -631,8 +638,8 @@ const Sales = ({ userDetails }) => {
             name="discountPercent"
             fullWidth
             onChange={handleInputChange}
-            error={Boolean(formErrors.discountPercent)}  // Error condition
-  helperText={formErrors.discountPercent}  // Show helper text for error
+            error={Boolean(formErrors.discountPercent)}
+  helperText={formErrors.discountPercent}  
           />
 
           
@@ -653,6 +660,8 @@ const Sales = ({ userDetails }) => {
             inputProps={{
               min: dayjs().format("YYYY-MM-DD") // Ensure only future dates are selectable   
             }}
+            error={Boolean(formErrors.orderDeliveryDate)}  
+            helperText={formErrors.orderDeliveryDate}  
           />
 
 
