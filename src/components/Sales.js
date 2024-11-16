@@ -405,7 +405,7 @@ const Sales = ({ userDetails }) => {
       errors.discountPercent = 'Discount Percent must be a valid number.';
   }
 
-  // Validate Promised Delivery Date
+
   if (!newSale.orderDeliveryDate) {
       errors.orderDeliveryDate = 'Promised Delivery Date is required.';
   }

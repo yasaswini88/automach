@@ -65,7 +65,7 @@ const Supplier = () => {
 
 
   const { isLoaded, loadError } = useLoadScript({
-    
+
     googleMapsApiKey: 'AIzaSyDGHTc6OClMANPGNji-8fwLoxvNkwqdhF0',
     libraries: ['places'], // Loading the "places" tool from Google.
     onLoad: () => setPlacesLoaded(true), // This means once loaded, it sets a value to let the rest of your code know it's ready.
@@ -85,13 +85,12 @@ const Supplier = () => {
     // Create a service to get address suggestions
     const service = new window.google.maps.places.AutocompleteService();
 
-     // Use this service to get suggestions based on what was typed
+    // Use this service to get suggestions based on what was typed
     service.getPlacePredictions(
       { input: inputValue, componentRestrictions: { country: "us" } },
       (predictions, status) => {
-        if (status === window.google.maps.places.PlacesServiceStatus.OK) 
-          {
-            // This is the suggested address.
+        if (status === window.google.maps.places.PlacesServiceStatus.OK) {
+          // This is the suggested address.
           const suggestions = predictions.map(prediction => ({
             description: prediction.description,
             placeId: prediction.place_id, // This is a unique ID for each suggested place.
@@ -125,7 +124,7 @@ const Supplier = () => {
     setOrders(response.data);
   };
 
- 
+
 
   const [formErrors, setFormErrors] = useState({}); // State to store form validation errors
 
@@ -133,37 +132,38 @@ const Supplier = () => {
     // Define regular expressions for validation
     const emailRegex = /^[a-zA-Z0-9._%+-]+@gmail\.com$/; // Validates Gmail addresses
     const phoneRegex = /^\d{10}$/; // Validates 10-digit phone numbers
-  
+
     // Initialize an empty errors object
     let errors = {};
-  
+
     // Check for empty required fields and validate them
     if (!selectedSupplier?.name) errors.name = "Name is required.";
     if (!selectedSupplier?.email) errors.email = "Email is required.";
     else if (!emailRegex.test(selectedSupplier.email)) {
       errors.email = "Please enter a valid Gmail address.";
     }
-    
+
     if (!selectedSupplier?.phone) errors.phone = "Phone number is required.";
     else if (!phoneRegex.test(selectedSupplier.phone)) {
       errors.phone = "Please enter a valid 10-digit phone number.";
     }
-  
+
     if (!selectedSupplier?.addressLine1) errors.addressLine1 = "Address Line 1 is required.";
     if (!selectedSupplier?.city) errors.city = "City is required.";
     if (!selectedSupplier?.state) errors.state = "State is required.";
     if (!selectedSupplier?.postalCode) errors.postalCode = "Postal Code is required.";
-  
-    
+
+
+
     if (Object.keys(errors).length > 0) {
       setFormErrors(errors);
       return;
     }
-  
-  
+
+
     setFormErrors({});
-  
-    
+
+
     const supplierData = {
       ...selectedSupplier,
       rawMaterialIds: selectedRawMaterials.map(material => material.id), // Add raw materials as an array of IDs
@@ -197,7 +197,7 @@ const Supplier = () => {
   // Handle place changed to autofill the address details
   const fetchSelectedPlaceDetails = (placeId) => {
 
-   // Create a service to get detailed address information based on placeId
+    // Create a service to get detailed address information based on placeId
     const service = new window.google.maps.places.PlacesService(document.createElement('div'));
 
     service.getDetails({ placeId }, (place, status) => {
@@ -236,7 +236,7 @@ const Supplier = () => {
           }
         });
 
-          // Update the selected supplier’s details with the complete address information
+        // Update the selected supplier’s details with the complete address information
         setSelectedSupplier((prevSupplier) => ({
           ...prevSupplier,
           ...addressComponents,
@@ -318,11 +318,11 @@ const Supplier = () => {
     }));
   };
 
- 
+
   const toggleDetails = (supplierId) => {
     setExpandedDetails((prevState) => ({
       ...prevState,
-      [supplierId]: !prevState[supplierId], 
+      [supplierId]: !prevState[supplierId],
     }));
   };
 
@@ -359,24 +359,24 @@ const Supplier = () => {
 
         {/* Sort by Name Button */}
         {!isMobile && (
-        <Button
-          variant="outlined"
-          onClick={handleSortByName}
-          sx={{
-            color: theme.palette.text.primary, // Adjust text color for dark mode
-            backgroundColor: theme.palette.background.paper,
-            display: 'flex', alignItems: 'center'
-          }}
-        >
-          Sort by Name <SwapVertIcon style={{ marginLeft: '8px' }} />
-        </Button>
+          <Button
+            variant="outlined"
+            onClick={handleSortByName}
+            sx={{
+              color: theme.palette.text.primary, // Adjust text color for dark mode
+              backgroundColor: theme.palette.background.paper,
+              display: 'flex', alignItems: 'center'
+            }}
+          >
+            Sort by Name <SwapVertIcon style={{ marginLeft: '8px' }} />
+          </Button>
         )}
       </div>
 
 
 
       <TableContainer component={Paper}>
-        <Table sx={{ border: `1px solid ${theme.palette.divider}` }}> 
+        <Table sx={{ border: `1px solid ${theme.palette.divider}` }}>
           <TableHead sx={{ backgroundColor: theme.palette.background.default }}>
             <TableRow>
               <TableCell sx={{ color: theme.palette.text.primary }}>
@@ -445,8 +445,8 @@ const Supplier = () => {
                         backgroundColor: theme.palette.mode === 'light' ? '#f9f9f9' : theme.palette.background.paper,
                         borderRadius: '8px',
                         border: '1px solid #ccc',
-                        width: isMobile ? '100%' : '50%', 
-    maxWidth: isMobile ? '100%' : '300px',
+                        width: isMobile ? '100%' : '50%',
+                        maxWidth: isMobile ? '100%' : '300px',
                       }}
                     >
                       <Typography variant="h6" sx={{ mb: 1 }}>Raw Materials Supplied:</Typography>
@@ -484,11 +484,11 @@ const Supplier = () => {
           sx: {
             padding: '16px',
             borderRadius: '8px',
-            border: `1px solid ${theme.palette.divider}`,  
-            backgroundColor: theme.palette.background.paper, 
-            color: theme.palette.text.primary, 
-            boxShadow: '0px 4px 20px rgba(0, 0, 0, 0.1)', 
-            width:"75%"
+            border: `1px solid ${theme.palette.divider}`,
+            backgroundColor: theme.palette.background.paper,
+            color: theme.palette.text.primary,
+            boxShadow: '0px 4px 20px rgba(0, 0, 0, 0.1)',
+            width: "75%"
           }
         }}
       >
@@ -505,60 +505,106 @@ const Supplier = () => {
               {formErrors.phone && <div>{formErrors.phone}</div>}
             </div>
           )}
-
-<Stack spacing={isMobile ? 1 : 2} sx={{ width: isMobile ? '100%' : '95%' }}>
-          <TextField label="Name" fullWidth required helperText="Required   Name" 
-          value={selectedSupplier?.name || ''} onChange={(e) => handleSupplierChange('name', e.target.value)} />
-          <Autocomplete
-            multiple
-            options={rawMaterials}
-            getOptionLabel={(option) => option.materialName}
-            value={selectedRawMaterials}
-            onChange={(event, newValue) => setSelectedRawMaterials(newValue)}
-            renderTags={(value, getTagProps) =>
-              value.map((option, index) => (
-                <Chip label={option.materialName} {...getTagProps({ index })} />
-              ))
-            }
-            renderInput={(params) => (
-              <TextField {...params} label="Raw Materials" variant="outlined" fullWidth required/>
-            )}
-          />
-          <TextField label="Email" fullWidth required value={selectedSupplier?.email || ''} onChange={(e) => handleSupplierChange('email', e.target.value)} />
-          <TextField label="Phone" fullWidth required value={selectedSupplier?.phone || ''} onChange={(e) => handleSupplierChange('phone', e.target.value)} />
-
-          <Autocomplete
-            options={addressSuggestions.map((suggestion) => suggestion.description)}
-            freeSolo
-            onInputChange={(event, newInputValue) => {
-              handleSupplierChange('addressLine1', newInputValue);
-            }}
-            onChange={(event, value) => {
-              // Handle selection of suggestion
-              const selected = addressSuggestions.find(suggestion => suggestion.description === value);
-              if (selected) {
-                fetchSelectedPlaceDetails(selected.placeId);
+          <Stack spacing={isMobile ? 1 : 2} sx={{ width: isMobile ? '100%' : '95%' }}>
+            <TextField
+              label="Name"
+              fullWidth
+              required
+              helperText={formErrors.name} // Show error message if any
+              error={!!formErrors.name} // Set error if formErrors contains a message for name
+              value={selectedSupplier?.name || ''}
+              onChange={(e) => handleSupplierChange('name', e.target.value)}
+            />
+            <Autocomplete
+              multiple
+              options={rawMaterials}
+              getOptionLabel={(option) => option.materialName}
+              value={selectedRawMaterials}
+              onChange={(event, newValue) => setSelectedRawMaterials(newValue)}
+              renderTags={(value, getTagProps) =>
+                value.map((option, index) => (
+                  <Chip label={option.materialName} {...getTagProps({ index })} />
+                ))
               }
-            }}
-            renderInput={(params) => (
-              <TextField
-                {...params}
-                label="Address Line 1"
-                fullWidth
-                required
-                helperText="Required"
-                value={selectedSupplier?.addressLine1 || ''}
-                onChange={(e) => handleSupplierChange('addressLine1', e.target.value)}
-              />
-            )}
-          />
-
-
-          <TextField label="Address Line 2" fullWidth value={selectedSupplier?.addressLine2 || ''} onChange={(e) => handleSupplierChange('addressLine2', e.target.value)} />
-          <TextField label="City" fullWidth value={selectedSupplier?.city || ''} onChange={(e) => handleSupplierChange('city', e.target.value)} />
-          <TextField label="State" fullWidth value={selectedSupplier?.state || ''} onChange={(e) => handleSupplierChange('state', e.target.value)} />
-          <TextField label="Postal Code" fullWidth value={selectedSupplier?.postalCode || ''} onChange={(e) => handleSupplierChange('postalCode', e.target.value)} />
+              renderInput={(params) => (
+                <TextField {...params} label="Raw Materials" variant="outlined" fullWidth required />
+              )}
+            />
+            <TextField
+              label="Email"
+              fullWidth
+              required
+              helperText={formErrors.email}
+              error={!!formErrors.email}
+              value={selectedSupplier?.email || ''}
+              onChange={(e) => handleSupplierChange('email', e.target.value)}
+            />
+            <TextField
+              label="Phone"
+              fullWidth
+              required
+              helperText={formErrors.phone}
+              error={!!formErrors.phone}
+              value={selectedSupplier?.phone || ''}
+              onChange={(e) => handleSupplierChange('phone', e.target.value)}
+            />
+            <Autocomplete
+              options={addressSuggestions.map((suggestion) => suggestion.description)}
+              freeSolo
+              onInputChange={(event, newInputValue) => {
+                handleSupplierChange('addressLine1', newInputValue);
+              }}
+              onChange={(event, value) => {
+                const selected = addressSuggestions.find(suggestion => suggestion.description === value);
+                if (selected) {
+                  fetchSelectedPlaceDetails(selected.placeId);
+                }
+              }}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label="Address Line 1"
+                  fullWidth
+                  required
+                  helperText={formErrors.addressLine1}
+                  error={!!formErrors.addressLine1}
+                  value={selectedSupplier?.addressLine1 || ''}
+                  onChange={(e) => handleSupplierChange('addressLine1', e.target.value)}
+                />
+              )}
+            />
+            <TextField
+              label="Address Line 2"
+              fullWidth
+              value={selectedSupplier?.addressLine2 || ''}
+              onChange={(e) => handleSupplierChange('addressLine2', e.target.value)}
+            />
+            <TextField
+              label="City"
+              fullWidth
+              helperText={formErrors.city}
+              error={!!formErrors.city}
+              value={selectedSupplier?.city || ''}
+              onChange={(e) => handleSupplierChange('city', e.target.value)}
+            />
+            <TextField
+              label="State"
+              fullWidth
+              helperText={formErrors.state}
+              error={!!formErrors.state}
+              value={selectedSupplier?.state || ''}
+              onChange={(e) => handleSupplierChange('state', e.target.value)}
+            />
+            <TextField
+              label="Postal Code"
+              fullWidth
+              helperText={formErrors.postalCode}
+              error={!!formErrors.postalCode}
+              value={selectedSupplier?.postalCode || ''}
+              onChange={(e) => handleSupplierChange('postalCode', e.target.value)}
+            />
           </Stack>
+
         </DialogContent>
 
         <DialogActions>
