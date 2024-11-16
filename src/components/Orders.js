@@ -31,6 +31,9 @@ const Orders = ({ userDetails }) => {
   const navigate = useNavigate();
 
 
+  const [formErrors, setFormErrors] = useState({});
+
+
   const [orders, setOrders] = useState([]);
   const [filteredOrders, setFilteredOrders] = useState([]); // New state for filtered orders
   const [open, setOpen] = useState(false);
@@ -188,12 +191,23 @@ const Orders = ({ userDetails }) => {
   };
 
   const handleAddOrder = async () => {
-    try {
-      if (!newOrder.rawMaterialId) {
-        setSnackbar({ open: true, message: 'Please select a raw material.', severity: 'warning' });
-        return;
-      }
+    let errors = {};
 
+  // Validation for required fields
+  if (!newOrder.rawMaterialId) errors.rawMaterialId = "Please select a raw material.";
+  if (!newOrder.supplierId) errors.supplierId = "Please select a supplier.";
+  if (!newOrder.notes) errors.notes = "Notes are required.";
+  if (newOrder.rawMaterialQuantity <= 0) errors.rawMaterialQuantity = "Quantity must be greater than zero.";
+
+  // If there are validation errors, set them and stop execution
+  if (Object.keys(errors).length > 0) {
+    setFormErrors(errors);
+    return;
+  }
+
+  setFormErrors({}); 
+    try {
+      
       const currentDate = new Date().toISOString();
 
       const orderData = {
@@ -369,7 +383,9 @@ const confirmDeleteOrder = async () => {
           setMaterialFilter(newValue ? newValue.materialName : ''); // Update filter as well
         }}
         renderInput={(params) => (
-          <TextField {...params} label="Filter by Raw Material" variant="outlined" sx={{ width: '240px', height: '50px' }} />
+          <TextField {...params} label="Filter by Raw Material" variant="outlined" sx={{ width: '240px', height: '50px' 
+            
+          }} />
         )}
       />
     )}
@@ -402,7 +418,7 @@ const confirmDeleteOrder = async () => {
           onChange={() => handleColumnVisibilityChange(column)}
         />
       }
-      label={column.charAt(0).toUpperCase() + column.slice(1)} // Capitalize first letter of column names
+      label={column.charAt(0).toUpperCase() + column.slice(1)} 
     />
   ))}
 </Box>
@@ -498,7 +514,11 @@ const confirmDeleteOrder = async () => {
             value={rawMaterials.find(material => material.id === newOrder.rawMaterialId) || null}
             onChange={handleRawMaterialChange}
             renderInput={(params) => (
-              <TextField {...params} label="Select Raw Material" variant="outlined" required helperText="Required"/>
+              <TextField {...params} label="Select Raw Material" variant="outlined" 
+              required
+
+              error={!!formErrors.rawMaterialId}
+      helperText={formErrors.rawMaterialId}/>
             )}
             fullWidth
             sx={{ mt: 2 }}
@@ -516,7 +536,9 @@ const confirmDeleteOrder = async () => {
               });
             }}
             renderInput={(params) => (
-              <TextField {...params} label="Select Supplier" variant="outlined" required helperText="Required" />
+              <TextField {...params} label="Select Supplier" variant="outlined" required
+              error={!!formErrors.supplierId}
+      helperText={formErrors.supplierId} />
             )}
             fullWidth
           />
@@ -553,26 +575,15 @@ const confirmDeleteOrder = async () => {
             margin={isMobile ? 'dense' : 'normal'}
             sx={{ mt: isMobile ? 1 : 2 }}
           />
-          {/* <Autocomplete
-            options={rawMaterials}
-            getOptionLabel={(option) => option.materialName}
-            value={rawMaterials.find(material => material.id === newOrder.rawMaterialId) || null}
-            onChange={(event, newValue) => {
-              setNewOrder({ ...newOrder, rawMaterialId: newValue ? newValue.id : '' });
-            }}
-            renderInput={(params) => (
-              <TextField {...params} label="Select Raw Material" variant="outlined" />
-            )}
-            fullWidth
-            sx={{ mt: 2 }}
-          /> */}
+         
           <TextField
             required
             label="Raw Material Quantity"
             type="number"
             fullWidth
             
-    helperText="Required"
+            error={!!formErrors.rawMaterialQuantity}
+            helperText={formErrors.rawMaterialQuantity}
             variant="outlined"
             value={newOrder.rawMaterialQuantity}
             onChange={(e) => setNewOrder({ ...newOrder, rawMaterialQuantity: e.target.value })}
