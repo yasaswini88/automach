@@ -248,7 +248,7 @@ const Sales = ({ userDetails }) => {
               options = ['Pending'];
           }
           setShippingOptions(options);
-          setOpenEdit(true); // Open edit dialog after setting the options
+          setOpenEdit(true); 
         })
         .catch(error => {
           console.error('Error fetching ready-to-ship status:', error);
@@ -656,7 +656,7 @@ const Sales = ({ userDetails }) => {
             name="orderDeliveryDate"
             fullWidth
             onChange={handleInputChange}
-            // Set minimum date to today's date to restrict past dates
+            
             inputProps={{
               min: dayjs().format("YYYY-MM-DD") // Ensure only future dates are selectable   
             }}
@@ -914,7 +914,7 @@ const Sales = ({ userDetails }) => {
             margin="dense"
             label="Product IDs (comma-separated)"
             name="productIds"
-            // value={formData.productIds.join(',')}
+           
             value={products.filter(p => formData.productIds.indexOf(p.prodId) > -1).map(p => p.prodName).join(',')}
             onChange={handleChange}
             fullWidth
@@ -951,14 +951,35 @@ const Sales = ({ userDetails }) => {
           </FormControl>
 
           <TextField
+          type="date"
             margin="dense"
-            label="Order Delivery Date"
+            label="Promised Delivery Date"
             name="orderDeliveryDate"
-            type="date"
+            
             value={formData.orderDeliveryDate}
             onChange={handleChange}
+             inputProps={{
+    min: dayjs().format("YYYY-MM-DD"), // Restrict dates to today and future dates
+  }}
             fullWidth
           />
+
+{/* <TextField
+            type="date"
+            margin="dense"
+            label="Promised Delivery Date"
+            InputLabelProps={{ shrink: true }}
+            name="orderDeliveryDate"
+            fullWidth
+            onChange={handleInputChange}
+            
+            inputProps={{
+              min: dayjs().format("YYYY-MM-DD") // Ensure only future dates are selectable   
+            }}
+            error={Boolean(formErrors.orderDeliveryDate)}  
+            helperText={formErrors.orderDeliveryDate}  
+          /> */}
+
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setOpenEdit(false)} color="secondary">
