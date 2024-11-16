@@ -490,7 +490,7 @@ const Sales = ({ userDetails }) => {
       <h1 sx={{ ml: 3 }}>Sales Orders</h1>
       <Box display="flex" justifyContent="space-between" alignItems="center" sx={{ ml: 3, mt: 2 }}>
   {/* Add New Order Button */}
-  <Button variant="contained" color="primary" onClick={handleClickOpenAdd}>
+  <Button variant="outlined" color="secondary" onClick={handleClickOpenAdd}>
     Add New Order
   </Button>
 
