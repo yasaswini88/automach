@@ -381,8 +381,8 @@ const Products = () => {
           </Grid>
           <Grid item style={{ marginBottom: '16px' }}>
             <Button
-              variant="contained"
-              color="primary"
+              variant="outlined"
+              color="secondary"
               startIcon={<AddIcon />}
               onClick={handleClickOpen}
             >
