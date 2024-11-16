@@ -138,6 +138,8 @@ const Supplier = () => {
 
     // Check for empty required fields and validate them
     if (!selectedSupplier?.name) errors.name = "Name is required.";
+    if (!selectedRawMaterials.length) errors.rawMaterials = "Please add at least one raw material.";
+
     if (!selectedSupplier?.email) errors.email = "Email is required.";
     else if (!emailRegex.test(selectedSupplier.email)) {
       errors.email = "Please enter a valid Gmail address.";
@@ -505,8 +507,8 @@ const Supplier = () => {
               label="Name"
               fullWidth
               required
-              helperText={formErrors.name} // Show error message if any
-              error={!!formErrors.name} // Set error if formErrors contains a message for name
+              helperText={formErrors.name} // Show error message 
+              error={!!formErrors.name} 
               value={selectedSupplier?.name || ''}
               onChange={(e) => handleSupplierChange('name', e.target.value)}
             />
@@ -522,7 +524,11 @@ const Supplier = () => {
                 ))
               }
               renderInput={(params) => (
-                <TextField {...params} label="Raw Materials" variant="outlined" fullWidth required />
+                <TextField {...params} label="Raw Materials" variant="outlined" fullWidth 
+                required
+                error={!!formErrors.rawMaterials} // Show error state if validation fails
+                helperText={formErrors.rawMaterials} // Display error message 
+                />
               )}
             />
             <TextField
