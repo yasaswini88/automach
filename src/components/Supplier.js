@@ -499,12 +499,7 @@ const Supplier = () => {
         </DialogTitle>
         <DialogContent>
           {/* Display error messages if any */}
-          {Object.keys(formErrors).length > 0 && (
-            <div style={{ color: 'red', marginBottom: '16px' }}>
-              {formErrors.email && <div>{formErrors.email}</div>}
-              {formErrors.phone && <div>{formErrors.phone}</div>}
-            </div>
-          )}
+          
           <Stack spacing={isMobile ? 1 : 2} sx={{ width: isMobile ? '100%' : '95%' }}>
             <TextField
               label="Name"
