@@ -531,8 +531,8 @@ const confirmDeleteOrder = async () => {
             onChange={(event, newValue) => {
               setNewOrder({
                 ...newOrder,
-                supplierId: newValue ? newValue.id : '',  // Set supplierId here
-                supplierName: newValue ? newValue.name : ''  // Set supplierName here
+                supplierId: newValue ? newValue.id : '',  
+                supplierName: newValue ? newValue.name : '' 
               });
             }}
             renderInput={(params) => (

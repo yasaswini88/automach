@@ -177,6 +177,8 @@ const CustomersDialog = ({ open, onClose, onSave, customerData }) => {
           onChange={handleChange}
           fullWidth
           required
+          error={!!formErrors.customerName}
+          helperText={formErrors.customerName}
 
           margin="normal"
         />
