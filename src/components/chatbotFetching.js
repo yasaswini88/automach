@@ -1,6 +1,8 @@
-require('dotenv').config();
+import React from 'react';
 
 import axios from 'axios';
+
+
 
 
 // Function to fetch chatbot response or raw materials
