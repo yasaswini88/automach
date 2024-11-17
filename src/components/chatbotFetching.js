@@ -279,8 +279,8 @@ what is the status of Wood order with George Suppliers ?
         });
         console.log('OpenAI response:', response.data);
         return response.data.choices[0].message.content.trim();
-    } catch (error) {
-        console.error('Error fetching chatbot response:', error);
-        return 'Sorry, there was an issue fetching the chatbot response. Please try again later.';
-    }
+    }catch (error) {
+      console.error('Error fetching chatbot response:', error.response?.data || error.message);
+      return 'Sorry, there was an issue fetching the chatbot response. Please try again later.';
+  }
 };
