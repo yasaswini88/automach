@@ -8,7 +8,7 @@ import axios from 'axios';
 
 export const fetchChatbotResponse = async (userMessage) => {
   
-   const apiKey = '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';
+   const apiKey = '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';
 
  
 
