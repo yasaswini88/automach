@@ -23,6 +23,6 @@ yarn-debug.log*
 .env
 yarn-error.log*
 
-# src/components/chatbotFetching.js
+
 
 

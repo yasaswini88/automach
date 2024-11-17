@@ -964,21 +964,7 @@ const Sales = ({ userDetails }) => {
             fullWidth
           />
 
-{/* <TextField
-            type="date"
-            margin="dense"
-            label="Promised Delivery Date"
-            InputLabelProps={{ shrink: true }}
-            name="orderDeliveryDate"
-            fullWidth
-            onChange={handleInputChange}
-            
-            inputProps={{
-              min: dayjs().format("YYYY-MM-DD") // Ensure only future dates are selectable   
-            }}
-            error={Boolean(formErrors.orderDeliveryDate)}  
-            helperText={formErrors.orderDeliveryDate}  
-          /> */}
+
 
         </DialogContent>
         <DialogActions>
