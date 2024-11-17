@@ -337,12 +337,12 @@ const NewHome = ({ userDetails }) => {
                         data: minQuantities,
                     }
                 ],
-
+                
                 options: {
                     ...prevData.options,
                     xaxis: {
                         ...prevData.options.xaxis,
-                        categories: materialNames,
+                        categories: materialNames, 
                     }
                 }
             }));
@@ -369,47 +369,35 @@ const NewHome = ({ userDetails }) => {
             <CssBaseline />
             <Grid container spacing={3}>
 
-                <Grid container spacing={3}>
-                    <Grid item xs={12} md={12} sx={{ mt: { xs: 1, md: 3 } }}>
-                        <Card
-                            sx={{
-                                mb: { xs: 2, md: 3 },
-                                mt: { xs: 2, md: 3 },
-                                borderRadius: '12px',
-                                border: '2px solid #D3D3D3',
-                                height: { xs: 'auto', md: 400 }, 
-                                background: '#e1f5fe',
-                                padding: { xs: '10px', md: '16px' }, 
-                            }}
-                        >
-                            <CardContent>
-                                <Typography
-                                    variant="h6"
-                                    sx={{ fontSize: { xs: '1rem', md: '1.5rem' } }} 
-                                >
-                                    <b>Raw Material Stock</b>
-                                </Typography>
+                <Grid item xs={12} md={12} sx={{ mt: isMobile ? 1 : 3 }}>
 
-                                <Box
-                                    sx={{
-                                        overflowX: { xs: 'auto', md: 'visible' }, 
-                                        width: { xs: '800px', md: '100%' }, 
-                                        whiteSpace: { xs: 'nowrap', md: 'normal' }, 
-                                    }}
-                                >
-                                    <ApexCharts
-                                        options={rawMaterialData.options}
-                                        series={rawMaterialData.series}
-                                        type="bar"
-                                        height={300}
-                                        width="100%" 
-                                    />
-                                </Box>
-                            </CardContent>
-                        </Card>
-                    </Grid>
+                    <Card
+                        sx={{
+                            mb: isMobile ? 2 : 3,
+                            mt: isMobile ? 2 : 3,
+                            borderRadius: '12px',
+                            border: '2px solid #D3D3D3',
+                            height: isMobile ? 'auto' : 300,
+                            background: '#e1f5fe',
+                            padding: isMobile ? '10px' : '16px',
+                        }}>
+                        <CardContent>
+                            <Typography variant="h6" sx={{ fontSize: isMobile ? '1rem' : '1.25rem' }}><b>Raw Material Stock</b></Typography>
+
+
+                            <Box
+                                sx={{
+                                    overflowX: isMobile ? 'auto' : 'visible',
+                                    whiteSpace: 'nowrap'
+                                }}
+                            >
+                                <ApexCharts options={rawMaterialData.options} series={rawMaterialData.series} type="bar" height={300} />
+                            </Box>
+
+
+                        </CardContent>
+                    </Card>
                 </Grid>
-
                 <Grid item xs={12} md={6} sx={{ mt: isMobile ? 1 : 3 }}>
                     <Card
                         sx={{
