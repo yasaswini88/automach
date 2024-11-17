@@ -8,12 +8,13 @@ import axios from 'axios';
 // Function to fetch chatbot response or raw materials
 export const fetchChatbotResponse = async (userMessage) => {
   
-   const apiKey = process.env.REACT_APP_OPENAI_API_KEY;
+   const apiKey = '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';
+  
 
  
 
   console.log(apiKey)
-  // console.log(apiKey);
+  
 
 
     
