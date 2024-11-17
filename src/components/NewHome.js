@@ -11,7 +11,6 @@ const NewHome = ({ userDetails }) => {
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
-    //Table Pagination
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(3);
 
@@ -365,7 +364,7 @@ const NewHome = ({ userDetails }) => {
     };
     const handleChangeRowsPerPage = (event) => {
         setRowsPerPage(parseInt(event.target.value, 10));
-        setPage(0); 
+        setPage(0);
     };
 
     const handleOverduePageChange = (event, newPage) => {
@@ -374,7 +373,7 @@ const NewHome = ({ userDetails }) => {
 
     const handleOverdueRowsPerPageChange = (event) => {
         setOverdueRowsPerPage(parseInt(event.target.value, 10));
-        setOverduePage(0); 
+        setOverduePage(0);
     };
 
 
@@ -400,14 +399,14 @@ const NewHome = ({ userDetails }) => {
 
                             <Box
                                 sx={{
-                                    overflowX: isMobile ? 'auto' : 'visible', 
-                                    overflowY: 'hidden', 
+                                    overflowX: isMobile ? 'auto' : 'visible',
+                                    overflowY: 'hidden',
                                     whiteSpace: 'nowrap',
                                 }}
                             >
                                 <Box
                                     sx={{
-                                        display: 'inline-block', 
+                                        display: 'inline-block',
                                         minWidth: isMobile ? '600px' : '100%',
                                     }}
                                 >
@@ -559,7 +558,7 @@ const NewHome = ({ userDetails }) => {
                                     <TablePagination
                                         rowsPerPageOptions={[3]}
                                         component="div"
-                                        count={overdueOrders.length} 
+                                        count={overdueOrders.length}
                                         rowsPerPage={overdueRowsPerPage}
                                         page={overduePage}
                                         onPageChange={handleOverduePageChange}
