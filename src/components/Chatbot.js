@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Box, Button, TextField, Typography, Paper, CircularProgress } from '@mui/material';
-import { fetchChatbotResponse } from './chatbotFetching'; 
+import { fetchChatbotResponse } from './chatbotFetching';
 import axios from 'axios';
 import SmartToyIcon from '@mui/icons-material/SmartToy';
 import Person4Icon from '@mui/icons-material/Person4';
@@ -24,13 +24,13 @@ const Chatbot = ({ userDetails }) => {
   const handleApiCall = async (url, queryContext = {}) => {
     try {
       let response;
-  
+
       switch (true) {
         // Raw Materials
         case url === '/api/rawmaterials':
           response = await axios.get(url);
           return response.data.map((material) => material.materialName || 'Unknown').join(', ');
-  
+
         case url.includes('/api/rawMaterialStock/material/'):
           const materialName = url.split('/').pop();
           response = await axios.get(url);
@@ -42,12 +42,12 @@ const Chatbot = ({ userDetails }) => {
           } else {
             return `Material: ${response.data.rawMaterial.materialName}, Min Quantity: ${response.data.minQuantity}, Current Quantity: ${response.data.quantity}`;
           }
-  
+
         // Suppliers
         case url === '/api/suppliers':
           response = await axios.get(url);
           return response.data.map((supplier) => supplier.name || 'Unknown').join(', ');
-  
+
         case url.includes('/api/suppliers/supplierName/'):
           const supplierName = url.split('/').pop();
           response = await axios.get(url);
@@ -56,12 +56,12 @@ const Chatbot = ({ userDetails }) => {
           } else {
             return `Supplier: ${response.data.name}, Email: ${response.data.email}, Phone: ${response.data.phone}`;
           }
-  
+
         // Products
         case url === '/api/products':
           response = await axios.get(url);
           return response.data.map((product) => product.prodName || 'Unknown').join(', ');
-  
+
         case url.includes('/api/products/name/'):
           const productName = url.split('/').pop();
           response = await axios.get(url);
@@ -84,17 +84,17 @@ const Chatbot = ({ userDetails }) => {
           } else {
             return `Product: ${productDetails.name}, Price: ${productDetails.price}, Category: ${productDetails.category}, Tags: ${productDetails.tags}, Raw Materials: ${productDetails.rawMaterials}`;
           }
-  
+
         // Most Commonly Used Raw Materials
         case url === '/api/sales/top-raw-materials':
           response = await axios.get(url);
           const topMaterials = response.data.rawMaterials.map((material) => material.rawMaterial.materialName || 'Unknown').join(', ');
           return `Most commonly used raw materials: ${topMaterials}.`;
-        
+
         // To check quantity of the product
         case url.includes('/api/inventory/product/'):
-        // case url=== '/api/inventory/product/${encodeURIComponent(productName)}/quantity' :
-      //  case url ="/api/inventory/product/${encodeURIComponent(productName)}/quantity":
+          // case url=== '/api/inventory/product/${encodeURIComponent(productName)}/quantity' :
+          //  case url ="/api/inventory/product/${encodeURIComponent(productName)}/quantity":
           response = await axios.get(url);
           if (!response.data || response.data.length === 0) {
             return `No inventory data found for ${queryContext.prodName}.`;
@@ -103,8 +103,8 @@ const Chatbot = ({ userDetails }) => {
           const inventoryMessage = ` Available Quantity: ${inventoryData.quantity}, Blocked Quantity: ${inventoryData.blockedQuantity}, Required Quantity: ${inventoryData.requiredQuantity}`;
           return inventoryMessage;
 
-          //To check the order status of raw material with supplier name 
-           // New case for Raw Material Order Status
+        //To check the order status of raw material with supplier name 
+        // New case for Raw Material Order Status
         case url.includes('/api/orders/'):
           response = await axios.get(url);
           if (!response.data || response.data.length === 0) {
@@ -113,8 +113,8 @@ const Chatbot = ({ userDetails }) => {
           const orderData = response.data[0]; // Assuming the first result is the required order data
           const orderMessage = `The order status of ${orderData.rawMaterialName} with ${orderData.supplierName} is "${orderData.status}" with a quantity of ${orderData.rawMaterialQuantity} units.`;
           return orderMessage;
-        
-// For orders related to raw materials 
+
+        // For orders related to raw materials 
         //   case url.includes('/api/orders') && queryContext.orderStatus:
         // const statusUrl = `/api/orders?status=${queryContext.orderStatus}`;
         // response = await axios.get(statusUrl);
@@ -131,16 +131,16 @@ const Chatbot = ({ userDetails }) => {
         // return `Raw Materials with ${queryContext.orderStatus} order status are: ${ordersMessage}.`;
 
         case url.includes('/api/orders') && url.includes('?status='):
-  response = await axios.get(url);
-  if (!response.data || response.data.length === 0) {
-    return `No orders found with status ${queryContext.orderStatus}.`;
-  }
-  const ordersMessage = response.data.map((order, index) => {
-    return `${index + 1}. ${order.rawMaterialName}, Quantity: ${order.rawMaterialQuantity} units, Supplier: ${order.supplierName}`;
-  }).join(" | ");
-  return `Raw Materials with ${queryContext.orderStatus} order status are: ${ordersMessage}.`;
+          response = await axios.get(url);
+          if (!response.data || response.data.length === 0) {
+            return `No orders found with status ${queryContext.orderStatus}.`;
+          }
+          const ordersMessage = response.data.map((order, index) => {
+            return `${index + 1}. ${order.rawMaterialName}, Quantity: ${order.rawMaterialQuantity} units, Supplier: ${order.supplierName}`;
+          }).join(" | ");
+          return `Raw Materials with ${queryContext.orderStatus} order status are: ${ordersMessage}.`;
 
-  
+
         // Low Stock Alerts for Commonly Used Raw Materials
         case url === '/api/sales/top-raw-materials/low-stock':
           const topRawMaterialsResponse = await axios.get('/api/sales/top-raw-materials');
@@ -159,7 +159,7 @@ const Chatbot = ({ userDetails }) => {
           return lowStockAlerts.length
             ? `Low stock alerts for commonly used raw materials: ${lowStockAlerts.join('; ')}.`
             : 'No low stock alerts for the commonly used raw materials.';
-  
+
         default:
           return 'No valid API URL provided.';
       }
@@ -168,7 +168,7 @@ const Chatbot = ({ userDetails }) => {
       return 'Sorry, there was an issue fetching the data. Please try again later.';
     }
   };
-  
+
   const handleSendMessage = async () => {
     if (!userMessage) return;
 
@@ -180,16 +180,14 @@ const Chatbot = ({ userDetails }) => {
       const response = await fetchChatbotResponse(userMessage);
       console.log('Chatbot response:', response);
 
-      // Extract URL from the chatbot response (more robust regex to handle URL within axios.get())
-      // const urlMatch = response.match(/axios\.get\('([^']+)'\)/);
-      // const url = urlMatch ? urlMatch[1] : null;
+
       const urlMatch = response.match(/"apiURL"\s*:\s*"([^"]+)"/);
       const url = urlMatch ? urlMatch[1] : null;
-      // Extract raw material name or supplier name from the user's query (fallback to 'wood' for raw materials)
-      const rawMaterialMatch = userMessage.match(/quantity of ([a-zA-Z]+)/i);
-      const rawMaterial = rawMaterialMatch ? rawMaterialMatch[1].toLowerCase() : 'wood'; // Default to 'wood'
 
-      // Extract supplier name from user's query (if applicable)
+      const rawMaterialMatch = userMessage.match(/quantity of ([a-zA-Z]+)/i);
+      const rawMaterial = rawMaterialMatch ? rawMaterialMatch[1].toLowerCase() : 'wood';
+
+
       const supplierMatch = userMessage.match(/address of ([a-zA-Z\s]+)/i);
       const supplierName = supplierMatch ? supplierMatch[1].toLowerCase() : null;
 
@@ -199,11 +197,11 @@ const Chatbot = ({ userDetails }) => {
       const productQuantity = userMessage.match(/quantity of ([a-zA-Z\s]+)/i);
       const prodName = productQuantity ? productQuantity[1] : null;
 
-      //for finding orders with raw material status pending 
+
 
       const orderStatusMatch = response.match(/"orderStatus"\s*:\s*"([^"]+)"/);
-    const orderStatus = orderStatusMatch ? orderStatusMatch[1] : null;
-  
+      const orderStatus = orderStatusMatch ? orderStatusMatch[1] : null;
+
       const queryContext = {
         rawMaterial: rawMaterial,
         supplierName: supplierName,
@@ -231,174 +229,174 @@ const Chatbot = ({ userDetails }) => {
 
   return (
     <Paper
-    elevation={4}
-  sx={{
-    position: 'relative', // Allow absolute positioning within
-    padding: 6,
-    maxWidth: 900,
-    margin: '0 auto',
-    textAlign: 'center',
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    backgroundColor: '#f9f9f9',
-  }}
->
-  {/* Icon in Top Right Corner */}
-  <Box
-    sx={{
-      position: 'absolute',
-      top: 16,
-      left: 16,
-    }}
-  >
-    <AutoAwesomeIcon 
-      sx={{ 
-        fontSize: 40, 
-        color: "#388e3c"
-      }} 
-    />
-  </Box>
-
-  {/* Chatbot Image in Center */}
-  <img 
-    src="https://botnation.ai/site/wp-content/uploads/2022/02/meilleur-chatbot.jpg" 
-    alt="Chatbot Icon" 
-    style={{ width: '160px', height: '100px', marginBottom: '10px' }} // Increase image size
-  />
-
-
-  
-    {/* Prompt Text */}
-    <Typography variant="h6" sx={{ marginBottom: 4 ,color:"#388e3c" }}>
-      What do you want to know about Automach?
-    </Typography>
-  
-    {/* Chat History */}
-    <Paper
-      elevation={3}
+      elevation={4}
       sx={{
-        width: '100%',
-        maxHeight: 400,
-        overflowY: 'auto',
-        padding: 2,
-        marginBottom: 2,
+        position: 'relative',
+        padding: 0,
+        maxWidth: 900,
+        margin: '0 auto',
+        textAlign: 'center',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
         backgroundColor: '#f9f9f9',
-       
-    borderRadius: '8px', // Optional: Add rounded corners for a smoother look
       }}
     >
-      {chatHistory.map((chat, index) => (
-        <Box key={index} sx={{ marginBottom: 2 }}>
-          {/* User Message */}
-          {chat.user && (
-            <Box
-              sx={{
-                display: 'flex',
-                justifyContent: 'flex-start',
-                alignItems: 'center',
-                gap: 1,
-                marginBottom: 1,
-              }}
-            >
-              <Person4Icon sx={{ color: '#1976d2' }} /> 
-              <Box
-                sx={{
-                  maxWidth: '75%',
-                  padding: 1.5,
-                  borderRadius: 3,
-                  backgroundColor: '#4aedc4',
-                  color: '#fff',
-                  textAlign: 'right',
-                }}
-              >
-                <Typography variant="body1">
-                  {chat.user}
-                </Typography>
-              </Box>
-            </Box>
-          )}
-          {/* Bot Message */}
-          {chat.bot && (
-            <Box
-              sx={{
-                display: 'flex',
-                justifyContent: 'flex-end',
-                alignItems: 'center',
-                gap: 1,
-              }}
-            >
-              <SmartToyIcon sx={{ color: '#555' }} />
-              <Box
-                sx={{
-                  maxWidth: '75%',
-                  padding: 1.5,
-                  borderRadius: 3,
-                  backgroundColor: '#e0e0e0',
-                  color: '#000',
-                  textAlign: 'left',
-                }}
-              >
-                <Typography variant="body1">
-                  {chat.bot}
-                </Typography>
-              </Box>
-            </Box>
-          )}
-        </Box>
-      ))}
-  
-      {/* Typing Indicator */}
-      {typing && (
-        <Typography variant="body2" sx={{ textAlign: 'left', marginTop: 1 }}>
-          <em>Bot is typing...</em>
-        </Typography>
-      )}
-    </Paper>
-  
-    {/* Error Message */}
-    {error && <Typography color="error" variant="body2">{error}</Typography>}
-  
-    {/* Input Field and Send Button */}
-    <Box display="flex" width="100%" gap={2}>
-  <TextField
-    label="Type your message"
-    variant="outlined"
-    fullWidth
-    value={userMessage}
-    onChange={(e) => setUserMessage(e.target.value)}
-    disabled={loading}
-    sx={{
-      '& .MuiOutlinedInput-root': {
-        '&.Mui-focused fieldset': {
-          borderColor: '#388e3c', // Border color when focused
-        },
-      },
-      '& .MuiInputLabel-root.Mui-focused': {
-        color: '#388e3c', // Label color when focused
-      },
-    }}
-  />
-    <IconButton 
-    color="primary" 
-    onClick={handleSendMessage} 
-    disabled={loading || !userMessage}
-    sx={{
-      // backgroundColor: '#388e3c', // Icon background color
-      '&:hover': {
-        backgroundColor: '#2e7d32', // Slightly darker green on hover
-      },
-      color: '#388e3c', // Icon color
-      maxWidth:"75px"
-    }}
-  >
-    {loading ? <CircularProgress size={24} /> : <SendIcon />} {/* Use icon here */}
-  </IconButton>
-</Box>
+      {/* Icon in Top Right Corner */}
+      <Box
+        sx={{
+          position: 'absolute',
+          top: 16,
+          left: 16,
+        }}
+      >
+        <AutoAwesomeIcon
+          sx={{
+            fontSize: 40,
+            color: "#388e3c"
+          }}
+        />
+      </Box>
 
-  </Paper>
-  
-  
+      {/* Chatbot Image in Center */}
+      <img
+        src="https://botnation.ai/site/wp-content/uploads/2022/02/meilleur-chatbot.jpg"
+        alt="Chatbot Icon"
+        style={{ width: '160px', height: '100px', marginBottom: '10px' }} // Increase image size
+      />
+
+
+
+      {/* Prompt Text */}
+      <Typography variant="h6" sx={{ marginBottom: 4, color: "#388e3c" }}>
+        What do you want to know about Automach?
+      </Typography>
+
+      {/* Chat History */}
+      <Paper
+        elevation={3}
+        sx={{
+          width: '100%',
+          maxHeight: 400,
+          overflowY: 'auto',
+          padding: 2,
+          marginBottom: 2,
+          backgroundColor: '#f9f9f9',
+
+          borderRadius: '8px', // Optional: Add rounded corners for a smoother look
+        }}
+      >
+        {chatHistory.map((chat, index) => (
+          <Box key={index} sx={{ marginBottom: 2 }}>
+            {/* User Message */}
+            {chat.user && (
+              <Box
+                sx={{
+                  display: 'flex',
+                  justifyContent: 'flex-start',
+                  alignItems: 'center',
+                  gap: 1,
+                  marginBottom: 1,
+                }}
+              >
+                <Person4Icon sx={{ color: '#1976d2' }} />
+                <Box
+                  sx={{
+                    maxWidth: '75%',
+                    padding: 1.5,
+                    borderRadius: 3,
+                    backgroundColor: '#4aedc4',
+                    color: '#fff',
+                    textAlign: 'right',
+                  }}
+                >
+                  <Typography variant="body1">
+                    {chat.user}
+                  </Typography>
+                </Box>
+              </Box>
+            )}
+            {/* Bot Message */}
+            {chat.bot && (
+              <Box
+                sx={{
+                  display: 'flex',
+                  justifyContent: 'flex-end',
+                  alignItems: 'center',
+                  gap: 1,
+                }}
+              >
+                <SmartToyIcon sx={{ color: '#555' }} />
+                <Box
+                  sx={{
+                    maxWidth: '75%',
+                    padding: 1.5,
+                    borderRadius: 3,
+                    backgroundColor: '#e0e0e0',
+                    color: '#000',
+                    textAlign: 'left',
+                  }}
+                >
+                  <Typography variant="body1">
+                    {chat.bot}
+                  </Typography>
+                </Box>
+              </Box>
+            )}
+          </Box>
+        ))}
+
+        {/* Typing Indicator */}
+        {typing && (
+          <Typography variant="body2" sx={{ textAlign: 'left', marginTop: 1 }}>
+            <em>Bot is typing...</em>
+          </Typography>
+        )}
+      </Paper>
+
+      {/* Error Message */}
+      {error && <Typography color="error" variant="body2">{error}</Typography>}
+
+      {/* Input Field and Send Button */}
+      <Box display="flex" width="100%" gap={2}>
+        <TextField
+          label="Type your message"
+          variant="outlined"
+          fullWidth
+          value={userMessage}
+          onChange={(e) => setUserMessage(e.target.value)}
+          disabled={loading}
+          sx={{
+            '& .MuiOutlinedInput-root': {
+              '&.Mui-focused fieldset': {
+                borderColor: '#388e3c', // Border color when focused
+              },
+            },
+            '& .MuiInputLabel-root.Mui-focused': {
+              color: '#388e3c', // Label color when focused
+            },
+          }}
+        />
+        <IconButton
+          color="primary"
+          onClick={handleSendMessage}
+          disabled={loading || !userMessage}
+          sx={{
+            // backgroundColor: '#388e3c', // Icon background color
+            '&:hover': {
+              backgroundColor: '#2e7d32', // Slightly darker green on hover
+            },
+            color: '#388e3c', // Icon color
+            maxWidth: "75px"
+          }}
+        >
+          {loading ? <CircularProgress size={24} /> : <SendIcon />} {/* Use icon here */}
+        </IconButton>
+      </Box>
+
+    </Paper>
+
+
   );
 };
 
