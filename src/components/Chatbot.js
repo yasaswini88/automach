@@ -359,11 +359,11 @@ const Chatbot = ({ userDetails }) => {
       sx={{
         '& .MuiOutlinedInput-root': {
           '&.Mui-focused fieldset': {
-            borderColor: '#388e3c', // Border color when focused
+            borderColor: '#388e3c', 
           },
         },
         '& .MuiInputLabel-root.Mui-focused': {
-          color: '#388e3c', // Label color when focused
+          color: '#388e3c', 
         },
       }}
     />
