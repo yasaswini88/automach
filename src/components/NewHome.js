@@ -369,42 +369,35 @@ const NewHome = ({ userDetails }) => {
             <CssBaseline />
             <Grid container spacing={3}>
 
-            <Grid container spacing={3}>
-    <Grid item xs={12} md={12} sx={{ mt: 3 }}>
-        <Card
-            sx={{
-                mb: 3,
-                borderRadius: '12px',
-                border: '2px solid #D3D3D3',
-                background: '#e1f5fe',
-                padding: '16px',
-            }}
-        >
-            <CardContent>
-                <Typography variant="h6" sx={{ fontSize: '1.25rem' }}>
-                    <b>Raw Material Stock</b>
-                </Typography>
+                <Grid item xs={12} md={12} sx={{ mt: isMobile ? 1 : 3 }}>
 
-                {/* Wrapper Box to control overflow */}
-                <Box
-                    sx={{
-                        overflowX: { xs: 'auto', md: 'visible' }, // Scrollable on mobile, static on desktop
-                        whiteSpace: { xs: 'nowrap', md: 'normal' }, // Prevent wrapping on mobile
-                    }}
-                >
-                    <ApexCharts
-                        options={rawMaterialData.options}
-                        series={rawMaterialData.series}
-                        type="bar"
-                        height={300}
-                        width={900} // Add a width to make it scrollable on small screens
-                    />
-                </Box>
-            </CardContent>
-        </Card>
-    </Grid>
-</Grid>
+                    <Card
+                        sx={{
+                            mb: isMobile ? 2 : 3,
+                            mt: isMobile ? 2 : 3,
+                            borderRadius: '12px',
+                            border: '2px solid #D3D3D3',
+                            height: isMobile ? 'auto' : 300,
+                            background: '#e1f5fe',
+                            padding: isMobile ? '10px' : '16px',
+                        }}>
+                        <CardContent>
+                            <Typography variant="h6" sx={{ fontSize: isMobile ? '1rem' : '1.25rem' }}><b>Raw Material Stock</b></Typography>
 
+
+                            <Box
+                                sx={{
+                                    overflowX: isMobile ? 'auto' : 'visible',
+                                    whiteSpace: 'nowrap'
+                                }}
+                            >
+                                <ApexCharts options={rawMaterialData.options} series={rawMaterialData.series} type="bar" height={300} />
+                            </Box>
+
+
+                        </CardContent>
+                    </Card>
+                </Grid>
                 <Grid item xs={12} md={6} sx={{ mt: isMobile ? 1 : 3 }}>
                     <Card
                         sx={{
