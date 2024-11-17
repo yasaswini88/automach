@@ -12,8 +12,12 @@ const NewHome = ({ userDetails }) => {
     const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
     //Table Pagination
-    const [page, setPage] = useState(0); // Current page
-    const [rowsPerPage, setRowsPerPage] = useState(3); // Rows per page
+    const [page, setPage] = useState(0);
+    const [rowsPerPage, setRowsPerPage] = useState(3);
+
+    const [overduePage, setOverduePage] = useState(0);
+    const [overdueRowsPerPage, setOverdueRowsPerPage] = useState(3);
+
 
     const [deliveryOrders, setDeliveryOrders] = useState([]);
     const [overdueOrders, setOverdueOrders] = useState([]);
@@ -361,8 +365,18 @@ const NewHome = ({ userDetails }) => {
     };
     const handleChangeRowsPerPage = (event) => {
         setRowsPerPage(parseInt(event.target.value, 10));
-        setPage(0); // Reset to first page when rows per page changes
+        setPage(0); 
     };
+
+    const handleOverduePageChange = (event, newPage) => {
+        setOverduePage(newPage);
+    };
+
+    const handleOverdueRowsPerPageChange = (event) => {
+        setOverdueRowsPerPage(parseInt(event.target.value, 10));
+        setOverduePage(0); 
+    };
+
 
     return (
         <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', ml: 5, mr: 5, bgcolor: theme.palette.background.default }}>
@@ -386,15 +400,15 @@ const NewHome = ({ userDetails }) => {
 
                             <Box
                                 sx={{
-                                    overflowX: isMobile ? 'auto' : 'visible', // Enable horizontal scrolling on mobile
-                                    overflowY: 'hidden', // Prevent vertical scrolling
+                                    overflowX: isMobile ? 'auto' : 'visible', 
+                                    overflowY: 'hidden', 
                                     whiteSpace: 'nowrap',
                                 }}
                             >
                                 <Box
                                     sx={{
-                                        display: 'inline-block', // Ensure content fits within scrolling container
-                                        minWidth: isMobile ? '600px' : '100%', // Adjust width to allow scrolling on mobile
+                                        display: 'inline-block', 
+                                        minWidth: isMobile ? '600px' : '100%',
                                     }}
                                 >
                                     <ApexCharts options={rawMaterialData.options} series={rawMaterialData.series} type="bar" height={300} />
@@ -465,7 +479,7 @@ const NewHome = ({ userDetails }) => {
                                     <TablePagination
                                         rowsPerPageOptions={[3]}
                                         component="div"
-                                        count={deliveryOrders.length} // For Delivery Orders Table
+                                        count={deliveryOrders.length}
                                         rowsPerPage={rowsPerPage}
                                         page={page}
                                         onPageChange={handleChangePage}
@@ -529,7 +543,7 @@ const NewHome = ({ userDetails }) => {
                                             </TableRow>
                                         </TableHead>
                                         <TableBody>
-                                            {overdueOrders.map((order) => (
+                                            {overdueOrders.slice(overduePage * overdueRowsPerPage, overduePage * overdueRowsPerPage + overdueRowsPerPage).map((order) => (
                                                 <TableRow key={order.saleId}>
                                                     <TableCell>{order.customerName}</TableCell>
                                                     <TableCell>{order.orderStatus}</TableCell>
@@ -539,7 +553,19 @@ const NewHome = ({ userDetails }) => {
                                                 </TableRow>
                                             ))}
                                         </TableBody>
+
                                     </Table>
+
+                                    <TablePagination
+                                        rowsPerPageOptions={[3]}
+                                        component="div"
+                                        count={overdueOrders.length} 
+                                        rowsPerPage={overdueRowsPerPage}
+                                        page={overduePage}
+                                        onPageChange={handleOverduePageChange}
+                                        onRowsPerPageChange={handleOverdueRowsPerPageChange}
+                                    />
+
                                 </TableContainer>
                             </Box>
                         </CardContent>
