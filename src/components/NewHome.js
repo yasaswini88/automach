@@ -337,12 +337,12 @@ const NewHome = ({ userDetails }) => {
                         data: minQuantities,
                     }
                 ],
-                
+
                 options: {
                     ...prevData.options,
                     xaxis: {
                         ...prevData.options.xaxis,
-                        categories: materialNames, 
+                        categories: materialNames,
                     }
                 }
             }));
@@ -370,7 +370,6 @@ const NewHome = ({ userDetails }) => {
             <Grid container spacing={3}>
 
                 <Grid item xs={12} md={12} sx={{ mt: isMobile ? 1 : 3 }}>
-
                     <Card
                         sx={{
                             mb: isMobile ? 2 : 3,
@@ -380,24 +379,31 @@ const NewHome = ({ userDetails }) => {
                             height: isMobile ? 'auto' : 300,
                             background: '#e1f5fe',
                             padding: isMobile ? '10px' : '16px',
-                        }}>
+                        }}
+                    >
                         <CardContent>
                             <Typography variant="h6" sx={{ fontSize: isMobile ? '1rem' : '1.25rem' }}><b>Raw Material Stock</b></Typography>
 
-
                             <Box
                                 sx={{
-                                    overflowX: isMobile ? 'auto' : 'visible',
-                                    whiteSpace: 'nowrap'
+                                    overflowX: isMobile ? 'auto' : 'visible', // Enable horizontal scrolling on mobile
+                                    overflowY: 'hidden', // Prevent vertical scrolling
+                                    whiteSpace: 'nowrap',
                                 }}
                             >
-                                <ApexCharts options={rawMaterialData.options} series={rawMaterialData.series} type="bar" height={300} />
+                                <Box
+                                    sx={{
+                                        display: 'inline-block', // Ensure content fits within scrolling container
+                                        minWidth: isMobile ? '600px' : '100%', // Adjust width to allow scrolling on mobile
+                                    }}
+                                >
+                                    <ApexCharts options={rawMaterialData.options} series={rawMaterialData.series} type="bar" height={300} />
+                                </Box>
                             </Box>
-
-
                         </CardContent>
                     </Card>
                 </Grid>
+
                 <Grid item xs={12} md={6} sx={{ mt: isMobile ? 1 : 3 }}>
                     <Card
                         sx={{
