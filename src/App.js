@@ -43,7 +43,7 @@ import Customers from './components/Customers';
 
 
  axios.defaults.baseURL=`http://98.82.11.0:8080`;
-// axios.defaults.baseURL=`http://localhost:8080`;
+
 
 
 console.log(process.env)
@@ -400,9 +400,10 @@ const App = () => {
         <NotificationAlerts alerts={stockAlerts} />
       </CustomDialog>
 
-      {authState.isLoggedIn && !isMobile && (
+      {/* {authState.isLoggedIn && !isMobile && (
         <FloatingChatButton userDetails={authState.userDetails} />
-      )}
+      )} */}
+      <FloatingChatButton userDetails={authState.userDetails} />
 
 
     </ThemeProvider>
