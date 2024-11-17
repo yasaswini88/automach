@@ -5,7 +5,7 @@ import axios from 'axios';
 
 
 
-// Function to fetch chatbot response or raw materials
+
 export const fetchChatbotResponse = async (userMessage) => {
   
    const apiKey = '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';
