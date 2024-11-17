@@ -1,15 +1,14 @@
-
-// Function to fetch chatbot response from OpenAI
-// export const fetchChatbotResponse = async (userMessage) => {
-//   const apiKey = 'sk-nVAAJ-v66eAlev9-nF_ry50x_S1NEDes2ITbMPoA7FT3BlbkFJRqGE3ofFiOfc2GOx-8f1_UhIHFDv2jyOFSUQasTrEA';
-//   const prompt = `User: ${userMessage}\nChatbot:`; 
+require('dotenv').config();
 
 import axios from 'axios';
 
+
 // Function to fetch chatbot response or raw materials
 export const fetchChatbotResponse = async (userMessage) => {
-  //check for testing commit
-  const apiKey = process.env.REACT_APP_OPENAI_API_KEY;
+  
+   const apiKey = process.env.REACT_APP_OPENAI_API_KEY;
+
+ 
 
   console.log(apiKey)
   // console.log(apiKey);
