@@ -221,6 +221,11 @@ const Sales = ({ userDetails }) => {
         setSnackbar({ open: true, message: 'Order deleted successfully!', severity: 'success' });
         setOpenDeleteDialog(false);  // Close the dialog
         setSaleToDelete(null);  // Reset saleToDelete
+       return  axios.get('/api/sales');
+      })
+      .then(response => {
+        setSales(response.data);
+        setSortedSales(response.data);  
       })
       .catch(error => {
         setSnackbar({ open: true, message: 'Error deleting order.', severity: 'error' });
