@@ -400,11 +400,11 @@ const App = () => {
         <NotificationAlerts alerts={stockAlerts} />
       </CustomDialog>
 
-      {authState.isLoggedIn && !isMobile && (
+      {/* {authState.isLoggedIn && !isMobile && (
         <FloatingChatButton userDetails={authState.userDetails} />
-      )}
+      )} */}
      
-
+     <FloatingChatButton userDetails={authState.userDetails} />
 
     </ThemeProvider>
     

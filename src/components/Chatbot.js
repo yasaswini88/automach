@@ -228,173 +228,162 @@ const Chatbot = ({ userDetails }) => {
   };
 
   return (
-    <Paper
-      elevation={4}
+<Box
+  sx={{
+    maxWidth: 900,
+    margin: '0 auto',
+    textAlign: 'center',
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    backgroundColor: '#f9f9f9',
+  }}
+>
+  {/* Icon in Top Right Corner */}
+  <Box
+    sx={{
+      position: 'absolute',
+      top: 16,
+      left: 16,
+    }}
+  >
+    <AutoAwesomeIcon
       sx={{
-        position: 'relative',
-        padding: 0,
-        maxWidth: 900,
-        margin: '0 auto',
-        textAlign: 'center',
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        backgroundColor: '#f9f9f9',
+        fontSize: 40,
+        color: "#388e3c"
+      }}
+    />
+  </Box>
+
+  {/* Chatbot Image in Center */}
+  <img
+    src="https://botnation.ai/site/wp-content/uploads/2022/02/meilleur-chatbot.jpg"
+    alt="Chatbot Icon"
+    style={{ width: '160px', height: '100px', marginBottom: '10px' }} // Increase image size
+  />
+
+  {/* Prompt Text */}
+  <Typography variant="h6" sx={{ marginBottom: 4, color: "#388e3c" }}>
+    What do you want to know about Automach?
+  </Typography>
+
+  {/* Chat History */}
+  <Paper
+    elevation={3}
+    sx={{
+      width: '100%',
+      maxHeight: 400,
+      overflowY: 'auto',
+      padding: 0,
+      marginBottom: 2,
+      backgroundColor: '#f9f9f9',
+      borderRadius: '8px',
+    }}
+  >
+    {chatHistory.map((chat, index) => (
+      <Box key={index} sx={{ marginBottom: 2 }}>
+        {/* User Message */}
+        {chat.user && (
+          <Box
+            sx={{
+              display: 'flex',
+              justifyContent: 'flex-start',
+              alignItems: 'center',
+              gap: 1,
+              marginBottom: 1,
+            }}
+          >
+            <Person4Icon sx={{ color: '#1976d2' }} />
+            <Box
+              sx={{
+                maxWidth: '75%',
+                padding: 1.5,
+                borderRadius: 3,
+                backgroundColor: '#4aedc4',
+                color: '#fff',
+                textAlign: 'right',
+              }}
+            >
+              <Typography variant="body1">{chat.user}</Typography>
+            </Box>
+          </Box>
+        )}
+        {/* Bot Message */}
+        {chat.bot && (
+          <Box
+            sx={{
+              display: 'flex',
+              justifyContent: 'flex-end',
+              alignItems: 'center',
+              gap: 1,
+            }}
+          >
+            <SmartToyIcon sx={{ color: '#555' }} />
+            <Box
+              sx={{
+                maxWidth: '75%',
+                padding: 1.5,
+                borderRadius: 3,
+                backgroundColor: '#e0e0e0',
+                color: '#000',
+                textAlign: 'left',
+              }}
+            >
+              <Typography variant="body1">{chat.bot}</Typography>
+            </Box>
+          </Box>
+        )}
+      </Box>
+    ))}
+
+    {/* Typing Indicator */}
+    {typing && (
+      <Typography variant="body2" sx={{ textAlign: 'left', marginTop: 1 }}>
+        <em>Bot is typing...</em>
+      </Typography>
+    )}
+  </Paper>
+
+  {/* Error Message */}
+  {error && <Typography color="error" variant="body2">{error}</Typography>}
+
+  {/* Input Field and Send Button */}
+  <Box display="flex" width="100%" gap={2}>
+    <TextField
+      label="Type your message"
+      variant="outlined"
+      fullWidth
+      value={userMessage}
+      onChange={(e) => setUserMessage(e.target.value)}
+      disabled={loading}
+      sx={{
+        '& .MuiOutlinedInput-root': {
+          '&.Mui-focused fieldset': {
+            borderColor: '#388e3c', // Border color when focused
+          },
+        },
+        '& .MuiInputLabel-root.Mui-focused': {
+          color: '#388e3c', // Label color when focused
+        },
+      }}
+    />
+    <IconButton
+      color="primary"
+      onClick={handleSendMessage}
+      disabled={loading || !userMessage}
+      sx={{
+        '&:hover': {
+          backgroundColor: '#2e7d32', // Slightly darker green on hover
+        },
+        color: '#388e3c', // Icon color
+        maxWidth: "75px"
       }}
     >
-      {/* Icon in Top Right Corner */}
-      <Box
-        sx={{
-          position: 'absolute',
-          top: 16,
-          left: 16,
-        }}
-      >
-        <AutoAwesomeIcon
-          sx={{
-            fontSize: 40,
-            color: "#388e3c"
-          }}
-        />
-      </Box>
+      {loading ? <CircularProgress size={24} /> : <SendIcon />} {/* Use icon here */}
+    </IconButton>
+  </Box>
+</Box>
 
-      {/* Chatbot Image in Center */}
-      <img
-        src="https://botnation.ai/site/wp-content/uploads/2022/02/meilleur-chatbot.jpg"
-        alt="Chatbot Icon"
-        style={{ width: '160px', height: '100px', marginBottom: '10px' }} // Increase image size
-      />
-
-
-
-      {/* Prompt Text */}
-      <Typography variant="h6" sx={{ marginBottom: 4, color: "#388e3c" }}>
-        What do you want to know about Automach?
-      </Typography>
-
-      {/* Chat History */}
-      <Paper
-        elevation={3}
-        sx={{
-          width: '100%',
-          maxHeight: 400,
-          overflowY: 'auto',
-          padding: 2,
-          marginBottom: 2,
-          backgroundColor: '#f9f9f9',
-
-          borderRadius: '8px', // Optional: Add rounded corners for a smoother look
-        }}
-      >
-        {chatHistory.map((chat, index) => (
-          <Box key={index} sx={{ marginBottom: 2 }}>
-            {/* User Message */}
-            {chat.user && (
-              <Box
-                sx={{
-                  display: 'flex',
-                  justifyContent: 'flex-start',
-                  alignItems: 'center',
-                  gap: 1,
-                  marginBottom: 1,
-                }}
-              >
-                <Person4Icon sx={{ color: '#1976d2' }} />
-                <Box
-                  sx={{
-                    maxWidth: '75%',
-                    padding: 1.5,
-                    borderRadius: 3,
-                    backgroundColor: '#4aedc4',
-                    color: '#fff',
-                    textAlign: 'right',
-                  }}
-                >
-                  <Typography variant="body1">
-                    {chat.user}
-                  </Typography>
-                </Box>
-              </Box>
-            )}
-            {/* Bot Message */}
-            {chat.bot && (
-              <Box
-                sx={{
-                  display: 'flex',
-                  justifyContent: 'flex-end',
-                  alignItems: 'center',
-                  gap: 1,
-                }}
-              >
-                <SmartToyIcon sx={{ color: '#555' }} />
-                <Box
-                  sx={{
-                    maxWidth: '75%',
-                    padding: 1.5,
-                    borderRadius: 3,
-                    backgroundColor: '#e0e0e0',
-                    color: '#000',
-                    textAlign: 'left',
-                  }}
-                >
-                  <Typography variant="body1">
-                    {chat.bot}
-                  </Typography>
-                </Box>
-              </Box>
-            )}
-          </Box>
-        ))}
-
-        {/* Typing Indicator */}
-        {typing && (
-          <Typography variant="body2" sx={{ textAlign: 'left', marginTop: 1 }}>
-            <em>Bot is typing...</em>
-          </Typography>
-        )}
-      </Paper>
-
-      {/* Error Message */}
-      {error && <Typography color="error" variant="body2">{error}</Typography>}
-
-      {/* Input Field and Send Button */}
-      <Box display="flex" width="100%" gap={2}>
-        <TextField
-          label="Type your message"
-          variant="outlined"
-          fullWidth
-          value={userMessage}
-          onChange={(e) => setUserMessage(e.target.value)}
-          disabled={loading}
-          sx={{
-            '& .MuiOutlinedInput-root': {
-              '&.Mui-focused fieldset': {
-                borderColor: '#388e3c', // Border color when focused
-              },
-            },
-            '& .MuiInputLabel-root.Mui-focused': {
-              color: '#388e3c', // Label color when focused
-            },
-          }}
-        />
-        <IconButton
-          color="primary"
-          onClick={handleSendMessage}
-          disabled={loading || !userMessage}
-          sx={{
-            // backgroundColor: '#388e3c', // Icon background color
-            '&:hover': {
-              backgroundColor: '#2e7d32', // Slightly darker green on hover
-            },
-            color: '#388e3c', // Icon color
-            maxWidth: "75px"
-          }}
-        >
-          {loading ? <CircularProgress size={24} /> : <SendIcon />} {/* Use icon here */}
-        </IconButton>
-      </Box>
-
-    </Paper>
 
 
   );
