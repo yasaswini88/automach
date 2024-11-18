@@ -225,7 +225,7 @@ const Chatbot = ({ userDetails }) => {
     backgroundColor: '#f9f9f9',
   }}
 >
-  {/* Icon in Top Right Corner */}
+  
   <Box
     sx={{
       position: 'absolute',
@@ -241,14 +241,14 @@ const Chatbot = ({ userDetails }) => {
     />
   </Box>
 
-  {/* Chatbot Image in Center */}
+  
   <img
     src="https://botnation.ai/site/wp-content/uploads/2022/02/meilleur-chatbot.jpg"
     alt="Chatbot Icon"
     style={{ width: '160px', height: '100px', marginBottom: '10px' }} // Increase image size
   />
 
-  {/* Prompt Text */}
+  
   <Typography variant="h6" sx={{ marginBottom: 4, color: "#388e3c" }}>
     What do you want to know about Automach?
   </Typography>
