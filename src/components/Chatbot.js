@@ -110,25 +110,11 @@ const Chatbot = ({ userDetails }) => {
           if (!response.data || response.data.length === 0) {
             return `No order data found for ${queryContext.rawMaterialName} with ${queryContext.supplierName}.`;
           }
-          const orderData = response.data[0]; // Assuming the first result is the required order data
+          const orderData = response.data[0]; 
           const orderMessage = `The order status of ${orderData.rawMaterialName} with ${orderData.supplierName} is "${orderData.status}" with a quantity of ${orderData.rawMaterialQuantity} units.`;
           return orderMessage;
 
-        // For orders related to raw materials 
-        //   case url.includes('/api/orders') && queryContext.orderStatus:
-        // const statusUrl = `/api/orders?status=${queryContext.orderStatus}`;
-        // response = await axios.get(statusUrl);
-
-        // if (!response.data || response.data.length === 0) {
-        //   return `No orders found with status ${queryContext.orderStatus}.`;
-        // }
-
-        // // Format each order item into the specified format
-        // const ordersMessage = response.data.map((order, index) => {
-        //   return `${index + 1}. ${order.rawMaterialName}, Quantity: ${order.rawMaterialQuantity} units, Supplier: ${order.supplierName}`;
-        // }).join(" | "); // Use a separator (|) to format nicely in one line
-
-        // return `Raw Materials with ${queryContext.orderStatus} order status are: ${ordersMessage}.`;
+        
 
         case url.includes('/api/orders') && url.includes('?status='):
           response = await axios.get(url);
@@ -373,13 +359,13 @@ const Chatbot = ({ userDetails }) => {
       disabled={loading || !userMessage}
       sx={{
         '&:hover': {
-          backgroundColor: '#2e7d32', // Slightly darker green on hover
+          backgroundColor: '#2e7d32', 
         },
-        color: '#388e3c', // Icon color
+        color: '#388e3c', 
         maxWidth: "75px"
       }}
     >
-      {loading ? <CircularProgress size={24} /> : <SendIcon />} {/* Use icon here */}
+      {loading ? <CircularProgress size={24} /> : <SendIcon />} 
     </IconButton>
   </Box>
 </Box>
